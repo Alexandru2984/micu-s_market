@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}Adaugă anunț nou - Micu's Market{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Adaugă anunț nou</h1>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="space-y-6">
+                    <!-- Titlu -->
+                    <div>
+                        <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.title.label }} *
+                        </label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            {% for error in form.title.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Descriere -->
+                    <div>
+                        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.description.label }} *
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            {% for error in form.description.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Categorie -->
+                    <div>
+                        <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.category.label }} *
+                        </label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                            {% for error in form.category.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Preț -->
+                    <div>
+                        <label for="{{ form.price.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.price.label }} *
+                        </label>
+                        {{ form.price }}
+                        {% if form.price.errors %}
+                            {% for error in form.price.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Oraș -->
+                    <div>
+                        <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.city.label }} *
+                        </label>
+                        {{ form.city }}
+                        {% if form.city.errors %}
+                            {% for error in form.city.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Județ -->
+                    <div>
+                        <label for="{{ form.county.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.county.label }}
+                        </label>
+                        {{ form.county }}
+                        {% if form.county.errors %}
+                            {% for error in form.county.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Adresă -->
+                    <div>
+                        <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.location.label }}
+                        </label>
+                        {{ form.location }}
+                        {% if form.location.errors %}
+                            {% for error in form.location.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Telefon -->
+                    <div>
+                        <label for="{{ form.contact_phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.contact_phone.label }}
+                        </label>
+                        {{ form.contact_phone }}
+                        {% if form.contact_phone.errors %}
+                            {% for error in form.contact_phone.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Stare -->
+                    <div>
+                        <label for="{{ form.condition.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.condition.label }}
+                        </label>
+                        {{ form.condition }}
+                        {% if form.condition.errors %}
+                            {% for error in form.condition.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Negociabil -->
+                    <div>
+                        <div class="flex items-center">
+                            {{ form.negotiable }}
+                            <label for="{{ form.negotiable.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                                {{ form.negotiable.label }}
+                            </label>
+                        </div>
+                        {% if form.negotiable.errors %}
+                            {% for error in form.negotiable.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Imagini -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Imagini (opțional)
+                        </label>
+                        <input type="file" name="images" multiple accept="image/*" class="form-control">
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="pt-6">
+                        <button type="submit" class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                            Publică anunțul
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+select.form-control {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+</style>
+{% endblock %}

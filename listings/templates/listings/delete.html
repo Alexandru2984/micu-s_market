@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Șterge anunț - Micu's Market{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center gap-3">
+                <a href="{% url 'listings:detail' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="text-3xl font-bold text-red-600 mb-2">Șterge anunț</h1>
+                    <p class="text-gray-600">Această acțiune nu poate fi anulată</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning Card -->
+        <div class="bg-red-50 border border-red-200 rounded-xl p-6 mb-8">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-semibold text-red-800 mb-2">Atenție!</h3>
+                    <p class="text-red-700">
+                        Ești pe cale să ștergi definitiv acest anunț. Toate informațiile asociate, inclusiv imaginile, 
+                        vor fi șterse permanent și nu vor putea fi recuperate.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Listing Preview -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+            <div class="flex items-start space-x-4">
+                <!-- Image -->
+                <div class="flex-shrink-0">
+                    {% if listing.main_image %}
+                        <img src="{{ listing.main_image.image.url }}" alt="{{ listing.title }}" class="w-24 h-24 object-cover rounded-lg border">
+                    {% else %}
+                        <div class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-image text-gray-400 text-xl"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Content -->
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">{{ listing.title }}</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                        <div class="flex items-center">
+                            <i class="fas fa-tag mr-2 text-gray-400"></i>
+                            <span>{{ listing.category.name }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-euro-sign mr-2 text-gray-400"></i>
+                            <span>{{ listing.price|floatformat:0 }} RON</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                            <span>{{ listing.location }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar mr-2 text-gray-400"></i>
+                            <span>{{ listing.created_at|date:"d M Y" }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-eye mr-2 text-gray-400"></i>
+                            <span>{{ listing.views_count }} vizualizări</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-images mr-2 text-gray-400"></i>
+                            <span>{{ listing.images.count }} imagini</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                        <p class="text-sm text-gray-700 line-clamp-3">
+                            {{ listing.description|truncatewords:30 }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmation Form -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="border-l-4 border-yellow-400 bg-yellow-50 p-4 rounded-r-lg">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-yellow-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-yellow-800">
+                                Ce se va întâmpla:
+                            </h3>
+                            <ul class="mt-2 text-sm text-yellow-700 list-disc list-inside space-y-1">
+                                <li>Anunțul va fi șters definitiv din baza de date</li>
+                                <li>Toate imaginile asociate vor fi șterse de pe server</li>
+                                <li>Linkurile către acest anunț nu vor mai funcționa</li>
+                                <li>Datele nu vor putea fi recuperate</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Confirmation Checkbox -->
+                <div class="flex items-start space-x-3">
+                    <input type="checkbox" id="confirm-delete" name="confirm" required 
+                           class="mt-1 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                    <label for="confirm-delete" class="text-sm text-gray-700">
+                        <span class="font-medium">Confirm că vreau să șterg acest anunț definitiv.</span>
+                        <br>
+                        <span class="text-gray-500">Înțeleg că această acțiune nu poate fi anulată.</span>
+                    </label>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                    <div class="flex items-center space-x-3">
+                        <a href="{% url 'listings:detail' slug=listing.slug %}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Înapoi la anunț
+                        </a>
+                        <a href="{% url 'listings:my_listings' %}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                            Anulează
+                        </a>
+                    </div>
+                    
+                    <button type="submit" id="delete-button" disabled
+                            class="px-8 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        <i class="fas fa-trash-alt mr-2"></i>
+                        Șterge definitiv
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('confirm-delete');
+    const button = document.getElementById('delete-button');
+    
+    checkbox.addEventListener('change', function() {
+        button.disabled = !this.checked;
+        if (this.checked) {
+            button.classList.remove('disabled:bg-gray-400', 'disabled:cursor-not-allowed');
+            button.classList.add('bg-red-600', 'hover:bg-red-700');
+        } else {
+            button.classList.add('disabled:bg-gray-400', 'disabled:cursor-not-allowed');
+            button.classList.remove('bg-red-600', 'hover:bg-red-700');
+        }
+    });
+});
+</script>
+{% endblock %}

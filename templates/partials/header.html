@@ -1,0 +1,52 @@
+<header class="main-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">
+                <a href="{% url 'listings:home' %}">
+                    <h1>🏪 Micu's Market</h1>
+                </a>
+            </div>
+            
+            <nav class="main-nav">
+                <a href="{% url 'listings:home' %}">Acasă</a>
+                <a href="{% url 'listings:list' %}">Anunțuri</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'listings:create' %}">Adaugă Anunț</a>
+                    <a href="{% url 'listings:my_listings' %}">Anunțurile Mele</a>
+                    <div class="user-dropdown">
+                        <a href="#" class="user-menu-toggle">
+                            <i class="fas fa-user-circle"></i> {{ user.get_full_name|default:user.username }}
+                            <i class="fas fa-chevron-down"></i>
+                        </a>
+                        <div class="user-dropdown-menu">
+                            <a href="{% url 'accounts:profile' %}">
+                                <i class="fas fa-user"></i> Profilul Meu
+                            </a>
+                            <a href="{% url 'listings:my_listings' %}">
+                                <i class="fas fa-list"></i> Anunțurile Mele
+                            </a>
+                            <a href="{% url 'listings:create' %}">
+                                <i class="fas fa-plus"></i> Adaugă Anunț
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="{% url 'accounts:logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Ieșire
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="auth-btn login-btn">
+                        <i class="fas fa-sign-in-alt"></i> Autentificare
+                    </a>
+                    <a href="{% url 'accounts:register' %}" class="auth-btn register-btn">
+                        <i class="fas fa-user-plus"></i> Înregistrare
+                    </a>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+</header>
+
+<style>
+
+</style>

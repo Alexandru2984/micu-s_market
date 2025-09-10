@@ -1,0 +1,488 @@
+
+.breadcrumb {
+    background: #f8fafc;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.breadcrumb ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.breadcrumb li {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb li:not(:last-child)::after {
+    content: '›';
+    margin: 0 0.5rem;
+    color: #a0aec0;
+}
+
+.breadcrumb a {
+    color: #667eea;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumb a:hover {
+    color: #5a67d8;
+}
+
+.breadcrumb .current {
+    color: #4a5568;
+    font-weight: 500;
+}
+
+/* Listing Detail */
+.listing-detail {
+    padding: 2rem 0;
+}
+
+.listing-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+}
+
+/* Image Gallery */
+.image-gallery {
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+}
+
+.main-image {
+    position: relative;
+    background: #f7fafc;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    aspect-ratio: 4/3;
+}
+
+.main-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.featured-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: linear-gradient(45deg, #fbbf24, #f59e0b);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(251, 191, 36, 0.3);
+}
+
+.image-thumbnails {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 0.5rem;
+}
+
+.thumbnail {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.thumbnail:hover,
+.thumbnail.active {
+    border-color: #667eea;
+    transform: scale(1.05);
+}
+
+.no-images {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    color: #a0aec0;
+    background: #f7fafc;
+    border-radius: 12px;
+}
+
+.no-images i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+/* Listing Info */
+.listing-header h1 {
+    font-size: 2rem;
+    color: #2d3748;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.listing-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.price {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #667eea;
+}
+
+.negotiable {
+    background: #48bb78;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.listing-details {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-item i {
+    color: #667eea;
+    width: 20px;
+    text-align: center;
+}
+
+.detail-item span {
+    color: #718096;
+    min-width: 100px;
+}
+
+.detail-item strong {
+    color: #2d3748;
+    font-weight: 600;
+}
+
+/* Actions */
+.listing-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #f7fafc;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-secondary:hover {
+    background: #edf2f7;
+    border-color: #cbd5e0;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #667eea;
+    border: 1px solid #667eea;
+}
+
+.btn-outline:hover {
+    background: #667eea;
+    color: white;
+}
+
+/* Description Section */
+.description-section,
+.seller-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+}
+
+.description-section h2,
+.seller-section h2 {
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.description-section h2 i,
+.seller-section h2 i {
+    color: #667eea;
+}
+
+.description-content {
+    color: #4a5568;
+    line-height: 1.6;
+    font-size: 1.1rem;
+}
+
+/* Seller Info */
+.seller-info {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.seller-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.seller-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.default-avatar {
+    width: 100%;
+    height: 100%;
+    background: #edf2f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a0aec0;
+    font-size: 2rem;
+}
+
+.seller-details h3 {
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.member-since {
+    color: #718096;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.seller-stats {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: #4a5568;
+}
+
+.seller-stats i {
+    color: #667eea;
+    margin-right: 0.25rem;
+}
+
+.seller-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Similar Listings */
+.similar-listings {
+    background: #f8fafc;
+    padding: 3rem 0;
+}
+
+.similar-listings h2 {
+    text-align: center;
+    color: #2d3748;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.similar-listings h2 i {
+    color: #667eea;
+}
+
+.listings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.listing-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: all 0.3s;
+    border: 1px solid #e2e8f0;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.listing-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    text-decoration: none;
+    color: inherit;
+}
+
+.listing-image {
+    height: 180px;
+    background: #f7fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.listing-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.no-image {
+    color: #a0aec0;
+    font-size: 2rem;
+}
+
+.listing-content {
+    padding: 1.5rem;
+}
+
+.listing-content h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.listing-content h3 a {
+    color: #2d3748;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.listing-content h3 a:hover {
+    color: #667eea;
+}
+
+.listing-content .price {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #667eea;
+    margin: 0.5rem 0;
+}
+
+.listing-content .location {
+    color: #718096;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.listing-content .location i {
+    margin-right: 0.25rem;
+    color: #a0aec0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .listing-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .seller-info {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .seller-actions {
+        flex-direction: row;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .breadcrumb ol {
+        font-size: 0.9rem;
+    }
+    
+    .listing-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .price {
+        font-size: 2rem;
+    }
+    
+    .listing-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .listings-grid {
+        grid-template-columns: 1fr;
+    }
+}

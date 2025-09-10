@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Anunțurile mele - Micu's Market{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Anunțurile mele</h1>
+                    <p class="text-gray-600">Gestionează-ți anunțurile publicate</p>
+                </div>
+                <a href="{% url 'listings:create' %}" class="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    <i class="fas fa-plus"></i>
+                    Adaugă anunț nou
+                </a>
+            </div>
+        </div>
+
+        {% if page_obj %}
+            <!-- Statistics -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-list text-blue-600"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Total anunțuri</p>
+                            <p class="text-2xl font-bold text-gray-900">{{ page_obj.paginator.count }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-check-circle text-green-600"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Active</p>
+                            <p class="text-2xl font-bold text-gray-900">
+                                {% for listing in page_obj %}{% if listing.status == 'active' %}{% if forloop.first %}1{% else %}{{ forloop.counter }}{% endif %}{% endif %}{% endfor %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-pause-circle text-yellow-600"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">În așteptare</p>
+                            <p class="text-2xl font-bold text-gray-900">
+                                {% for listing in page_obj %}{% if listing.status == 'pending' %}{% if forloop.first %}1{% else %}{{ forloop.counter }}{% endif %}{% endif %}{% endfor %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-eye text-gray-600"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Total vizualizări</p>
+                            <p class="text-2xl font-bold text-gray-900">
+                                {% for listing in page_obj %}{{ listing.views_count|add:0 }}{% if not forloop.last %}+{% endif %}{% endfor %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Listings Grid -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="space-y-4 p-6">
+                    {% for listing in page_obj %}
+                        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+                            <div class="flex items-center space-x-4">
+                                <!-- Image -->
+                                <div class="flex-shrink-0">
+                                    {% if listing.main_image %}
+                                        <img src="{{ listing.main_image.image.url }}" alt="{{ listing.title }}" class="w-16 h-16 object-cover rounded-lg border">
+                                    {% else %}
+                                        <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-image text-gray-400"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Content -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <h3 class="text-lg font-semibold text-gray-900 truncate">{{ listing.title }}</h3>
+                                        
+                                        <!-- Status Badge -->
+                                        {% if listing.status == 'active' %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <i class="fas fa-check-circle mr-1"></i>
+                                                Activ
+                                            </span>
+                                        {% elif listing.status == 'pending' %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                <i class="fas fa-clock mr-1"></i>
+                                                În așteptare
+                                            </span>
+                                        {% elif listing.status == 'expired' %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                <i class="fas fa-times-circle mr-1"></i>
+                                                Expirat
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="flex items-center text-sm text-gray-500 space-x-4">
+                                        <span class="flex items-center">
+                                            <i class="fas fa-tag mr-1"></i>
+                                            {{ listing.category.name }}
+                                        </span>
+                                        <span class="flex items-center">
+                                            <i class="fas fa-euro-sign mr-1"></i>
+                                            {{ listing.price|floatformat:0 }} RON
+                                        </span>
+                                        <span class="flex items-center">
+                                            <i class="fas fa-map-marker-alt mr-1"></i>
+                                            {{ listing.city }}{% if listing.location %}, {{ listing.location }}{% endif %}
+                                        </span>
+                                        <span class="flex items-center">
+                                            <i class="fas fa-eye mr-1"></i>
+                                            {{ listing.views_count }} vizualizări
+                                        </span>
+                                        <span class="flex items-center">
+                                            <i class="fas fa-calendar mr-1"></i>
+                                            {{ listing.created_at|date:"d M Y" }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Actions -->
+                            <div class="flex items-center space-x-2">
+                                <a href="{% url 'listings:detail' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Vezi anunțul">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'listings:update' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Editează">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'listings:upload_images' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="Gestionează imagini">
+                                    <i class="fas fa-images"></i>
+                                </a>
+                                <a href="{% url 'listings:delete' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Șterge">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                    <div class="border-t border-gray-200 px-6 py-4 bg-gray-50">
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm text-gray-700">
+                                Afișez <span class="font-medium">{{ page_obj.start_index }}</span> - <span class="font-medium">{{ page_obj.end_index }}</span> 
+                                din <span class="font-medium">{{ page_obj.paginator.count }}</span> anunțuri
+                            </div>
+                            
+                            <div class="flex items-center space-x-2">
+                                {% if page_obj.has_previous %}
+                                    <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                {% endif %}
+                                
+                                <span class="px-3 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg">
+                                    Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}
+                                </span>
+                                
+                                {% if page_obj.has_next %}
+                                    <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-16">
+                <div class="max-w-md mx-auto">
+                    <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-box-open text-4xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Nu ai încă anunțuri</h3>
+                    <p class="text-gray-600 mb-8">Începe să vinzi produsele tale adăugând primul anunț.</p>
+                    <a href="{% url 'listings:create' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        <i class="fas fa-plus"></i>
+                        Adaugă primul anunț
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Acasă - Micu's Market{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1>🏪 Bine ai venit la Micu's Market!</h1>
+            <p>Magazinul tău online pentru tot ce ai nevoie</p>
+            <div class="search-box">
+                <form method="get" action="{% url 'listings:list' %}">
+                    <input type="text" name="search" placeholder="Caută anunțuri..." value="{{ request.GET.search|default:'' }}">
+                    <button type="submit">
+                        <i class="fas fa-search"></i> Caută
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categorii Principale -->
+<section class="categories-section">
+    <div class="container">
+        <h2><i class="fas fa-th-large"></i> Categorii Principale</h2>
+        <div class="categories-grid">
+            {% for category in categories %}
+            <div class="category-card">
+                <a href="{% url 'listings:list' %}?category={{ category.slug }}">
+                    <div class="category-icon">
+                        {% if category.icon %}
+                            <i class="{{ category.icon }}"></i>
+                        {% else %}
+                            <i class="fas fa-folder"></i>
+                        {% endif %}
+                    </div>
+                    <h3>{{ category.name }}</h3>
+                    <p>{{ category.active_listings_count }} anunțuri</p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Anunțuri Recomandate -->
+{% if featured_listings %}
+<section class="featured-section">
+    <div class="container">
+        <h2><i class="fas fa-star"></i> Anunțuri Recomandate</h2>
+        <div class="listings-grid">
+            {% for listing in featured_listings %}
+            <a href="{% url 'listings:detail' listing.slug %}" class="listing-card featured">
+                <div class="listing-image">
+                    {% if listing.images.first %}
+                        <img src="{{ listing.images.first.image.url }}" alt="{{ listing.title }}">
+                    {% else %}
+                        <div class="no-image">
+                            <i class="fas fa-image"></i>
+                        </div>
+                    {% endif %}
+                    <div class="featured-badge">
+                        <i class="fas fa-star"></i> Recomandat
+                    </div>
+                </div>
+                <div class="listing-content">
+                    <h3>{{ listing.title }}</h3>
+                    <p class="price">{{ listing.price }} RON</p>
+                    <p class="location">
+                        <i class="fas fa-map-marker-alt"></i> 
+                        {{ listing.city }}, {{ listing.county }}
+                    </p>
+                    <div class="listing-meta">
+                        <span class="category">{{ listing.category.name }}</span>
+                        <span class="date">{{ listing.created_at|date:"d.m.Y" }}</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Anunțuri Recente -->
+<section class="recent-section">
+    <div class="container">
+        <h2><i class="fas fa-clock"></i> Anunțuri Recente</h2>
+        <div class="listings-grid">
+            {% for listing in recent_listings %}
+            <a href="{% url 'listings:detail' listing.slug %}" class="listing-card">
+                <div class="listing-image">
+                    {% if listing.images.first %}
+                        <img src="{{ listing.images.first.image.url }}" alt="{{ listing.title }}">
+                    {% else %}
+                        <div class="no-image">
+                            <i class="fas fa-image"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="listing-content">
+                    <h3>{{ listing.title }}</h3>
+                    <p class="price">{{ listing.price }} RON</p>
+                    <p class="location">
+                        <i class="fas fa-map-marker-alt"></i> 
+                        {{ listing.city }}, {{ listing.county }}
+                    </p>
+                    <div class="listing-meta">
+                        <span class="category">{{ listing.category.name }}</span>
+                        <span class="date">{{ listing.created_at|date:"d.m.Y" }}</span>
+                    </div>
+                </div>
+            </a>
+            {% empty %}
+            <div class="no-listings">
+                <i class="fas fa-inbox"></i>
+                <p>Nu există anunțuri disponibile momentan.</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if recent_listings %}
+        <div class="view-all">
+            <a href="{% url 'listings:list' %}" class="btn btn-primary">
+                <i class="fas fa-th"></i> Vezi toate anunțurile
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+
+</style>
+{% endblock %}

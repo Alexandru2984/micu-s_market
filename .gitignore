@@ -1,0 +1,42 @@
+# Mediul virtual
+venv/
+ENV/
+env/
+
+# Fișiere de configurare mediul local
+*.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+db.sqlite3
+
+# Migrations (le generezi pe server sau alt mediu)
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# Fișiere media (imagini, upload-uri)
+media/
+uploads/
+
+# Static files (dacă le generezi cu collectstatic)
+staticfiles/
+
+# IDE/editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Sistem
+.DS_Store
+Thumbs.db

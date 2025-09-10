@@ -1,0 +1,388 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Micu's Market{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ title }}</h1>
+                    <p class="text-gray-600">Completează formularul pentru a publica anunțul tău</p>
+                </div>
+                <a href="{% url 'listings:my_listings' %}" class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                    <i class="fas fa-arrow-left"></i>
+                    Înapoi la anunțurile mele
+                </a>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <form method="post" enctype="multipart/form-data" class="space-y-6 p-6">
+                {% csrf_token %}
+                
+                <!-- Basic Info Section -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Informații generale</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Titlu -->
+                        <div class="md:col-span-2">
+                            <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.title.label }}
+                                <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.title.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Categorie -->
+                        <div>
+                            <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.category.label }}
+                                <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.category.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Preț -->
+                        <div>
+                            <label for="{{ form.price.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.price.label }}
+                                <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.price }}
+                            {% if form.price.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.price.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Locație -->
+                        <div>
+                            <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.city.label }}
+                                <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.city }}
+                            {% if form.city.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.city.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Județ -->
+                        <div>
+                            <label for="{{ form.county.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.county.label }}
+                            </label>
+                            {{ form.county }}
+                            {% if form.county.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.county.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Adresă completă -->
+                        <div class="md:col-span-2">
+                            <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.location.label }}
+                                <span class="text-gray-400">(opțional)</span>
+                            </label>
+                            {{ form.location }}
+                            {% if form.location.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.location.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Stare produs -->
+                        <div>
+                            <label for="{{ form.condition.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.condition.label }}
+                            </label>
+                            {{ form.condition }}
+                            {% if form.condition.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.condition.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Telefon -->
+                        <div>
+                            <label for="{{ form.contact_phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.contact_phone.label }}
+                                <span class="text-gray-400">(opțional)</span>
+                            </label>
+                            {{ form.contact_phone }}
+                            {% if form.contact_phone.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.contact_phone.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Negociabil -->
+                        <div class="md:col-span-2">
+                            <div class="flex items-center">
+                                {{ form.negotiable }}
+                                <label for="{{ form.negotiable.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                                    {{ form.negotiable.label }}
+                                </label>
+                            </div>
+                            {% if form.negotiable.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.negotiable.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description Section -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Descriere</h2>
+                    
+                    <div>
+                        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.description.label }}
+                            <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {% for error in form.description.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <p class="mt-2 text-sm text-gray-500">
+                            Descrie produsul sau serviciul în detaliu.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Images Section -->
+                <div class="pb-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Imagini</h2>
+                    <p class="text-sm text-gray-600 mb-4">Adaugă până la 10 imagini pentru anunțul tău (maxim 5MB per imagine)</p>
+                    
+                    <div class="space-y-4">
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Selectează imagini
+                            </label>
+                            <input type="file" name="images" multiple accept="image/*" class="form-control" id="image-input">
+                            <p class="text-xs text-gray-500 mt-1">
+                                Poți selecta multiple imagini odată
+                            </p>
+                        </div>
+                        
+                        <div id="image-preview" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4"></div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                    <a href="{% url 'listings:my_listings' %}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        Anulează
+                    </a>
+                    
+                    <button type="submit" class="px-8 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        <i class="fas fa-save mr-2"></i>
+                        Publică anunțul
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-control[type="file"] {
+    padding: 0.5rem;
+}
+
+select.form-control {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+.image-preview {
+    max-width: 150px;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    border: 2px solid #e5e7eb;
+}
+
+.compression-info {
+    font-size: 0.75rem;
+    color: #10b981;
+    margin-top: 0.25rem;
+}
+</style>
+
+<script>
+// Funcție pentru compresie automată imagini
+function compressImage(file, maxWidth = 800, maxHeight = 800, quality = 0.8) {
+    return new Promise((resolve) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        img.onload = function() {
+            // Calculează dimensiunile noi păstrând raportul de aspect
+            let { width, height } = img;
+            
+            if (width > height) {
+                if (width > maxWidth) {
+                    height = (height * maxWidth) / width;
+                    width = maxWidth;
+                }
+            } else {
+                if (height > maxHeight) {
+                    width = (width * maxHeight) / height;
+                    height = maxHeight;
+                }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Desenează imaginea compresată
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Convertește înapoi în Blob
+            canvas.toBlob(resolve, 'image/jpeg', quality);
+        };
+        
+        img.src = URL.createObjectURL(file);
+    });
+}
+
+// Adaugă funcționalitate de compresie la input-ul de imagini
+document.addEventListener('DOMContentLoaded', function() {
+    const imageInput = document.getElementById('image-input');
+    const previewContainer = document.getElementById('image-preview');
+    
+    if (imageInput) {
+        imageInput.addEventListener('change', async function(e) {
+            const files = Array.from(e.target.files);
+            previewContainer.innerHTML = '';
+            
+            for (let file of files) {
+                if (!file.type.startsWith('image/')) continue;
+                
+                const originalSize = file.size;
+                const maxSize = 2 * 1024 * 1024; // 2MB
+                
+                // Compresează dacă e prea mare
+                if (originalSize > maxSize) {
+                    try {
+                        const compressedFile = await compressImage(file);
+                        // Înlocuiește fișierul în lista
+                        const index = files.indexOf(file);
+                        const newFile = new File([compressedFile], file.name, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now()
+                        });
+                        files[index] = newFile;
+                        
+                        // Afișează preview cu info compresie
+                        showImagePreview(newFile, compressedFile.size, originalSize);
+                    } catch (error) {
+                        console.error('Eroare la compresie:', error);
+                        showImagePreview(file);
+                    }
+                } else {
+                    showImagePreview(file);
+                }
+            }
+            
+            // Actualizează input-ul cu fișierele comprimate
+            const dataTransfer = new DataTransfer();
+            files.forEach(file => dataTransfer.items.add(file));
+            e.target.files = dataTransfer.files;
+        });
+    }
+});
+
+function showImagePreview(file, compressedSize = null, originalSize = null) {
+    const previewContainer = document.getElementById('image-preview');
+    const previewDiv = document.createElement('div');
+    previewDiv.className = 'relative';
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        previewDiv.innerHTML = `
+            <img src="${e.target.result}" alt="Preview" class="image-preview w-full h-32 object-cover rounded-lg border">
+            <p class="text-xs text-gray-500 mt-1 text-center">${file.name}</p>
+            ${compressedSize ? `
+                <div class="compression-info text-center">
+                    <i class="fas fa-check-circle"></i>
+                    Compresată: ${(originalSize / (1024 * 1024)).toFixed(2)}MB → ${(compressedSize / (1024 * 1024)).toFixed(2)}MB
+                </div>
+            ` : ''}
+        `;
+    };
+    reader.readAsDataURL(file);
+    
+    previewContainer.appendChild(previewDiv);
+}
+</script>
+{% endblock %}

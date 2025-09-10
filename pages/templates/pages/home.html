@@ -1,0 +1,26 @@
+{% comment %} {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Acasa{% endblock %}
+
+{% block content %}
+  <h2>Ultimele anunturi</h2>
+  <div class="grid">
+    {% for item in listings %}
+      <article class="card">
+        <a href="#">
+          {% if item.image %}
+            <img src="{{ item.image.url }}" alt="{{ item.title }}">
+          {% else %}
+            <img src="{% static 'img/no-image.png' %}" alt="No image">
+          {% endif %}
+          <h3>{{ item.title }}</h3>
+        </a>
+        <p>{{ item.price }} RON</p>
+        {% if item.description %}<p class="muted">{{ item.description|truncatechars:80 }}</p>{% endif %}
+      </article>
+    {% empty %}
+      <p>Nu exista anunturi inca.</p>
+    {% endfor %}
+  </div>
+{% endblock %} {% endcomment %}
