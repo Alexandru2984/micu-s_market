@@ -1,0 +1,65 @@
+{% extends 'base_auth.html' %}
+{% load static %}
+
+{% block title %}Bine ai venit! - Micu's Market{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1><i class="fas fa-check-circle" style="color: #48bb78;"></i> Bine ai venit!</h1>
+        </div>
+        
+        <div class="auth-form">
+            <div style="text-align: center; padding: 2rem;">
+                <h2 style="color: #2d3748; margin-bottom: 1rem;">Contul tău a fost confirmat cu succes! 🎉</h2>
+                
+                <p style="font-size: 1.1rem; margin-bottom: 2rem; color: #4a5568;">
+                    Bine ai venit în comunitatea <strong>Micu's Market</strong>! 
+                    Acum poți începe să vinzi și să cumperi produse.
+                </p>
+                
+                <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h3 style="color: #2d3748; margin-bottom: 1rem;">Ce poți face acum:</h3>
+                    <ul style="text-align: left; color: #4a5568; list-style: none; padding: 0;">
+                        <li style="margin-bottom: 0.5rem;"><i class="fas fa-plus-circle" style="color: #667eea; margin-right: 0.5rem;"></i> Publică primul tău anunț</li>
+                        <li style="margin-bottom: 0.5rem;"><i class="fas fa-search" style="color: #667eea; margin-right: 0.5rem;"></i> Caută produse interesante</li>
+                        <li style="margin-bottom: 0.5rem;"><i class="fas fa-user-edit" style="color: #667eea; margin-right: 0.5rem;"></i> Completează-ți profilul</li>
+                        <li style="margin-bottom: 0.5rem;"><i class="fas fa-heart" style="color: #667eea; margin-right: 0.5rem;"></i> Salvează anunțuri favorite</li>
+                        <li><i class="fas fa-comments" style="color: #667eea; margin-right: 0.5rem;"></i> Comunică cu alți utilizatori</li>
+                    </ul>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="{% url 'listings:create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Adaugă primul anunț
+                    </a>
+                    <a href="{% url 'listings:list' %}" class="btn btn-secondary">
+                        <i class="fas fa-search"></i> Explorează anunțuri
+                    </a>
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">
+                        <i class="fas fa-user"></i> Completează profilul
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.btn-secondary {
+    background: #e2e8f0;
+    color: #4a5568;
+    border: 1px solid #cbd5e0;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e0;
+    transform: translateY(-1px);
+}
+</style>
+{% endblock %}

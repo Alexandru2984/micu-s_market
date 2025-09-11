@@ -11,25 +11,41 @@ def home_view(request):
     """Homepage cu anunțuri recente și categorii"""
     recent_listings = Listing.objects.filter(status='active').select_related('category', 'owner').prefetch_related('images').order_by('-created_at')[:8]
     featured_listings = Listing.objects.filter(status='active', is_featured=True).select_related('category', 'owner').prefetch_related('images').order_by('-created_at')[:4]
-    popular_categories = Category.objects.filter(is_active=True).annotate(
-        listing_count=Count('listings')
-    ).order_by('-listing_count')[:6]
     
-    # Debug complet
-    print("=== HOME VIEW DEBUG ===")
-    print(f"Recent listings count: {recent_listings.count()}")
-    for listing in recent_listings:
-        print(f"- {listing.title}: {listing.images.count()} images")
-        if listing.images.first():
-            print(f"  First image: {listing.images.first().image.url}")
+    # Adaugă starea de favorite pentru utilizatorul autentificat
+    if request.user.is_authenticated:
+        from favorites.models import Favorite
+        user_favorites = set(Favorite.objects.filter(user=request.user).values_list('listing_id', flat=True))
+        
+        for listing in recent_listings:
+            listing.is_favorited = listing.id in user_favorites
+        for listing in featured_listings:
+            listing.is_favorited = listing.id in user_favorites
     
-    print(f"Featured listings count: {featured_listings.count()}")
-    print(f"Categories count: {popular_categories.count()}")
+    # Calculez manual numărul de anunțuri pentru fiecare categorie incluzând subcategoriile
+    categories = Category.objects.filter(is_active=True)
+    categories_with_counts = []
+    
+    for category in categories:
+        # Include categoria principală și toate subcategoriile
+        category_ids = [category.id] + [sub.id for sub in category.get_all_children]
+        active_count = Listing.objects.filter(
+            category_id__in=category_ids, 
+            status='active'
+        ).count()
+        
+        # Adaug proprietatea temporară pentru count
+        category.active_listings_count = active_count
+        categories_with_counts.append(category)
+    
+    # Sortez după numărul de anunțuri și iau primele 12 categorii (în loc de 6)
+    categories_with_counts.sort(key=lambda x: x.active_listings_count, reverse=True)
+    top_categories = categories_with_counts[:12]
     
     context = {
         'recent_listings': recent_listings,
         'featured_listings': featured_listings,
-        'popular_categories': popular_categories,
+        'categories': top_categories,
     }
     return render(request, 'listings/home.html', context)
 
@@ -37,10 +53,31 @@ def listing_list_view(request):
     """Lista anunțurilor cu filtrare și sortare"""
     listings = Listing.objects.filter(status='active').select_related('category', 'owner').prefetch_related('images')
     
+    # Filtrare după vânzător
+    seller = request.GET.get('seller')
+    if seller:
+        listings = listings.filter(owner__username=seller)
+    
     # Filtrare după categorie
-    category_id = request.GET.get('category')
-    if category_id:
-        listings = listings.filter(category_id=category_id)
+    category_param = request.GET.get('category')
+    selected_category = None
+    if category_param:
+        try:
+            # Încearcă să găsească categoria după slug
+            selected_category = Category.objects.get(slug=category_param, is_active=True)
+            # Include categoria principală și toate subcategoriile
+            category_ids = [selected_category.id] + [sub.id for sub in selected_category.get_all_children]
+            listings = listings.filter(category_id__in=category_ids)
+        except Category.DoesNotExist:
+            # Dacă nu găsește după slug, încearcă după ID
+            try:
+                selected_category = Category.objects.get(id=category_param, is_active=True)
+                # Include categoria principală și toate subcategoriile
+                category_ids = [selected_category.id] + [sub.id for sub in selected_category.get_all_children]
+                listings = listings.filter(category_id__in=category_ids)
+            except (Category.DoesNotExist, ValueError):
+                # Dacă nu găsește nici după ID, ignoră filtrul
+                pass
     
     # Filtrare după preț
     min_price = request.GET.get('min_price')
@@ -76,14 +113,24 @@ def listing_list_view(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
+    # Adaugă starea de favorite pentru utilizatorul autentificat
+    if request.user.is_authenticated:
+        from favorites.models import Favorite
+        user_favorites = set(Favorite.objects.filter(user=request.user).values_list('listing_id', flat=True))
+        
+        for listing in page_obj:
+            listing.is_favorited = listing.id in user_favorites
+    
     # Context pentru template
     categories = Category.objects.filter(is_active=True).order_by('name')
     
     context = {
         'page_obj': page_obj,
         'categories': categories,
-        'current_category': category_id,
+        'current_category': selected_category,
+        'current_category_slug': category_param,
         'current_city': city,
+        'current_seller': seller,
         'min_price': min_price,
         'max_price': max_price,
         'search_query': search,
@@ -99,6 +146,12 @@ def listing_detail_view(request, slug):
     listing.views_count += 1
     listing.save(update_fields=['views_count'])
     
+    # Verifică dacă anunțul este în favorite pentru utilizatorul autentificat
+    is_favorited = False
+    if request.user.is_authenticated:
+        from favorites.models import Favorite
+        is_favorited = Favorite.objects.filter(user=request.user, listing=listing).exists()
+    
     # Anunțuri similare
     similar_listings = Listing.objects.filter(
         category=listing.category,
@@ -108,8 +161,22 @@ def listing_detail_view(request, slug):
     context = {
         'listing': listing,
         'similar_listings': similar_listings,
+        'is_favorited': is_favorited,
     }
     return render(request, 'listings/detail.html', context)
+
+def process_images(request, listing):
+    images = request.FILES.getlist('images')
+    for image in images:
+        if image:
+            try:
+                ListingImage.objects.create(
+                    listing=listing,
+                    image=image,
+                    alt_text=f"Imagine pentru {listing.title}"
+                )
+            except Exception as e:
+                messages.warning(request, f'Nu am putut încărca o imagine: {e}')
 
 @login_required
 def listing_create_view(request):
@@ -122,18 +189,8 @@ def listing_create_view(request):
             listing.owner = request.user
             listing.save()
             
-            # Procesează imaginile
-            images = request.FILES.getlist('images')
-            for image in images:
-                if image:
-                    try:
-                        ListingImage.objects.create(
-                            listing=listing,
-                            image=image,
-                            alt_text=f"Imagine pentru {listing.title}"
-                        )
-                    except Exception as e:
-                        messages.warning(request, f'Nu am putut încărca o imagine: {e}')
+            # Folosește funcția auxiliară
+            process_images(request, listing)
             
             messages.success(request, 'Anunțul a fost creat cu succes!')
             return redirect('listings:detail', slug=listing.slug)
@@ -156,18 +213,8 @@ def listing_update_view(request, slug):
         formset = ListingImageFormSet(request.POST, request.FILES, queryset=listing.images.all())
         
         if form.is_valid() and formset.is_valid():
-            listing = form.save()
-            
-            # Procesează imaginile
-            for image_form in formset:
-                if image_form.cleaned_data:
-                    if image_form.cleaned_data.get('DELETE', False):
-                        if image_form.instance.pk:
-                            image_form.instance.delete()
-                    elif image_form.cleaned_data.get('image'):
-                        image = image_form.save(commit=False)
-                        image.listing = listing
-                        image.save()
+            form.save()
+            formset.save() # Aceasta se va ocupa de salvarea/ștergerea imaginilor
             
             messages.success(request, 'Anunțul a fost actualizat!')
             return redirect('listings:detail', slug=listing.slug)

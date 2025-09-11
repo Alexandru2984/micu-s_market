@@ -1,11 +1,119 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>chat/inbox</title>
-</head>
-<body>
-    <h1>chat/inbox</h1>
-</body>
-</html>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mesaje - Micu's Market{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="container">
+        <div class="chat-header">
+            <h1><i class="fas fa-envelope"></i> Mesajele mele</h1>
+            {% if total_unread > 0 %}
+                <span class="unread-badge">{{ total_unread }} necitit{{ total_unread|pluralize:"e" }}</span>
+            {% endif %}
+        </div>
+
+        {% if page_obj %}
+            <div class="conversations-list">
+                {% for conversation in page_obj %}
+                    <div class="conversation-card {% if conversation.unread_count > 0 %}unread{% endif %}">
+                        <a href="{% url 'chat:conversation' conversation.pk %}" class="conversation-link">
+                            <div class="conversation-info">
+                                <!-- Avatar celuilalt participant -->
+                                <div class="participant-avatar">
+                                    {% if conversation.other_participant.profile.avatar %}
+                                        <img src="{{ conversation.other_participant.profile.avatar.url }}" alt="{{ conversation.other_participant.username }}">
+                                    {% else %}
+                                        <div class="default-avatar">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="conversation-details">
+                                    <div class="conversation-header">
+                                        <h3 class="participant-name">
+                                            {{ conversation.other_participant.get_full_name|default:conversation.other_participant.username }}
+                                        </h3>
+                                        <span class="conversation-time">
+                                            {{ conversation.updated_at|timesince }} în urmă
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="listing-info">
+                                        <i class="fas fa-tag"></i>
+                                        <span>{{ conversation.listing.title|truncatechars:40 }}</span>
+                                        <span class="listing-price">{{ conversation.listing.price }} RON</span>
+                                    </div>
+                                    
+                                    {% with last_message=conversation.get_last_message %}
+                                        {% if last_message %}
+                                            <div class="last-message">
+                                                <span class="message-preview">
+                                                    {% if last_message.sender == request.user %}
+                                                        <strong>Tu:</strong>
+                                                    {% endif %}
+                                                    {{ last_message.content|truncatechars:80 }}
+                                                </span>
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                                
+                                {% if conversation.unread_count > 0 %}
+                                    <div class="unread-indicator">
+                                        <span class="unread-count">{{ conversation.unread_count }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Paginare -->
+            {% if page_obj.has_other_pages %}
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}" class="page-btn">
+                            <i class="fas fa-chevron-left"></i> Anterior
+                        </a>
+                    {% endif %}
+                    
+                    <span class="page-info">
+                        Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}
+                    </span>
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="page-btn">
+                            Următorul <i class="fas fa-chevron-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+            
+        {% else %}
+            <div class="no-conversations">
+                <div class="empty-state">
+                    <i class="fas fa-comments"></i>
+                    <h3>Nu ai încă conversații</h3>
+                    <p>Când vei trimite sau primi mesaje, acestea vor apărea aici.</p>
+                    <a href="{% url 'listings:list' %}" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Explorează anunțurile
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+
+
+
+
+
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+{% endblock %}

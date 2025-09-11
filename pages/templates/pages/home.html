@@ -1,26 +1,48 @@
-{% comment %} {% extends "base.html" %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block title %}Acasa{% endblock %}
 
 {% block content %}
-  <h2>Ultimele anunturi</h2>
-  <div class="grid">
-    {% for item in listings %}
-      <article class="card">
-        <a href="#">
-          {% if item.image %}
-            <img src="{{ item.image.url }}" alt="{{ item.title }}">
+  <!-- Categorii Section -->
+  <section class="categories-section">
+    <h2>Explorează categoriile</h2>
+    <div class="categories-grid">
+      {% for category in categories %}
+        <a href="{{ category.get_absolute_url }}" class="category-card">
+          {% if category.icon %}
+            <i class="fas {{ category.icon }}"></i>
           {% else %}
-            <img src="{% static 'img/no-image.png' %}" alt="No image">
+            <i class="fas fa-folder"></i>
           {% endif %}
-          <h3>{{ item.title }}</h3>
+          <span>{{ category.name }}</span>
         </a>
-        <p>{{ item.price }} RON</p>
-        {% if item.description %}<p class="muted">{{ item.description|truncatechars:80 }}</p>{% endif %}
-      </article>
-    {% empty %}
-      <p>Nu exista anunturi inca.</p>
-    {% endfor %}
-  </div>
-{% endblock %} {% endcomment %}
+      {% empty %}
+        <p>Nu există categorii disponibile.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Latest Listings Section -->
+  <section class="listings-section">
+    <h2>Ultimele anunturi</h2>
+    <div class="grid">
+      {% for item in listings %}
+        <article class="card">
+          <a href="#">
+            {% if item.image %}
+              <img src="{{ item.image.url }}" alt="{{ item.title }}">
+            {% else %}
+              <img src="{% static 'img/no-image.png' %}" alt="No image">
+            {% endif %}
+            <h3>{{ item.title }}</h3>
+          </a>
+          <p>{{ item.price }} RON</p>
+          {% if item.description %}<p class="muted">{{ item.description|truncatechars:80 }}</p>{% endif %}
+        </article>
+      {% empty %}
+        <p>Nu exista anunturi inca.</p>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

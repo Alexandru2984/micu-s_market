@@ -1,0 +1,25 @@
+/* Header specific styles */
+
+.messages-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.unread-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #e53e3e;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    border: 2px solid white;
+}

@@ -1,0 +1,29 @@
+{% extends 'base_auth.html' %}
+{% load static %}
+
+{% block title %}Logout - Micu's Market{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1><i class="fas fa-sign-out-alt"></i> Deconectare</h1>
+            <p>Ești sigur că vrei să te deconectezi?</p>
+        </div>
+        
+        <form method="post" class="auth-form" action="{% url 'account_logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-block">
+                <i class="fas fa-sign-out-alt"></i> Da, deconectează-mă
+            </button>
+            <a href="{% url 'listings:home' %}" class="btn btn-secondary btn-block" style="margin-top: 1rem;">
+                <i class="fas fa-times"></i> Anulează
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,1 @@
+{% load i18n %}{% autoescape off %}🏪 Confirmă-ți contul pe Micu's Market{% endautoescape %}

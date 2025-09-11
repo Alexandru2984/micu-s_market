@@ -10,9 +10,9 @@
                 <h4>Linkuri Rapide</h4>
                 <ul>
                     <li><a href="{% url 'listings:list' %}">Toate Anunțurile</a></li>
-                    <li><a href="#adauga">Adaugă Anunț</a></li>
-                    <li><a href="#despre">Despre Noi</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="{% url 'listings:create' %}">Adaugă Anunț</a></li>
+                    <li><a href="#" data-modal="despre-modal">Despre mine</a></li>
+                    <li><a href="#" data-modal="contact-modal">Contact</a></li>
                 </ul>
             </div>
             
@@ -29,9 +29,9 @@
             <div class="footer-section">
                 <h4>Legal</h4>
                 <ul>
-                    <li><a href="#termeni">Termeni și Condiții</a></li>
-                    <li><a href="#privacitate">Politica de Confidențialitate</a></li>
-                    <li><a href="#ajutor">Ajutor</a></li>
+                    <li><a href="#" data-modal="termeni-modal">Termeni și Condiții</a></li>
+                    <li><a href="#" data-modal="privacitate-modal">Politica de Confidențialitate</a></li>
+                    <li><a href="#" data-modal="ajutor-modal">Ajutor</a></li>
                 </ul>
             </div>
         </div>
@@ -40,8 +40,131 @@
             <p>&copy; 2025 Micu's Market. Toate drepturile rezervate.</p>
         </div>
     </div>
+
+    <!-- Modal pentru Contact -->
+    <div id="contact-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Contact</h2>
+                <span class="close" data-close="contact-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="contact-info">
+                    <h3>Conectează-te cu mine!</h3>
+                    <p>Contactează-ma prin oricare dintre metodele de mai jos:</p>
+                    
+                    <div class="contact-methods">
+                        <div class="contact-item">
+                            <i class="fab fa-instagram"></i>
+                            <div>
+                                <h4>Instagram</h4>
+                                <a href="https://www.instagram.com/alexandrumihaidragne/" target="_blank">@alexandrumihaidragne</a>
+                                <p>Urmărește-ne pentru cele mai noi anunțuri și actualizări</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <h4>Email</h4>
+                                <a href="mailto:contact@micutu.com">contact@micusmarket.ro</a>
+                                <p>Trimite-ne un email pentru întrebări sau suport</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <i class="fab fa-linkedin"></i>
+                            <div>
+                                <h4>LinkedIn</h4>
+                                <a href="https://www.linkedin.com/in/dragne-alexandru-a201b2162/" target="_blank">Dragne Alexandru Mihai</a>
+                                <p>Conectează-te cu mine pe LinkedIn pentru oportunități profesionale</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <i class="fab fa-github"></i>
+                            <div>
+                                <h4>GitHub</h4>
+                                <a href="https://github.com/Alexandru2984" target="_blank">Alexandru2984/micu-s_market</a>
+                                <p>Urmărește dezvoltarea mea personala pe GitHub</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pentru Despre Noi -->
+    <div id="despre-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Despre Noi</h2>
+                <span class="close" data-close="despre-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="work-in-progress">
+                    <i class="fas fa-hammer"></i>
+                    <h3>Încă lucrăm la această secțiune</h3>
+                    <p>Site-ul nostru nu este încă oficial lansat. Suntem în proces de dezvoltare și îmbunătățire continuă.</p>
+                    <p>Te rugăm să revii mai târziu pentru informații complete despre echipa și misiunea noastră.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pentru Termeni și Condiții -->
+    <div id="termeni-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Termeni și Condiții</h2>
+                <span class="close" data-close="termeni-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="work-in-progress">
+                    <i class="fas fa-hammer"></i>
+                    <h3>Încă lucrăm la această secțiune</h3>
+                    <p>Site-ul nostru nu este încă oficial lansat. Suntem în proces de dezvoltare și îmbunătățire continuă.</p>
+                    <p>Termenii și condițiile vor fi disponibili înainte de lansarea oficială.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pentru Politica de Confidențialitate -->
+    <div id="privacitate-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Politica de Confidențialitate</h2>
+                <span class="close" data-close="privacitate-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="work-in-progress">
+                    <i class="fas fa-hammer"></i>
+                    <h3>Încă lucrăm la această secțiune</h3>
+                    <p>Site-ul nostru nu este încă oficial lansat. Suntem în proces de dezvoltare și îmbunătățire continuă.</p>
+                    <p>Politica de confidențialitate va fi disponibilă înainte de lansarea oficială.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pentru Ajutor -->
+    <div id="ajutor-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Ajutor</h2>
+                <span class="close" data-close="ajutor-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="work-in-progress">
+                    <i class="fas fa-hammer"></i>
+                    <h3>Încă lucrăm la această secțiune</h3>
+                    <p>Site-ul nostru nu este încă oficial lansat. Suntem în proces de dezvoltare și îmbunătățire continuă.</p>
+                    <p>Secțiunea de ajutor va fi disponibilă înainte de lansarea oficială.</p>
+                    <p>Pentru întrebări urgente, te rugăm să ne contactezi prin <a href="#" data-modal="contact-modal">pagina de contact</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </footer>
-
-<style>
-
-</style>

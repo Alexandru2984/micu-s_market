@@ -134,4 +134,4 @@ def my_listings_view(request):
         'page_obj': page_obj,
         'status_filter': status_filter,
     }
-    return render(request, 'accounts/my_listings.html', context)
+    return render(request, 'listings/my_listings.html', context)

@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% csrf_token %}
+
 {% block title %}{{ listing.title }} - Micu's Market{% endblock %}
 
 {% block content %}
@@ -91,13 +93,29 @@
                 </div>
                 
                 <!-- Actions -->
-                <div class="listing-actions">
-                    <button class="btn btn-primary contact-btn">
-                        <i class="fas fa-phone"></i> Contactează vânzătorul
-                    </button>
-                    <button class="btn btn-secondary favorite-btn" data-listing="{{ listing.id }}">
-                        <i class="far fa-heart"></i> Salvează în favorite
-                    </button>
+                <div class="listing-actions" style="position: static !important; opacity: 1 !important; display: flex !important; gap: 1rem !important;">
+                    {% if user.is_authenticated and user != listing.owner %}
+                        <a href="{% url 'chat:start_conversation' listing.slug %}" class="btn btn-primary">
+                            <i class="fas fa-envelope"></i> Trimite mesaj
+                        </a>
+                    {% elif user == listing.owner %}
+                        <a href="{% url 'listings:update' listing.slug %}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Editează anunțul
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-primary">
+                            <i class="fas fa-envelope"></i> Trimite mesaj
+                        </a>
+                    {% endif %}
+                    
+                    {% if user.is_authenticated and user != listing.owner %}
+                        <button id="favorite-detail-btn" class="{% if is_favorited %}favorited{% endif %}" 
+                                data-listing="{{ listing.id }}" 
+                                title="{% if is_favorited %}Elimină din favorite{% else %}Adaugă la favorite{% endif %}">
+                            <i class="{% if is_favorited %}fas{% else %}far{% endif %} fa-heart"></i> 
+                            <span>{% if is_favorited %}În favorite{% else %}Adaugă la favorite{% endif %}</span>
+                        </button>
+                    {% endif %}
                     <button class="btn btn-secondary share-btn">
                         <i class="fas fa-share-alt"></i> Partajează
                     </button>
@@ -138,9 +156,9 @@
                     <button class="btn btn-outline">
                         <i class="fas fa-envelope"></i> Trimite mesaj
                     </button>
-                    <button class="btn btn-outline">
+                    <a href="{% url 'listings:list' %}?seller={{ listing.owner.username }}" class="btn btn-outline">
                         <i class="fas fa-list"></i> Vezi toate anunțurile
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -178,9 +196,61 @@
     </div>
 </section>
 {% endif %}
+{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/listings.css' %}">
+<style>
+/* Design elegant pentru butonul de favorite - NU MAI PĂTRATE! */
+#favorite-detail-btn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    padding: 10px 15px;
+    border-radius: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    border: 2px solid #e2e8f0;
+    min-height: 40px;
+}
 
+#favorite-detail-btn:hover {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #ef4444;
+}
 
+#favorite-detail-btn.favorited {
+    background: #fef2f2;
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+#favorite-detail-btn.favorited:hover {
+    background: #fecaca;
+    border-color: #dc2626;
+    color: #dc2626;
+}
+
+#favorite-detail-btn i {
+    font-size: 16px;
+}
+
+#favorite-detail-btn span {
+    font-weight: 500;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/favorites.js' %}"></script>
 <script>
 
 </script>

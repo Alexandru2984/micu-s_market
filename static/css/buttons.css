@@ -1,0 +1,247 @@
+/* BUTOANE SPECTACULOASE - buttons.css - PRIORITATE MAXIMĂ */
+
+/* Butonul de căutare principală - SPECTACULOS */
+#searchButton {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 12px 24px !important;
+    border-radius: 15px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4) !important;
+    transform: translateZ(0) !important;
+    will-change: transform !important;
+}
+
+/* Butonul are clasa quick-search-btn dar noi îl stilizăm cu ID */
+.quick-search-btn#searchButton {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 12px 24px !important;
+    border-radius: 15px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4) !important;
+}
+
+#searchButton::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent) !important;
+    transition: left 0.5s ease !important;
+}
+
+#searchButton:hover::before {
+    left: 100% !important;
+}
+
+#searchButton:hover {
+    transform: translateY(-3px) scale(1.05) !important;
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5) !important;
+}
+
+#searchButton:active {
+    transform: translateY(-1px) scale(0.98) !important;
+}
+
+#searchButton i {
+    font-size: 16px !important;
+    animation: pulse 2s infinite !important;
+}
+
+/* Butonul de aplicare filtre - SPECTACULOS */
+#filterButton {
+    flex: 2 !important;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 16px 24px !important;
+    border-radius: 15px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4) !important;
+    transform: translateZ(0) !important;
+}
+
+/* Prioritate maximă pentru butonul de filtrare */
+.btn-apply-filters#filterButton {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 16px 24px !important;
+    border-radius: 15px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4) !important;
+}
+
+#filterButton::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent) !important;
+    transition: left 0.5s ease !important;
+}
+
+#filterButton:hover::before {
+    left: 100% !important;
+}
+
+#filterButton:hover {
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 0 15px 35px rgba(16, 185, 129, 0.5) !important;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+}
+
+#filterButton:active {
+    transform: translateY(-1px) scale(0.98) !important;
+}
+
+#filterButton i {
+    font-size: 16px !important;
+    animation: bounce 1s infinite !important;
+}
+
+/* Butonul de resetare - SPECTACULOS */
+#resetButton {
+    flex: 1 !important;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 16px 20px !important;
+    border-radius: 15px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    transition: all 0.4s ease !important;
+    text-decoration: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4) !important;
+    transform: translateZ(0) !important;
+}
+
+/* Prioritate maximă pentru butonul de resetare */
+.btn-reset-filters#resetButton {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 16px 20px !important;
+    border-radius: 15px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4) !important;
+    text-decoration: none !important;
+}
+
+#resetButton:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    color: white !important;
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 12px 25px rgba(239, 68, 68, 0.4) !important;
+    text-decoration: none !important;
+}
+
+#resetButton:active {
+    transform: translateY(-1px) scale(0.98) !important;
+}
+
+#resetButton i {
+    font-size: 16px !important;
+    animation: shake 2s infinite !important;
+}
+
+/* ANIMAȚII SPECTACULOASE */
+@keyframes pulse {
+    0%, 100% { 
+        transform: scale(1); 
+        opacity: 1; 
+    }
+    50% { 
+        transform: scale(1.1); 
+        opacity: 0.8; 
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-3px);
+    }
+    60% {
+        transform: translateY(-2px);
+    }
+}
+
+@keyframes shake {
+    0%, 100% { 
+        transform: translateX(0); 
+    }
+    10%, 30%, 50%, 70%, 90% { 
+        transform: translateX(-2px); 
+    }
+    20%, 40%, 60%, 80% { 
+        transform: translateX(2px); 
+    }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    #searchButton {
+        padding: 10px 20px !important;
+        font-size: 12px !important;
+    }
+    
+    #filterButton, #resetButton {
+        padding: 14px 18px !important;
+        font-size: 12px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #searchButton {
+        padding: 8px 16px !important;
+        font-size: 11px !important;
+    }
+    
+    #filterButton, #resetButton {
+        padding: 12px 16px !important;
+        font-size: 11px !important;
+        gap: 6px !important;
+    }
+}

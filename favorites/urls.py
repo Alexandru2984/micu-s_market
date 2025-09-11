@@ -1,9 +1,10 @@
 from django.urls import path
-from .views import toggle_favorite_view
-from .views import favorites_list_view
+from . import views
+
+app_name = 'favorites'
 
 urlpatterns = [
-
-	path("favorites_list", favorites_list_view),
-	path("toggle_favorite", toggle_favorite_view),
+    path('', views.favorites_list_view, name='list'),
+    path('toggle/', views.toggle_favorite_view, name='toggle'),
+    path('remove/<int:favorite_id>/', views.remove_favorite_view, name='remove'),
 ]

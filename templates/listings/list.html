@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% csrf_token %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/spectacular-elements.css' %}">
+<link rel="stylesheet" href="{% static 'css/listings.css' %}">
+{% endblock %}
+
 {% block title %}
     {% if current_category %}
         {{ current_category.name }} - Anunțuri
@@ -37,14 +44,14 @@
         <div class="search-form">
             <form method="get" class="filters-form">
                 <div class="search-input">
-                    <input type="text" name="search" placeholder="Caută anunțuri..." value="{{ search_query|default:'' }}">
-                    <button type="submit">
-                        <i class="fas fa-search"></i>
+                    <input type="text" name="search" placeholder="Caută anunțuri..." value="{{ search_query|default:'' }}" id="searchInput">
+                    <button type="submit" id="searchBtn">
+                        <i class="fas fa-search" id="searchIcon"></i>
                     </button>
                 </div>
                 
                 <div class="filters">
-                    <select name="category">
+                    <select name="category" id="categoryDropdown">
                         <option value="">Toate categoriile</option>
                         {% for category in categories %}
                             <option value="{{ category.slug }}" {% if current_category_slug == category.slug %}selected{% endif %}>
@@ -53,16 +60,19 @@
                         {% endfor %}
                     </select>
                     
-                    <select name="sort">
+                    <select name="sort" id="sortDropdown">
                         <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Cele mai recente</option>
                         <option value="created_at" {% if sort_by == 'created_at' %}selected{% endif %}>Cele mai vechi</option>
                         <option value="price" {% if sort_by == 'price' %}selected{% endif %}>Preț crescător</option>
                         <option value="-price" {% if sort_by == '-price' %}selected{% endif %}>Preț descrescător</option>
                     </select>
                     
-                    <button type="submit" class="filter-btn">
+                    <button type="submit" class="filter-btn" id="filterBtn">
                         <i class="fas fa-filter"></i> Filtrează
                     </button>
+                    <a href="{% url 'listings:list' %}" class="reset-btn" id="resetBtn">
+                        <i class="fas fa-times"></i> Resetează
+                    </a>
                 </div>
             </form>
         </div>
@@ -95,9 +105,11 @@
                             <div class="view-btn">
                                 <i class="fas fa-eye"></i>
                             </div>
-                            <button class="favorite-btn" data-listing="{{ listing.id }}" onclick="event.preventDefault(); event.stopPropagation();">
-                                <i class="fas fa-heart"></i>
-                            </button>
+                            {% if user.is_authenticated and user != listing.owner %}
+                                <button class="favorite-btn{% if listing.is_favorited %} favorited{% endif %}" data-listing="{{ listing.id }}" onclick="event.preventDefault(); event.stopPropagation();" title="{% if listing.is_favorited %}Elimină din favorite{% else %}Adaugă la favorite{% endif %}">
+                                    <i class="{% if listing.is_favorited %}fas{% else %}far{% endif %} fa-heart"></i>
+                                </button>
+                            {% endif %}
                         </div>
                     </div>
                     
@@ -167,412 +179,17 @@
     </div>
 </section>
 
-<style>
-/* Search & Filters */
-.search-filters {
-    background: #f8fafc;
-    padding: 2rem 0;
-    border-bottom: 1px solid #e2e8f0;
-}
 
-.search-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
+    </div>
+</section>
 
-.search-header h1 {
-    color: #2d3748;
-    margin-bottom: 0.5rem;
-    font-size: 2.5rem;
-    font-weight: 700;
-}
+{% endblock %}
 
-.search-header h1 i {
-    color: #667eea;
-    margin-right: 0.5rem;
-}
 
-.results-count {
-    color: #718096;
-    font-size: 1.1rem;
-    margin: 0;
-}
 
-.search-form {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.filters-form {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-}
-
-.search-input {
-    display: flex;
-    margin-bottom: 1rem;
-}
-
-.search-input input {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 8px 0 0 8px;
-    font-size: 1rem;
-    outline: none;
-}
-
-.search-input input:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.search-input button {
-    background: #667eea;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0 8px 8px 0;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-.search-input button:hover {
-    background: #5a67d8;
-}
-
-.filters {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-}
-
-.filters select {
-    padding: 0.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    background: white;
-    min-width: 150px;
-    outline: none;
-}
-
-.filters select:focus {
-    border-color: #667eea;
-}
-
-.filter-btn {
-    background: #48bb78;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-.filter-btn:hover {
-    background: #38a169;
-}
-
-/* Listings Section */
-.listings-section {
-    padding: 2rem 0;
-}
-
-.listings-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
-}
-
-.listing-card {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    transition: all 0.3s;
-    border: 1px solid #e2e8f0;
-    display: block;
-    text-decoration: none;
-    color: inherit;
-}
-
-.listing-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.1);
-    text-decoration: none;
-    color: inherit;
-}
-
-.listing-image {
-    position: relative;
-    height: 220px;
-    background: #f7fafc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.listing-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.no-image {
-    color: #a0aec0;
-    font-size: 3rem;
-}
-
-.featured-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: linear-gradient(45deg, #fbbf24, #f59e0b);
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
-}
-
-.listing-actions {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    gap: 0.5rem;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.listing-card:hover .listing-actions {
-    opacity: 1;
-}
-
-.view-btn,
-.favorite-btn {
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: #4a5568;
-    text-decoration: none;
-}
-
-.view-btn:hover,
-.favorite-btn:hover {
-    background: white;
-    color: #667eea;
-    transform: scale(1.1);
-}
-
-.listing-content {
-    padding: 1.5rem;
-}
-
-.listing-content h3 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.listing-content h3 a {
-    color: #2d3748;
-    text-decoration: none;
-    transition: color 0.2s;
-}
-
-.listing-content h3 a:hover {
-    color: #667eea;
-}
-
-.price {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #667eea;
-    margin: 0.5rem 0;
-}
-
-.description {
-    color: #718096;
-    margin: 0.75rem 0;
-    line-height: 1.5;
-    font-size: 0.95rem;
-}
-
-.listing-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 1rem 0;
-    padding-top: 1rem;
-    border-top: 1px solid #e2e8f0;
-    font-size: 0.9rem;
-}
-
-.location {
-    color: #718096;
-}
-
-.location i {
-    margin-right: 0.25rem;
-    color: #a0aec0;
-}
-
-.category {
-    background: #edf2f7;
-    color: #4a5568;
-    padding: 0.25rem 0.75rem;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.listing-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.85rem;
-    color: #a0aec0;
-}
-
-.views i {
-    margin-right: 0.25rem;
-}
-
-/* Pagination */
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 3rem;
-    padding: 2rem 0;
-}
-
-.page-btn {
-    background: #667eea;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.2s;
-}
-
-.page-btn:hover {
-    background: #5a67d8;
-    transform: translateY(-1px);
-}
-
-.page-info {
-    color: #718096;
-    font-weight: 500;
-}
-
-/* No Results */
-.no-results {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: #718096;
-}
-
-.no-results i {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    color: #a0aec0;
-}
-
-.no-results h3 {
-    color: #2d3748;
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-}
-
-.btn {
-    display: inline-block;
-    padding: 0.75rem 2rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.2s;
-    margin-top: 1rem;
-}
-
-.btn-primary {
-    background: #667eea;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #5a67d8;
-    transform: translateY(-1px);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .search-header h1 {
-        font-size: 2rem;
-    }
-    
-    .filters {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    
-    .filters select,
-    .filter-btn {
-        width: 100%;
-    }
-    
-    .listings-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .listing-meta {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-    
-    .pagination {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-}
-</style>
-
+{% block extra_js %}
+<script src="{% static 'js/favorites.js' %}"></script>
 <script>
-// Favorite functionality (placeholder)
-document.querySelectorAll('.favorite-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const icon = this.querySelector('i');
-        if (icon.classList.contains('fas')) {
-            icon.classList.remove('fas');
-            icon.classList.add('far');
-            this.style.color = '#a0aec0';
-        } else {
-            icon.classList.remove('far');
-            icon.classList.add('fas');
-            this.style.color = '#e53e3e';
-        }
-    });
-});
-
 // Auto-submit form on select change
 document.querySelectorAll('.filters select').forEach(select => {
     select.addEventListener('change', function() {

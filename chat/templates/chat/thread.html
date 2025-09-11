@@ -1,11 +1,274 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>chat/thread</title>
-</head>
-<body>
-    <h1>chat/thread</h1>
-</body>
-</html>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Conversație cu {{ other_participant.get_full_name|default:other_participant.username }} - Micu's Market
+{% endblock %}
+
+{% block content %}
+<div class="conversation-container">
+    <div class="container">
+        <!-- Header conversație -->
+        <div class="conversation-header">
+            <div class="header-left">
+                <a href="{% url 'chat:inbox' %}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Înapoi la mesaje
+                </a>
+                
+                <div class="conversation-info">
+                    <div class="participant-avatar">
+                        {% if other_participant.profile.avatar %}
+                            <img src="{{ other_participant.profile.avatar.url }}" alt="{{ other_participant.username }}">
+                        {% else %}
+                            <div class="default-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="participant-details">
+                        <h2>{{ other_participant.get_full_name|default:other_participant.username }}</h2>
+                        <div class="listing-info">
+                            <i class="fas fa-tag"></i>
+                            <a href="{% url 'listings:detail' listing.slug %}">{{ listing.title }}</a>
+                            <span class="listing-price">{{ listing.price }} RON</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <a href="{% url 'listings:detail' listing.slug %}" class="btn btn-outline">
+                    <i class="fas fa-eye"></i> Vezi anunțul
+                </a>
+            </div>
+        </div>
+
+        <!-- Mesaje -->
+        <div class="messages-container" id="messagesContainer">
+            <div class="messages-list" id="messagesList">
+                {% for message in page_obj reversed %}
+                    <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                        <div class="message-avatar">
+                            {% if message.sender.profile.avatar %}
+                                <img src="{{ message.sender.profile.avatar.url }}" alt="{{ message.sender.username }}">
+                            {% else %}
+                                <div class="small-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                <p>{{ message.content|linebreaks }}</p>
+                                
+                                <!-- Atașamente -->
+                                {% if message.attachments.all %}
+                                    <div class="message-attachments">
+                                        {% for attachment in message.attachments.all %}
+                                            <div class="attachment">
+                                                {% if attachment.file_type == 'image' %}
+                                                    <img src="{{ attachment.file.url }}" alt="{{ attachment.filename }}" class="attachment-image">
+                                                {% else %}
+                                                    <a href="{{ attachment.file.url }}" target="_blank" class="attachment-file">
+                                                        <i class="fas fa-file"></i>
+                                                        {{ attachment.filename }}
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="message-time">
+                                {{ message.created_at|date:"d.m.Y H:i" }}
+                                {% if message.sender == request.user and message.is_read %}
+                                    <i class="fas fa-check-double read"></i>
+                                {% elif message.sender == request.user %}
+                                    <i class="fas fa-check"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Form pentru mesaj nou -->
+        <div class="message-form-container">
+            <form id="messageForm" method="post" action="{% url 'chat:send_message' conversation.pk %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="message-input-container">
+                    <textarea name="content" id="messageContent" placeholder="Scrie un mesaj..." rows="3" required></textarea>
+                    
+                    <div class="message-actions">
+                        <label for="fileInput" class="attachment-btn">
+                            <i class="fas fa-paperclip"></i>
+                        </label>
+                        <input type="file" id="fileInput" name="attachments" multiple accept="image/*,.pdf,.doc,.docx" style="display: none;">
+                        
+                        <button type="submit" class="send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="attachmentPreview" class="attachment-preview" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const messagesContainer = document.getElementById('messagesList');
+    const messageForm = document.getElementById('messageForm');
+    const messageContent = document.getElementById('messageContent');
+    const fileInput = document.getElementById('fileInput');
+    const attachmentPreview = document.getElementById('attachmentPreview');
+    
+    // Scroll to bottom
+    function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // Initial scroll
+    setTimeout(scrollToBottom, 100);
+    
+    // Handle file upload preview
+    fileInput.addEventListener('change', function() {
+        attachmentPreview.innerHTML = '';
+        
+        if (this.files.length > 0) {
+            attachmentPreview.style.display = 'block';
+            
+            Array.from(this.files).forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'attachment-item';
+                item.innerHTML = `
+                    <i class="fas fa-${file.type.startsWith('image/') ? 'image' : 'file'}"></i>
+                    ${file.name}
+                    <button type="button" class="remove-attachment" onclick="removeAttachment(${index})">×</button>
+                `;
+                attachmentPreview.appendChild(item);
+            });
+        } else {
+            attachmentPreview.style.display = 'none';
+        }
+    });
+    
+    // Handle form submission
+    messageForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const content = messageContent.value.trim();
+        
+        if (!content && fileInput.files.length === 0) {
+            return;
+        }
+        
+        // Disable form
+        const sendBtn = this.querySelector('.send-btn');
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Add message to UI
+                addMessageToUI(data.message);
+                
+                // Clear form
+                messageContent.value = '';
+                fileInput.value = '';
+                attachmentPreview.innerHTML = '';
+                attachmentPreview.style.display = 'none';
+                
+                // Scroll to bottom
+                scrollToBottom();
+            } else {
+                alert('Eroare la trimiterea mesajului: ' + (data.error || 'Eroare necunoscută'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Eroare la trimiterea mesajului');
+        })
+        .finally(() => {
+            // Re-enable form
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+        });
+    });
+    
+    // Handle Enter key
+    messageContent.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            messageForm.dispatchEvent(new Event('submit'));
+        }
+    });
+    
+    // Auto-resize textarea
+    messageContent.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+});
+
+function addMessageToUI(message) {
+    const messagesContainer = document.getElementById('messagesList');
+    const messageHTML = `
+        <div class="message sent">
+            <div class="message-avatar">
+                <div class="small-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+            <div class="message-content">
+                <div class="message-bubble">
+                    <p>${message.content.replace(/\n/g, '<br>')}</p>
+                    ${message.attachments.map(att => 
+                        att.file_type === 'image' 
+                            ? `<div class="message-attachments"><img src="${att.url}" alt="${att.filename}" class="attachment-image"></div>`
+                            : `<div class="message-attachments"><a href="${att.url}" target="_blank" class="attachment-file"><i class="fas fa-file"></i> ${att.filename}</a></div>`
+                    ).join('')}
+                </div>
+                <div class="message-time">
+                    ${message.created_at}
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+}
+
+function removeAttachment(index) {
+    const fileInput = document.getElementById('fileInput');
+    const dt = new DataTransfer();
+    
+    Array.from(fileInput.files).forEach((file, i) => {
+        if (i !== index) {
+            dt.items.add(file);
+        }
+    });
+    
+    fileInput.files = dt.files;
+    fileInput.dispatchEvent(new Event('change'));
+}
+</script>
+{% endblock %}

@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Acasă - Micu's Market{% endblock %}
+
+{% csrf_token %}
+
+{% block title %}Micu's Market - Anunțuri Online{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
@@ -53,32 +56,42 @@
         <h2><i class="fas fa-star"></i> Anunțuri Recomandate</h2>
         <div class="listings-grid">
             {% for listing in featured_listings %}
-            <a href="{% url 'listings:detail' listing.slug %}" class="listing-card featured">
-                <div class="listing-image">
-                    {% if listing.images.first %}
-                        <img src="{{ listing.images.first.image.url }}" alt="{{ listing.title }}">
-                    {% else %}
-                        <div class="no-image">
-                            <i class="fas fa-image"></i>
+            <div class="listing-card featured">
+                <a href="{% url 'listings:detail' listing.slug %}" class="listing-link">
+                    <div class="listing-image">
+                        {% if listing.images.first %}
+                            <img src="{{ listing.images.first.image.url }}" alt="{{ listing.title }}">
+                        {% else %}
+                            <div class="no-image">
+                                <i class="fas fa-image"></i>
+                            </div>
+                        {% endif %}
+                        <div class="featured-badge">
+                            <i class="fas fa-star"></i> Recomandat
                         </div>
-                    {% endif %}
-                    <div class="featured-badge">
-                        <i class="fas fa-star"></i> Recomandat
                     </div>
-                </div>
-                <div class="listing-content">
-                    <h3>{{ listing.title }}</h3>
-                    <p class="price">{{ listing.price }} RON</p>
-                    <p class="location">
-                        <i class="fas fa-map-marker-alt"></i> 
-                        {{ listing.city }}, {{ listing.county }}
-                    </p>
-                    <div class="listing-meta">
-                        <span class="category">{{ listing.category.name }}</span>
-                        <span class="date">{{ listing.created_at|date:"d.m.Y" }}</span>
+                    <div class="listing-content">
+                        <h3>{{ listing.title }}</h3>
+                        <p class="price">{{ listing.price }} RON</p>
+                        <p class="location">
+                            <i class="fas fa-map-marker-alt"></i> 
+                            {{ listing.city }}, {{ listing.county }}
+                        </p>
+                        <div class="listing-meta">
+                            <span class="category">{{ listing.category.name }}</span>
+                            <span class="date">{{ listing.created_at|date:"d.m.Y" }}</span>
+                        </div>
                     </div>
-                </div>
-            </a>
+                </a>
+                
+                {% if user.is_authenticated and user != listing.owner %}
+                    <div class="listing-actions">
+                        <button class="favorite-btn{% if listing.is_favorited %} favorited{% endif %}" data-listing="{{ listing.id }}" title="{% if listing.is_favorited %}Elimină din favorite{% else %}Adaugă la favorite{% endif %}">
+                            <i class="{% if listing.is_favorited %}fas{% else %}far{% endif %} fa-heart"></i>
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
             {% endfor %}
         </div>
     </div>
@@ -91,29 +104,39 @@
         <h2><i class="fas fa-clock"></i> Anunțuri Recente</h2>
         <div class="listings-grid">
             {% for listing in recent_listings %}
-            <a href="{% url 'listings:detail' listing.slug %}" class="listing-card">
-                <div class="listing-image">
-                    {% if listing.images.first %}
-                        <img src="{{ listing.images.first.image.url }}" alt="{{ listing.title }}">
-                    {% else %}
-                        <div class="no-image">
-                            <i class="fas fa-image"></i>
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="listing-content">
-                    <h3>{{ listing.title }}</h3>
-                    <p class="price">{{ listing.price }} RON</p>
-                    <p class="location">
-                        <i class="fas fa-map-marker-alt"></i> 
-                        {{ listing.city }}, {{ listing.county }}
-                    </p>
-                    <div class="listing-meta">
-                        <span class="category">{{ listing.category.name }}</span>
-                        <span class="date">{{ listing.created_at|date:"d.m.Y" }}</span>
+            <div class="listing-card">
+                <a href="{% url 'listings:detail' listing.slug %}" class="listing-link">
+                    <div class="listing-image">
+                        {% if listing.images.first %}
+                            <img src="{{ listing.images.first.image.url }}" alt="{{ listing.title }}">
+                        {% else %}
+                            <div class="no-image">
+                                <i class="fas fa-image"></i>
+                            </div>
+                        {% endif %}
                     </div>
-                </div>
-            </a>
+                    <div class="listing-content">
+                        <h3>{{ listing.title }}</h3>
+                        <p class="price">{{ listing.price }} RON</p>
+                        <p class="location">
+                            <i class="fas fa-map-marker-alt"></i> 
+                            {{ listing.city }}, {{ listing.county }}
+                        </p>
+                        <div class="listing-meta">
+                            <span class="category">{{ listing.category.name }}</span>
+                            <span class="date">{{ listing.created_at|date:"d.m.Y" }}</span>
+                        </div>
+                    </div>
+                </a>
+                
+                {% if user.is_authenticated and user != listing.owner %}
+                    <div class="listing-actions">
+                        <button class="favorite-btn{% if listing.is_favorited %} favorited{% endif %}" data-listing="{{ listing.id }}" title="{% if listing.is_favorited %}Elimină din favorite{% else %}Adaugă la favorite{% endif %}">
+                            <i class="{% if listing.is_favorited %}fas{% else %}far{% endif %} fa-heart"></i>
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
             {% empty %}
             <div class="no-listings">
                 <i class="fas fa-inbox"></i>
@@ -132,7 +155,12 @@
     </div>
 </section>
 
-<style>
+{% endblock %}
 
-</style>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/listings.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/favorites.js' %}"></script>
 {% endblock %}

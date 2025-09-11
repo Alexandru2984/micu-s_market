@@ -1,11 +1,574 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>reviews/create</title>
-</head>
-<body>
-    <h1>reviews/create</h1>
-</body>
-</html>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {% if review %}
+        Editează review pentru {{ reviewed_user.get_full_name|default:reviewed_user.username }} - Micu's Market
+    {% else %}
+        Lasă un review pentru {{ reviewed_user.get_full_name|default:reviewed_user.username }} - Micu's Market
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="create-review-container">
+    <div class="container">
+        <div class="review-form-card">
+            <div class="form-header">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        {% if reviewed_user.profile.avatar %}
+                            <img src="{{ reviewed_user.profile.avatar.url }}" alt="{{ reviewed_user.username }}">
+                        {% else %}
+                            <div class="default-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="user-details">
+                        <h1>
+                            {% if review %}
+                                Editează review pentru {{ reviewed_user.get_full_name|default:reviewed_user.username }}
+                            {% else %}
+                                Lasă un review pentru {{ reviewed_user.get_full_name|default:reviewed_user.username }}
+                            {% endif %}
+                        </h1>
+                        <p class="subtitle">Împărtășește experiența ta cu comunitatea</p>
+                    </div>
+                </div>
+                
+                <a href="{% url 'reviews:user_reviews' reviewed_user.username %}" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i> Înapoi la review-uri
+                </a>
+            </div>
+            
+            <form method="post" class="review-form">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="error-messages">
+                        {% for error in form.non_field_errors %}
+                            <div class="error-item">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <div class="form-section">
+                    <h3>Rating general</h3>
+                    <div class="form-group">
+                        <label for="{{ form.rating.id_for_label }}" class="required">Nota acordată</label>
+                        <div class="rating-input">
+                            {{ form.rating }}
+                            {% if form.rating.errors %}
+                                <div class="field-errors">
+                                    {% for error in form.rating.errors %}
+                                        <span class="error">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="rating-stars" id="ratingStars">
+                                <span data-value="1"><i class="far fa-star"></i></span>
+                                <span data-value="2"><i class="far fa-star"></i></span>
+                                <span data-value="3"><i class="far fa-star"></i></span>
+                                <span data-value="4"><i class="far fa-star"></i></span>
+                                <span data-value="5"><i class="far fa-star"></i></span>
+                            </div>
+                            <div class="rating-labels">
+                                <span data-rating="1">Foarte rău</span>
+                                <span data-rating="2">Rău</span>
+                                <span data-rating="3">Ok</span>
+                                <span data-rating="4">Bun</span>
+                                <span data-rating="5">Excelent</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Detalii review</h3>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.title.id_for_label }}">Titlu (opțional)</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="field-errors">
+                                {% for error in form.title.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="field-help">
+                            Oferă un titlu scurt pentru review-ul tău
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.comment.id_for_label }}" class="required">Comentariul tău</label>
+                        {{ form.comment }}
+                        {% if form.comment.errors %}
+                            <div class="field-errors">
+                                {% for error in form.comment.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="field-help">
+                            Descrie experiența ta cu acest utilizator. Fii constructiv și respectuos.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Context tranzacție</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.transaction_type.id_for_label }}" class="required">Tip tranzacție</label>
+                            {{ form.transaction_type }}
+                            {% if form.transaction_type.errors %}
+                                <div class="field-errors">
+                                    {% for error in form.transaction_type.errors %}
+                                        <span class="error">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.listing.id_for_label }}">Anunț asociat (opțional)</label>
+                            {{ form.listing }}
+                            {% if form.listing.errors %}
+                                <div class="field-errors">
+                                    {% for error in form.listing.errors %}
+                                        <span class="error">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="field-help">
+                                Selectează anunțul pentru care lași acest review
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-star"></i>
+                        {% if review %}
+                            Actualizează review-ul
+                        {% else %}
+                            Publică review-ul
+                        {% endif %}
+                    </button>
+                    
+                    <a href="{% url 'reviews:user_reviews' reviewed_user.username %}" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times"></i> Anulează
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Guidelines -->
+        <div class="guidelines-card">
+            <h3><i class="fas fa-info-circle"></i> Guidelines pentru review-uri</h3>
+            <ul>
+                <li>Fii sincer și constructiv în feedback-ul tău</li>
+                <li>Concentrează-te pe experiența ta cu utilizatorul</li>
+                <li>Evită limbajul ofensator sau discriminatoriu</li>
+                <li>Menționează aspecte concrete despre comunicare, livrare, calitate</li>
+                <li>Review-urile pot fi editate sau șterse oricând</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+.create-review-container {
+    min-height: 80vh;
+    background: #f8fafc;
+    padding: 2rem 0;
+}
+
+.review-form-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.form-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.user-avatar img,
+.default-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255,255,255,0.2);
+}
+
+.default-avatar {
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: rgba(255,255,255,0.8);
+}
+
+.user-details h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.subtitle {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+.form-header .btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+}
+
+.form-header .btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.review-form {
+    padding: 2rem;
+}
+
+.form-section {
+    margin-bottom: 2.5rem;
+}
+
+.form-section h3 {
+    color: #2d3748;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    border-bottom: 2px solid #edf2f7;
+    padding-bottom: 0.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+label.required::after {
+    content: " *";
+    color: #e53e3e;
+}
+
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: white;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.rating-input {
+    position: relative;
+}
+
+.rating-input input[type="number"] {
+    display: none;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 0.25rem;
+    margin: 1rem 0 0.5rem 0;
+}
+
+.rating-stars span {
+    font-size: 2rem;
+    color: #e2e8f0;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.rating-stars span:hover,
+.rating-stars span.active {
+    color: #fbbf24;
+}
+
+.rating-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #718096;
+    margin-top: 0.5rem;
+}
+
+.rating-labels span {
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.rating-labels span.active {
+    opacity: 1;
+    color: #667eea;
+    font-weight: 600;
+}
+
+.field-help {
+    font-size: 0.85rem;
+    color: #718096;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+.field-errors {
+    margin-top: 0.5rem;
+}
+
+.error {
+    display: block;
+    color: #e53e3e;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.error-messages {
+    background: #fed7d7;
+    border: 1px solid #feb2b2;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.error-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #c53030;
+    font-weight: 500;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #edf2f7;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #edf2f7;
+    color: #4a5568;
+}
+
+.btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+.btn-outline {
+    border: 1px solid rgba(255,255,255,0.2);
+    color: currentColor;
+    background: transparent;
+}
+
+/* Guidelines card */
+.guidelines-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.guidelines-card h3 {
+    color: #2d3748;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.guidelines-card h3 i {
+    color: #667eea;
+}
+
+.guidelines-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.guidelines-card li {
+    padding: 0.5rem 0;
+    color: #4a5568;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.guidelines-card li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #48bb78;
+    font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+    
+    .user-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .rating-labels {
+        font-size: 0.7rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ratingInput = document.getElementById('id_rating');
+    const stars = document.querySelectorAll('.rating-stars span');
+    const labels = document.querySelectorAll('.rating-labels span');
+    
+    // Initialize rating display
+    const currentRating = parseInt(ratingInput.value) || 0;
+    updateStarsDisplay(currentRating);
+    
+    // Handle star clicks
+    stars.forEach((star, index) => {
+        star.addEventListener('click', function() {
+            const rating = index + 1;
+            ratingInput.value = rating;
+            updateStarsDisplay(rating);
+        });
+        
+        star.addEventListener('mouseenter', function() {
+            updateStarsDisplay(index + 1, true);
+        });
+    });
+    
+    // Reset on mouse leave
+    document.querySelector('.rating-stars').addEventListener('mouseleave', function() {
+        const currentRating = parseInt(ratingInput.value) || 0;
+        updateStarsDisplay(currentRating);
+    });
+    
+    function updateStarsDisplay(rating, isHover = false) {
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.innerHTML = '<i class="fas fa-star"></i>';
+                star.classList.add('active');
+            } else {
+                star.innerHTML = '<i class="far fa-star"></i>';
+                star.classList.remove('active');
+            }
+        });
+        
+        // Update labels
+        labels.forEach((label, index) => {
+            if (index + 1 === rating) {
+                label.classList.add('active');
+            } else {
+                label.classList.remove('active');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

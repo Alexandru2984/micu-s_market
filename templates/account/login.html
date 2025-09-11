@@ -1,0 +1,70 @@
+{% extends 'base_auth.html' %}
+{% load static %}
+
+{% block title %}Autentificare - Micu's Market{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1><i class="fas fa-sign-in-alt"></i> Conectează-te</h1>
+            <p>Bine ai revenit! Accesează-ți contul.</p>
+        </div>
+        
+        <form method="post" class="auth-form" action="{% url 'account_login' %}">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <label for="id_login">
+                    <i class="fas fa-envelope"></i> Email
+                </label>
+                <input type="email" name="login" id="id_login" class="form-control" placeholder="Adresa ta de email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password">
+                    <i class="fas fa-lock"></i> Parolă
+                </label>
+                <div style="position: relative;">
+                    <input type="password" name="password" id="id_password" class="form-control" placeholder="Parola ta" required>
+                    <button type="button" onclick="togglePasswordVisibility('id_password')" 
+                            style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #718096; cursor: pointer;">
+                        <i class="fas fa-eye password-toggle-icon"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-check">
+                <input type="checkbox" name="remember" id="id_remember"> 
+                <label for="id_remember">Reține-mă</label>
+                <a href="{% url 'account_reset_password' %}" style="margin-left: auto;">Parolă uitată?</a>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">
+                <i class="fas fa-arrow-right"></i> Intră în cont
+            </button>
+        </form>
+        
+        <div class="auth-footer">
+            <p>Cont nou? <a href="{% url 'account_signup' %}">Înregistrează-te</a></p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/auth.js' %}"></script>
+{% endblock %}

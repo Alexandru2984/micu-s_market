@@ -3,6 +3,10 @@
 
 {% block title %}Șterge anunț - Micu's Market{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-2xl mx-auto">
@@ -36,54 +40,74 @@
         </div>
 
         <!-- Listing Preview -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-            <div class="flex items-start space-x-4">
-                <!-- Image -->
-                <div class="flex-shrink-0">
+        <div class="listing-preview-card mb-8">
+            <div class="listing-preview-header">
+                <i class="fas fa-eye"></i>
+                <span>Anunț care va fi șters</span>
+            </div>
+            
+            <div class="listing-preview-content">
+                <!-- Image Section -->
+                <div class="listing-image-container" onclick="openImageModal()">
                     {% if listing.main_image %}
-                        <img src="{{ listing.main_image.image.url }}" alt="{{ listing.title }}" class="w-24 h-24 object-cover rounded-lg border">
+                        <img src="{{ listing.images.first.image.url }}" alt="{{ listing.title }}" class="listing-main-image" id="preview-image">
+                        <div class="image-overlay">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
                     {% else %}
-                        <div class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-image text-gray-400 text-xl"></i>
+                        <div class="listing-no-image">
+                            <i class="fas fa-image"></i>
+                            <span>Fără imagine</span>
                         </div>
                     {% endif %}
                 </div>
                 
-                <!-- Content -->
-                <div class="flex-1 min-w-0">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">{{ listing.title }}</h3>
+                <!-- Content Section -->
+                <div class="listing-details">
+                    <div class="listing-title-section">
+                        <h3 class="listing-title">{{ listing.title }}</h3>
+                        <div class="listing-price">{{ listing.price|floatformat:0 }} RON</div>
+                    </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-                        <div class="flex items-center">
-                            <i class="fas fa-tag mr-2 text-gray-400"></i>
+                    <div class="listing-meta-grid">
+                        <div class="meta-item">
+                            <i class="fas fa-tag"></i>
                             <span>{{ listing.category.name }}</span>
                         </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-euro-sign mr-2 text-gray-400"></i>
-                            <span>{{ listing.price|floatformat:0 }} RON</span>
+                        <div class="meta-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>{{ listing.city }}, {{ listing.county }}</span>
                         </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
-                            <span>{{ listing.location }}</span>
-                        </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-calendar mr-2 text-gray-400"></i>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
                             <span>{{ listing.created_at|date:"d M Y" }}</span>
                         </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-eye mr-2 text-gray-400"></i>
+                        <div class="meta-item">
+                            <i class="fas fa-eye"></i>
                             <span>{{ listing.views_count }} vizualizări</span>
                         </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-images mr-2 text-gray-400"></i>
+                        <div class="meta-item">
+                            <i class="fas fa-images"></i>
                             <span>{{ listing.images.count }} imagini</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-info-circle"></i>
+                            <span>{{ listing.get_condition_display }}</span>
                         </div>
                     </div>
                     
-                    <div class="mt-4 p-3 bg-gray-50 rounded-lg">
-                        <p class="text-sm text-gray-700 line-clamp-3">
+                    <div class="listing-description">
+                        <div class="description-label">
+                            <i class="fas fa-align-left"></i>
+                            Descriere
+                        </div>
+                        <p class="description-text">
                             {{ listing.description|truncatewords:30 }}
                         </p>
+                    </div>
+                </div>
+            </div>
+        </div>
                     </div>
                 </div>
             </div>
@@ -125,24 +149,35 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-                    <div class="flex items-center space-x-3">
-                        <a href="{% url 'listings:detail' slug=listing.slug %}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                            <i class="fas fa-arrow-left mr-2"></i>
+                <div class="delete-actions pt-6 border-t border-gray-200">
+                    <div class="delete-actions-left">
+                        <a href="{% url 'listings:detail' slug=listing.slug %}" class="btn-back">
+                            <i class="fas fa-arrow-left"></i>
                             Înapoi la anunț
                         </a>
-                        <a href="{% url 'listings:my_listings' %}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        <a href="{% url 'listings:my_listings' %}" class="btn-cancel">
                             Anulează
                         </a>
                     </div>
                     
-                    <button type="submit" id="delete-button" disabled
-                            class="px-8 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed">
-                        <i class="fas fa-trash-alt mr-2"></i>
+                    <button type="submit" id="delete-button" disabled class="btn-delete-final">
+                        <i class="fas fa-trash-alt"></i>
                         Șterge definitiv
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="image-modal" onclick="closeImageModal()">
+    <div class="image-modal-content">
+        <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+        <img id="modalImage" class="modal-image" src="" alt="">
+        <div class="image-modal-info">
+            <h3 id="modalTitle"></h3>
+            <p id="modalPrice"></p>
         </div>
     </div>
 </div>
@@ -155,13 +190,54 @@ document.addEventListener('DOMContentLoaded', function() {
     checkbox.addEventListener('change', function() {
         button.disabled = !this.checked;
         if (this.checked) {
-            button.classList.remove('disabled:bg-gray-400', 'disabled:cursor-not-allowed');
-            button.classList.add('bg-red-600', 'hover:bg-red-700');
+            button.classList.remove('btn-disabled');
+            button.classList.add('btn-delete-final-active');
         } else {
-            button.classList.add('disabled:bg-gray-400', 'disabled:cursor-not-allowed');
-            button.classList.remove('bg-red-600', 'hover:bg-red-700');
+            button.classList.add('btn-disabled');
+            button.classList.remove('btn-delete-final-active');
         }
     });
+});
+
+function openImageModal() {
+    const previewImage = document.getElementById('preview-image');
+    if (!previewImage) return; // Nu face nimic dacă nu există imagine
+    
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalPrice = document.getElementById('modalPrice');
+    
+    modal.style.display = "block";
+    modalImg.src = previewImage.src;
+    modalImg.alt = previewImage.alt;
+    modalTitle.textContent = "{{ listing.title }}";
+    modalPrice.textContent = "{{ listing.price|floatformat:0 }} RON";
+    
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+    
+    // Animation
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    modal.classList.remove('show');
+    
+    setTimeout(() => {
+        modal.style.display = "none";
+        document.body.style.overflow = 'auto';
+    }, 300);
+}
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeImageModal();
+    }
 });
 </script>
 {% endblock %}

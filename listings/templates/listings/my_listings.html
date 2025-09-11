@@ -94,8 +94,8 @@
                             <div class="flex items-center space-x-4">
                                 <!-- Image -->
                                 <div class="flex-shrink-0">
-                                    {% if listing.main_image %}
-                                        <img src="{{ listing.main_image.image.url }}" alt="{{ listing.title }}" class="w-16 h-16 object-cover rounded-lg border">
+                                    {% if listing.main %}
+                                        <img src="{{ listing.main.image.url }}" alt="{{ listing.title }}" class="w-16 h-16 object-cover rounded-lg border">
                                     {% else %}
                                         <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
                                             <i class="fas fa-image text-gray-400"></i>

@@ -6,12 +6,15 @@ from django.conf import settings
 urlpatterns = [
     path("admin/", admin.site.urls),
 
+    # Django Allauth URLs
+    path("accounts/", include("allauth.urls")),
+    
     # Homepage
     path("", include(("listings.urls", "listings"), namespace="listings")),
     
     # Aplicații
     path("pages/", include(("pages.urls", "pages"), namespace="pages")),
-    path("accounts/", include(("accounts.urls", "accounts"), namespace="accounts")),
+    path("accounts/custom/", include(("accounts.urls", "accounts"), namespace="accounts")),
     path("categories/", include(("categories.urls", "categories"), namespace="categories")),
     path("search/", include(("search.urls", "search"), namespace="search")),
     path("chat/", include(("chat.urls", "chat"), namespace="chat")),

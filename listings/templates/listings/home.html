@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Micu's Market - Marketplace România{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <h1>Bine ai venit la Micu's Market!</h1>
+        <p>Marketplace-ul tău de încredere pentru cumpărături și vânzări</p>
+        
+        <div class="search-box">
+            <form method="GET" action="{% url 'listings:list' %}">
+                <input type="text" name="search" class="search-input" placeholder="Caută produse..." value="{{ request.GET.search }}">
+                <button type="submit" class="search-button">Caută</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Categorii Principale -->
+    <section class="categories-section">
+        <h2>Categorii Populare</h2>
+        <div class="categories-grid">
+            {% for category in categories %}
+            <a href="{% url 'listings:list' %}?category={{ category.slug }}" class="category-card">
+                {% if category.icon %}
+                    <div class="category-icon">
+                        <i class="fas {{ category.icon }}"></i>
+                    </div>
+                {% else %}
+                    <div class="category-icon">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                {% endif %}
+                <div class="category-name">{{ category.name }}</div>
+                {% if category.active_listings_count %}
+                    <div class="category-count">{{ category.active_listings_count }} anunțuri</div>
+                {% endif %}
+            </a>
+            {% empty %}
+            <p>Nu există categorii încă.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Anunțuri Promovate -->
+    {% if featured_listings %}
+    <section class="featured-section">
+        <h2>Anunțuri Promovate</h2>
+        <div class="listings-grid">
+            {% for listing in featured_listings %}
+            <a href="{% url 'listings:detail' listing.slug %}" class="listing-card featured">
+                <div class="listing-image">
+                    {% if listing.images.first %}
+                        <img src="{{ listing.images.first.image.url }}" alt="{{ listing.title }}">
+                    {% else %}
+                        <div class="no-image">📷</div>
+                    {% endif %}
+                    <span class="featured-badge">Promovat</span>
+                </div>
+                
+                <div class="listing-info">
+                    <h3>{{ listing.title }}</h3>
+                    <p class="price">{{ listing.price }} Lei</p>
+                    <p class="location">{{ listing.city }}, {{ listing.county }}</p>
+                    <p class="meta">
+                        {{ listing.created_at|date:"d M Y" }} • 
+                        {{ listing.views_count }} vizualizări
+                    </p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Anunțuri Recente -->
+    <section class="recent-section">
+        <h2>Anunțuri Recente</h2>
+        <div class="listings-grid">
+            {% for listing in recent_listings %}
+            <a href="{% url 'listings:detail' listing.slug %}" class="listing-card">
+                <div class="listing-image">
+                    {% if listing.images.first %}
+                        <img src="{{ listing.images.first.image.url }}" alt="{{ listing.title }}">
+                    {% else %}
+                        <div class="no-image">📷</div>
+                    {% endif %}
+                </div>
+                
+                <div class="listing-info">
+                    <h3>{{ listing.title }}</h3>
+                    <p class="price">{{ listing.price }} Lei</p>
+                    <p class="location">{{ listing.city }}, {{ listing.county }}</p>
+                    <p class="meta">
+                        {{ listing.created_at|date:"d M Y" }} • 
+                        {{ listing.views_count }} vizualizări
+                    </p>
+                </div>
+            </a>
+            {% empty %}
+            <div class="empty-state">
+                <h3>Nu există anunțuri încă</h3>
+                <p>Fii primul care postează un anunț!</p>
+                <a href="{% url 'listings:create' %}" class="btn btn-primary">Adaugă Anunț</a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if recent_listings %}
+        <div class="view-all">
+            <a href="{% url 'listings:list' %}" class="btn btn-outline">Vezi toate anunțurile</a>
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

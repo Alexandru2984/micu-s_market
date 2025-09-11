@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("Micu's Market ready ✅");
   
   // Inițializează compresia pentru avatar
   initializeAvatarCompression();

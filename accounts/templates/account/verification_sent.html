@@ -1,0 +1,31 @@
+{% extends 'base_auth.html' %}
+{% load static %}
+
+{% block title %}Verifică Email-ul - Micu's Market{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1><i class="fas fa-envelope"></i> Verifică Email-ul</h1>
+        </div>
+        
+        <div class="auth-form">
+            <div style="text-align: center; padding: 2rem;">
+                <i class="fas fa-envelope" style="color: #667eea; font-size: 3rem; margin-bottom: 1rem;"></i>
+                <p style="font-size: 1.1rem; margin-bottom: 1rem;">Am trimis un email de confirmare la adresa ta.</p>
+                <p style="color: #718096; margin-bottom: 1.5rem;">Te rugăm să verifici inbox-ul și spam-ul pentru a confirma contul.</p>
+                <p style="color: #718096; font-size: 0.9rem;">Nu ai primit emailul? Verifică din nou în câteva minute.</p>
+            </div>
+        </div>
+        
+        <div class="auth-footer">
+            <p><a href="{% url 'account_login' %}">Înapoi la autentificare</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -16,16 +16,18 @@ document.querySelector('.contact-btn')?.addEventListener('click', function() {
 // Favorite functionality
 document.querySelector('.favorite-btn')?.addEventListener('click', function() {
     const icon = this.querySelector('i');
+    const textSpan = this.querySelector('span'); // Selecționează elementul <span>
+    
     if (icon.classList.contains('fas')) {
+        // Logica pentru a elimina din favorite
         icon.classList.remove('fas');
         icon.classList.add('far');
-        this.style.color = '#4a5568';
-        this.innerHTML = '<i class="far fa-heart"></i> Salvează în favorite';
+        textSpan.textContent = 'Adaugă la favorite';
     } else {
+        // Logica pentru a adăuga la favorite
         icon.classList.remove('far');
         icon.classList.add('fas');
-        this.style.color = '#e53e3e';
-        this.innerHTML = '<i class="fas fa-heart"></i> Salvat în favorite';
+        textSpan.textContent = 'În favorite';
     }
 });
 

@@ -1,0 +1,28 @@
+{% load account %}{% user_display user as user_display %}{% load i18n %}{% autoescape off %}Bine ai venit la Micu's Market!
+
+Salut {{ user_display }},
+
+Îți mulțumim că te-ai alăturat comunității Micu's Market! 🏪
+
+Pentru a-ți activa contul și a începe să vinzi sau să cumperi produse, te rugăm să confirmi adresa de email făcând click pe link-ul de mai jos:
+
+{{ activate_url }}
+
+Dacă nu poți să faci click pe link, copiază și lipește această adresă în browser:
+{{ activate_url }}
+
+Ce poți face pe Micu's Market:
+✅ Publici anunțuri gratuit pentru produsele tale
+✅ Cauți și cumperi produse de la alți utilizatori
+✅ Comunici direct cu vânzătorii prin chat integrat
+✅ Salvezi anunțurile favorite
+✅ Primești și oferi review-uri
+
+Dacă nu te-ai înregistrat pe site-ul nostru, poți ignora acest email.
+
+Cu drag,
+Echipa Micu's Market
+🌐 {{ current_site.domain }}
+
+---
+Acest email a fost trimis automat. Te rugăm să nu răspunzi la acest email.{% endautoescape %}

@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
-
+{% load static %} 
 {% block title %}Adaugă anunț nou - Micu's Market{% endblock %}
-
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-2xl mx-auto">
@@ -164,27 +166,6 @@
     </div>
 </div>
 
-<style>
-.form-control {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-select.form-control {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-}
-</style>
 {% endblock %}
+
+

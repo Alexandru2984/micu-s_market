@@ -1,0 +1,499 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Răspunde la review - Micu's Market{% endblock %}
+
+{% block content %}
+<div class="add-response-container">
+    <div class="container">
+        <div class="response-form-card">
+            <!-- Review original -->
+            <div class="original-review">
+                <div class="review-header">
+                    <h2><i class="fas fa-reply"></i> Răspunde la review</h2>
+                    <p class="subtitle">Răspunde la review-ul primit pentru a clarifica sau mulțumi</p>
+                </div>
+                
+                <div class="review-content">
+                    <div class="reviewer-info">
+                        <div class="reviewer-avatar">
+                            {% if review.reviewer.profile.avatar %}
+                                <img src="{{ review.reviewer.profile.avatar.url }}" alt="{{ review.reviewer.username }}">
+                            {% else %}
+                                <div class="small-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="reviewer-details">
+                            <h3>{{ review.reviewer.get_full_name|default:review.reviewer.username }}</h3>
+                            <div class="review-meta">
+                                <div class="stars">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <span class="review-date">{{ review.created_at|date:"d.m.Y" }}</span>
+                                <span class="transaction-type">
+                                    {% if review.transaction_type == 'purchase' %}
+                                        <i class="fas fa-shopping-cart"></i> Cumpărare
+                                    {% else %}
+                                        <i class="fas fa-tag"></i> Vânzare
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="review-text">
+                        {% if review.title %}
+                            <h4 class="review-title">{{ review.title }}</h4>
+                        {% endif %}
+                        <p class="review-comment">{{ review.comment|linebreaks }}</p>
+                        
+                        {% if review.listing %}
+                            <div class="related-listing">
+                                <i class="fas fa-tag"></i>
+                                <span>Pentru anunțul: </span>
+                                <a href="{% url 'listings:detail' review.listing.slug %}">{{ review.listing.title }}</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formular răspuns -->
+            <div class="response-form-section">
+                <h3><i class="fas fa-pen"></i> Răspunsul tău</h3>
+                
+                <form method="post" class="response-form">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="error-messages">
+                            {% for error in form.non_field_errors %}
+                                <div class="error-item">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label for="{{ form.response_text.id_for_label }}" class="required">Răspunsul tău</label>
+                        {{ form.response_text }}
+                        {% if form.response_text.errors %}
+                            <div class="field-errors">
+                                {% for error in form.response_text.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="field-help">
+                            Oferă un răspuns constructiv și profesional. Poți mulțumi pentru feedback sau clarifica anumite aspecte.
+                        </div>
+                        <div class="char-count">
+                            <span id="charCount">0</span> / 1000 caractere
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-reply"></i> Publică răspunsul
+                        </button>
+                        
+                        <a href="{% url 'reviews:user_reviews' user.username %}" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-times"></i> Anulează
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Tips pentru răspunsuri -->
+        <div class="tips-card">
+            <h3><i class="fas fa-lightbulb"></i> Sfaturi pentru răspunsuri eficiente</h3>
+            <ul>
+                <li>Mulțumește pentru feedback-ul primit, chiar dacă este negativ</li>
+                <li>Răspunde într-o manieră profesională și respectuoasă</li>
+                <li>Clarifica orice neînțelegeri sau probleme menționate</li>
+                <li>Oferă soluții pentru problemele ridicate</li>
+                <li>Evită răspunsurile defensive sau conflictuale</li>
+                <li>Arată că îți pasă de experiența utilizatorilor</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+.add-response-container {
+    min-height: 80vh;
+    background: #f8fafc;
+    padding: 2rem 0;
+}
+
+.response-form-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+/* Review original */
+.original-review {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+}
+
+.review-header h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.subtitle {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+.review-content {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.reviewer-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.reviewer-avatar img,
+.small-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.2);
+}
+
+.small-avatar {
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.8);
+    font-size: 1.2rem;
+}
+
+.reviewer-details h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+}
+
+.review-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.review-meta .stars {
+    color: #fbbf24;
+}
+
+.review-text {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.review-title {
+    color: white;
+    margin: 0 0 0.75rem 0;
+    font-size: 1.1rem;
+}
+
+.review-comment {
+    color: rgba(255,255,255,0.95);
+    line-height: 1.6;
+    margin: 0 0 1rem 0;
+}
+
+.related-listing {
+    padding: 1rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: 6px;
+    color: rgba(255,255,255,0.9);
+    font-size: 0.9rem;
+}
+
+.related-listing a {
+    color: #fbbf24;
+    text-decoration: none;
+}
+
+.related-listing a:hover {
+    text-decoration: underline;
+}
+
+/* Formular răspuns */
+.response-form-section {
+    padding: 2rem;
+}
+
+.response-form-section h3 {
+    color: #2d3748;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 2px solid #edf2f7;
+    padding-bottom: 0.5rem;
+}
+
+.response-form-section h3 i {
+    color: #667eea;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+label.required::after {
+    content: " *";
+    color: #e53e3e;
+}
+
+textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    line-height: 1.6;
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.field-help {
+    font-size: 0.85rem;
+    color: #718096;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+.char-count {
+    text-align: right;
+    font-size: 0.8rem;
+    color: #718096;
+    margin-top: 0.5rem;
+}
+
+.char-count.over-limit {
+    color: #e53e3e;
+    font-weight: 600;
+}
+
+.field-errors {
+    margin-top: 0.5rem;
+}
+
+.error {
+    display: block;
+    color: #e53e3e;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.error-messages {
+    background: #fed7d7;
+    border: 1px solid #feb2b2;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.error-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #c53030;
+    font-weight: 500;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #edf2f7;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #edf2f7;
+    color: #4a5568;
+}
+
+.btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+/* Tips card */
+.tips-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.tips-card h3 {
+    color: #2d3748;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tips-card h3 i {
+    color: #fbbf24;
+}
+
+.tips-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tips-card li {
+    padding: 0.75rem 0;
+    color: #4a5568;
+    position: relative;
+    padding-left: 1.5rem;
+    line-height: 1.5;
+}
+
+.tips-card li::before {
+    content: "💡";
+    position: absolute;
+    left: 0;
+    top: 0.75rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .add-response-container {
+        padding: 1rem 0;
+    }
+    
+    .original-review,
+    .response-form-section {
+        padding: 1.5rem;
+    }
+    
+    .reviewer-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .review-meta {
+        flex-wrap: wrap;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .tips-card {
+        padding: 1.5rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('id_response_text');
+    const charCount = document.getElementById('charCount');
+    const maxLength = 1000;
+    
+    function updateCharCount() {
+        const currentLength = textarea.value.length;
+        charCount.textContent = currentLength;
+        
+        if (currentLength > maxLength) {
+            charCount.parentElement.classList.add('over-limit');
+        } else {
+            charCount.parentElement.classList.remove('over-limit');
+        }
+    }
+    
+    // Update count on page load
+    updateCharCount();
+    
+    // Update count as user types
+    textarea.addEventListener('input', updateCharCount);
+});
+</script>
+{% endblock %}

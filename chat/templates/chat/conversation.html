@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Conversație cu {{ other_participant.get_full_name|default:other_participant.username }} - Micu's Market
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="conversation-container">
+    <div class="container">
+        <!-- Header conversație -->
+        <div class="conversation-header">
+            <div class="header-left">
+                <a href="{% url 'chat:inbox' %}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Înapoi la mesaje
+                </a>
+                
+                <div class="conversation-info">
+                    <div class="participant-avatar">
+                        {% if other_participant.profile.avatar %}
+                            <img src="{{ other_participant.profile.avatar.url }}" alt="{{ other_participant.username }}">
+                        {% else %}
+                            <div class="default-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="participant-details">
+                        <h2>{{ other_participant.get_full_name|default:other_participant.username }}</h2>
+                        <div class="listing-info">
+                            <i class="fas fa-tag"></i>
+                            <a href="{% url 'listings:detail' listing.slug %}">{{ listing.title }}</a>
+                            <span class="listing-price">{{ listing.price }} RON</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <a href="{% url 'listings:detail' listing.slug %}" class="btn btn-outline">
+                    <i class="fas fa-eye"></i> Vezi anunțul
+                </a>
+            </div>
+        </div>
+
+        <!-- Mesaje -->
+        <div class="messages-container" id="messagesContainer">
+            <div class="messages-list" id="messagesList">
+                {% for message in page_obj reversed %}
+                    <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                        <div class="message-avatar">
+                            {% if message.sender.profile.avatar %}
+                                <img src="{{ message.sender.profile.avatar.url }}" alt="{{ message.sender.username }}">
+                            {% else %}
+                                <div class="small-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                <p>{{ message.content|linebreaks }}</p>
+                                
+                                <!-- Atașamente -->
+                                {% if message.attachments.all %}
+                                    <div class="message-attachments">
+                                        {% for attachment in message.attachments.all %}
+                                            <div class="attachment">
+                                                {% if attachment.file_type == 'image' %}
+                                                    <img src="{{ attachment.file.url }}" alt="{{ attachment.filename }}" class="attachment-image">
+                                                {% else %}
+                                                    <a href="{{ attachment.file.url }}" target="_blank" class="attachment-file">
+                                                        <i class="fas fa-file"></i>
+                                                        {{ attachment.filename }}
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="message-time">
+                                {{ message.created_at|date:"d.m.Y H:i" }}
+                                {% if message.sender == request.user and message.is_read %}
+                                    <i class="fas fa-check-double read"></i>
+                                {% elif message.sender == request.user %}
+                                    <i class="fas fa-check"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Form pentru mesaj nou -->
+        <div class="message-form-container">
+            <form id="messageForm" method="post" action="{% url 'chat:send_message' conversation.pk %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="message-input-container">
+                    <textarea name="content" id="messageContent" placeholder="Scrie un mesaj..." rows="3" required></textarea>
+                    
+                    <div class="message-actions">
+                        <label for="fileInput" class="attachment-btn">
+                            <i class="fas fa-paperclip"></i>
+                        </label>
+                        <input type="file" id="fileInput" name="attachments" multiple accept="image/*,.pdf,.doc,.docx" style="display: none;">
+                        
+                        <button type="submit" class="send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="attachmentPreview" class="attachment-preview" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/chat-conversation.js' %}"></script>
+{% endblock %}

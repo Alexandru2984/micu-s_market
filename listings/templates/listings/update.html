@@ -3,6 +3,10 @@
 
 {% block title %}{{ title }} - Micu's Market{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-4xl mx-auto">
@@ -13,12 +17,12 @@
                     <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ title }}</h1>
                     <p class="text-gray-600">Modifică informațiile anunțului tău</p>
                 </div>
-                <div class="flex items-center gap-3">
-                    <a href="{% url 'listings:detail' slug=listing.slug %}" class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                <div class="listing-header flex items-center gap-3">
+                    <a href="{% url 'listings:detail' slug=listing.slug %}">
                         <i class="fas fa-eye"></i>
                         Vezi anunțul
                     </a>
-                    <a href="{% url 'listings:my_listings' %}" class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                    <a href="{% url 'listings:my_listings' %}" class="secondary">
                         <i class="fas fa-arrow-left"></i>
                         Înapoi
                     </a>
@@ -206,10 +210,10 @@
 
                 <!-- Images Section -->
                 <div class="pb-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center justify-between">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center justify-between image-section-header">
                         <span>Imagini</span>
-                        <a href="{% url 'listings:upload_images' slug=listing.slug %}" class="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded-lg hover:bg-blue-100 transition-colors">
-                            <i class="fas fa-plus mr-1"></i>
+                        <a href="{% url 'listings:upload_images' slug=listing.slug %}">
+                            <i class="fas fa-plus"></i>
                             Gestionează imagini separat
                         </a>
                     </h2>
@@ -217,24 +221,39 @@
                     
                     {{ formset.management_form }}
                     
-                    <div id="image-forms" class="space-y-4">
+                    <div id="image-forms">
                         {% for form in formset %}
-                            <div class="image-form-row border border-gray-200 rounded-lg p-4">
+                            <div class="image-form-row{% if not form.instance.pk %} empty-form{% endif %}">
                                 {{ form.id }}
                                 
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Current Image Display -->
+                                {% if form.instance.image %}
+                                    <div class="current-image-display">
+                                        <img src="{{ form.instance.image.url }}" alt="{{ form.instance.alt_text }}">
+                                        <div class="current-image-label">
+                                            <i class="fas fa-image"></i>
+                                            Imagine curentă
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                <div class="image-form-grid">
                                     <!-- Imagine -->
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <label class="image-form-label">
+                                            <i class="fas fa-camera"></i>
                                             {{ form.image.label }}
                                         </label>
-                                        {% if form.instance.image %}
-                                            <div class="mb-2">
-                                                <img src="{{ form.instance.image.url }}" alt="{{ form.instance.alt_text }}" class="w-20 h-20 object-cover rounded-lg border">
-                                                <p class="text-xs text-gray-500 mt-1">Imagine curentă</p>
+                                        <div class="file-input-wrapper">
+                                            {{ form.image }}
+                                            <div class="file-input-display">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                                <div class="file-input-text">
+                                                    <span class="main-text">Alege imagine</span>
+                                                    <span class="sub-text">JPG, PNG (max 5MB)</span>
+                                                </div>
                                             </div>
-                                        {% endif %}
-                                        {{ form.image }}
+                                        </div>
                                         {% if form.image.errors %}
                                             <div class="mt-1 text-sm text-red-600">
                                                 {% for error in form.image.errors %}
@@ -246,10 +265,15 @@
 
                                     <!-- Alt text -->
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <label class="image-form-label">
+                                            <i class="fas fa-tag"></i>
                                             {{ form.alt_text.label }}
                                         </label>
-                                        {{ form.alt_text }}
+                                        <input type="text" name="{{ form.alt_text.name }}" 
+                                               value="{{ form.alt_text.value|default:'' }}"
+                                               class="alt-text-input"
+                                               placeholder="Descriere scurtă a imaginii"
+                                               {% if form.alt_text.field.required %}required{% endif %}>
                                         {% if form.alt_text.errors %}
                                             <div class="mt-1 text-sm text-red-600">
                                                 {% for error in form.alt_text.errors %}
@@ -262,11 +286,11 @@
 
                                 <!-- Delete checkbox -->
                                 {% if form.DELETE %}
-                                    <div class="mt-3 pt-3 border-t border-gray-100">
-                                        <label class="flex items-center gap-2 text-sm text-red-600 cursor-pointer">
+                                    <div class="delete-image-section">
+                                        <label class="delete-checkbox-wrapper">
                                             {{ form.DELETE }}
                                             <i class="fas fa-trash-alt"></i>
-                                            Șterge această imagine
+                                            <span class="delete-text">Șterge această imagine</span>
                                         </label>
                                     </div>
                                 {% endif %}
@@ -276,19 +300,20 @@
                 </div>
 
                 <!-- Submit Buttons -->
-                <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-                    <div class="flex items-center gap-3">
-                        <a href="{% url 'listings:detail' slug=listing.slug %}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="form-actions pt-6 border-t border-gray-200">
+                    <div class="form-actions-left">
+                        <a href="{% url 'listings:detail' slug=listing.slug %}" class="btn-cancel">
+                            <i class="fas fa-times"></i>
                             Anulează
                         </a>
-                        <a href="{% url 'listings:delete' slug=listing.slug %}" class="px-6 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors">
-                            <i class="fas fa-trash-alt mr-2"></i>
+                        <a href="{% url 'listings:delete' slug=listing.slug %}" class="btn-delete">
+                            <i class="fas fa-trash-alt"></i>
                             Șterge anunțul
                         </a>
                     </div>
                     
-                    <button type="submit" class="px-8 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                        <i class="fas fa-save mr-2"></i>
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save"></i>
                         Salvează modificările
                     </button>
                 </div>
@@ -297,175 +322,8 @@
     </div>
 </div>
 
-<style>
-.form-control {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    transition: border-color 0.2s;
-}
+{% endblock %}
 
-.form-control:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.form-control[type="file"] {
-    padding: 0.5rem;
-}
-
-select.form-control {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-}
-
-.image-preview {
-    max-width: 150px;
-    max-height: 150px;
-    object-fit: cover;
-    border-radius: 0.5rem;
-    border: 2px solid #e5e7eb;
-}
-
-.compression-info {
-    font-size: 0.75rem;
-    color: #10b981;
-    margin-top: 0.25rem;
-}
-</style>
-
-<script>
-// Funcție pentru compresie automată imagini
-function compressImage(file, maxWidth = 800, maxHeight = 800, quality = 0.8) {
-    return new Promise((resolve) => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const img = new Image();
-        
-        img.onload = function() {
-            // Calculează dimensiunile noi păstrând raportul de aspect
-            let { width, height } = img;
-            
-            if (width > height) {
-                if (width > maxWidth) {
-                    height = (height * maxWidth) / width;
-                    width = maxWidth;
-                }
-            } else {
-                if (height > maxHeight) {
-                    width = (width * maxHeight) / height;
-                    height = maxHeight;
-                }
-            }
-            
-            canvas.width = width;
-            canvas.height = height;
-            
-            // Desenează imaginea compresată
-            ctx.drawImage(img, 0, 0, width, height);
-            
-            // Convertește înapoi în Blob
-            canvas.toBlob(resolve, 'image/jpeg', quality);
-        };
-        
-        img.src = URL.createObjectURL(file);
-    });
-}
-
-// Adaugă funcționalitate de compresie la toate input-urile de tip file
-document.addEventListener('DOMContentLoaded', function() {
-    const fileInputs = document.querySelectorAll('input[type="file"][accept*="image"]');
-    
-    fileInputs.forEach(input => {
-        input.addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            // Verifică dacă e imagine
-            if (!file.type.startsWith('image/')) return;
-            
-            const originalSize = file.size;
-            const maxSize = 2 * 1024 * 1024; // 2MB
-            
-            // Doar compresează dacă imaginea e mai mare de 2MB
-            if (originalSize > maxSize) {
-                try {
-                    const compressedFile = await compressImage(file);
-                    const compressedSize = compressedFile.size;
-                    
-                    // Creează un nou File object
-                    const newFile = new File([compressedFile], file.name, {
-                        type: 'image/jpeg',
-                        lastModified: Date.now()
-                    });
-                    
-                    // Înlocuiește fișierul în input
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(newFile);
-                    e.target.files = dataTransfer.files;
-                    
-                    // Afișează info despre compresie
-                    showCompressionInfo(e.target, originalSize, compressedSize);
-                    
-                } catch (error) {
-                    console.error('Eroare la compresie:', error);
-                }
-            }
-            
-            // Afișează preview-ul imaginii
-            showImagePreview(e.target, e.target.files[0]);
-        });
-    });
-});
-
-function showCompressionInfo(input, originalSize, compressedSize) {
-    const container = input.closest('.image-form-row') || input.parentElement;
-    let infoDiv = container.querySelector('.compression-info');
-    
-    if (!infoDiv) {
-        infoDiv = document.createElement('div');
-        infoDiv.className = 'compression-info';
-        input.parentElement.appendChild(infoDiv);
-    }
-    
-    const originalMB = (originalSize / (1024 * 1024)).toFixed(2);
-    const compressedMB = (compressedSize / (1024 * 1024)).toFixed(2);
-    const reduction = (((originalSize - compressedSize) / originalSize) * 100).toFixed(1);
-    
-    infoDiv.innerHTML = `
-        <i class="fas fa-check-circle"></i>
-        Imagine compresată: ${originalMB}MB → ${compressedMB}MB (reducere ${reduction}%)
-    `;
-}
-
-function showImagePreview(input, file) {
-    const container = input.closest('.image-form-row') || input.parentElement;
-    let previewDiv = container.querySelector('.image-preview-container');
-    
-    if (!previewDiv) {
-        previewDiv = document.createElement('div');
-        previewDiv.className = 'image-preview-container mt-3';
-        input.parentElement.appendChild(previewDiv);
-    }
-    
-    if (file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            previewDiv.innerHTML = `
-                <img src="${e.target.result}" alt="Preview" class="image-preview">
-                <p class="text-xs text-gray-500 mt-1">Preview imagine</p>
-            `;
-        };
-        reader.readAsDataURL(file);
-    } else {
-        previewDiv.innerHTML = '';
-    }
-}
-</script>
+{% block extra_js %}
+<script src="{% static 'js/image-upload.js' %}"></script>
 {% endblock %}

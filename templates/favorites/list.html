@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Anunțurile mele favorite - Micu's Market{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <div class="header-content">
+            <h1><i class="fas fa-heart"></i> Anunțurile mele favorite</h1>
+            {% if total_favorites %}
+                <p class="subtitle">{{ total_favorites }} anunțuri în lista ta de favorite</p>
+            {% else %}
+                <p class="subtitle">Nu ai încă anunțuri în lista de favorite</p>
+            {% endif %}
+        </div>
+        
+        <div class="header-actions">
+            <a href="{% url 'listings:list' %}" class="btn btn-primary">
+                <i class="fas fa-search"></i> Căută anunțuri
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Favorites List -->
+<section class="favorites-section">
+    <div class="container">
+        {% if page_obj %}
+            <div class="listings-grid">
+                {% for favorite in page_obj %}
+                {% with listing=favorite.listing %}
+                <div class="listing-card">
+                    <a href="{% url 'listings:detail' listing.slug %}" class="listing-link">
+                        <div class="listing-image">
+                            {% if listing.images.first %}
+                                <img src="{{ listing.images.first.image.url }}" alt="{{ listing.title }}">
+                            {% else %}
+                                <div class="no-image">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            {% endif %}
+                            
+                            {% if listing.is_featured %}
+                                <div class="featured-badge">
+                                    <i class="fas fa-star"></i> Recomandat
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="listing-content">
+                            <h3>{{ listing.title }}</h3>
+                            <p class="price">{{ listing.price }} RON</p>
+                            <p class="description">{{ listing.description|truncatewords:15 }}</p>
+                            
+                            <div class="listing-meta">
+                                <span class="location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    {{ listing.city }}, {{ listing.county }}
+                                </span>
+                                <span class="category">{{ listing.category.name }}</span>
+                            </div>
+                            
+                            <div class="listing-footer">
+                                <span class="date">
+                                    <i class="fas fa-calendar"></i>
+                                    Adăugat la favorite: {{ favorite.created_at|date:"d.m.Y" }}
+                                </span>
+                                <span class="views">
+                                    <i class="fas fa-eye"></i> {{ listing.views_count }}
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Action Buttons -->
+                    <div class="listing-actions">
+                        <button class="remove-favorite-btn" data-favorite-id="{{ favorite.id }}" title="Elimină din favorite">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                {% endwith %}
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="page-btn">
+                        <i class="fas fa-chevron-left"></i> Anterior
+                    </a>
+                {% endif %}
+                
+                <span class="page-info">
+                    Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="page-btn">
+                        Următorul <i class="fas fa-chevron-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+        {% else %}
+            <!-- No Favorites -->
+            <div class="no-favorites">
+                <div class="no-favorites-content">
+                    <i class="fas fa-heart-broken"></i>
+                    <h3>Nu ai anunțuri în lista de favorite</h3>
+                    <p>Când vei găsi anunțuri interesante, le poți adăuga la favorite pentru a le accesa mai ușor.</p>
+                    <div class="no-favorites-actions">
+                        <a href="{% url 'listings:list' %}" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Explorează anunțurile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/favorites.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/favorites.js' %}"></script>
+{% endblock %}

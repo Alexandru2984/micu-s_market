@@ -1,0 +1,643 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Review-urile mele - Micu's Market{% endblock %}
+
+{% block content %}
+<div class="my-reviews-container">
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="header-content">
+                <h1><i class="fas fa-star"></i> Review-urile mele</h1>
+                <p class="page-subtitle">Gestionează toate review-urile pe care le-ai lăsat</p>
+            </div>
+            
+            <div class="header-stats">
+                <div class="stat-card">
+                    <div class="stat-value">{{ total_reviews }}</div>
+                    <div class="stat-label">Total review-uri</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ avg_rating_given }}</div>
+                    <div class="stat-label">Rating mediu dat</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filtru și căutare -->
+        <div class="filters-card">
+            <form method="get" class="filters-form">
+                <div class="filter-group">
+                    <label for="rating">Rating:</label>
+                    <select name="rating" id="rating">
+                        <option value="">Toate</option>
+                        <option value="5" {% if request.GET.rating == '5' %}selected{% endif %}>5 stele</option>
+                        <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4 stele</option>
+                        <option value="3" {% if request.GET.rating == '3' %}selected{% endif %}>3 stele</option>
+                        <option value="2" {% if request.GET.rating == '2' %}selected{% endif %}>2 stele</option>
+                        <option value="1" {% if request.GET.rating == '1' %}selected{% endif %}>1 stea</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="transaction_type">Tip tranzacție:</label>
+                    <select name="transaction_type" id="transaction_type">
+                        <option value="">Toate</option>
+                        <option value="purchase" {% if request.GET.transaction_type == 'purchase' %}selected{% endif %}>Cumpărare</option>
+                        <option value="sale" {% if request.GET.transaction_type == 'sale' %}selected{% endif %}>Vânzare</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="search">Caută în review-uri:</label>
+                    <input type="text" name="search" id="search" placeholder="Caută utilizatori sau conținut..." value="{{ request.GET.search }}">
+                </div>
+                
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filtrează
+                    </button>
+                    <a href="{% url 'reviews:my_reviews' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Resetează
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        {% if page_obj %}
+            <!-- Lista review-uri -->
+            <div class="reviews-list">
+                {% for review in page_obj %}
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewed-user-info">
+                                <div class="user-avatar">
+                                    {% if review.reviewed_user.profile.avatar %}
+                                        <img src="{{ review.reviewed_user.profile.avatar.url }}" alt="{{ review.reviewed_user.username }}">
+                                    {% else %}
+                                        <div class="small-avatar">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="user-details">
+                                    <h3>
+                                        <a href="{% url 'reviews:user_reviews' review.reviewed_user.username %}">
+                                            {{ review.reviewed_user.get_full_name|default:review.reviewed_user.username }}
+                                        </a>
+                                    </h3>
+                                    <div class="review-meta">
+                                        <div class="stars">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= review.rating %}
+                                                    <i class="fas fa-star"></i>
+                                                {% else %}
+                                                    <i class="far fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <span class="review-date">{{ review.created_at|date:"d.m.Y" }}</span>
+                                        <span class="transaction-type">
+                                            {% if review.transaction_type == 'purchase' %}
+                                                <i class="fas fa-shopping-cart"></i> Cumpărare
+                                            {% else %}
+                                                <i class="fas fa-tag"></i> Vânzare
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="review-actions">
+                                <a href="{% url 'reviews:edit_review' review.id %}" class="btn btn-outline btn-sm">
+                                    <i class="fas fa-edit"></i> Editează
+                                </a>
+                                <form method="post" action="{% url 'reviews:delete_review' review.id %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Ești sigur că vrei să ștergi acest review?')">
+                                        <i class="fas fa-trash"></i> Șterge
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="review-content">
+                            {% if review.title %}
+                                <h4 class="review-title">{{ review.title }}</h4>
+                            {% endif %}
+                            <p class="review-comment">{{ review.comment|linebreaks }}</p>
+                            
+                            {% if review.listing %}
+                                <div class="related-listing">
+                                    <i class="fas fa-tag"></i>
+                                    <span>Pentru anunțul: </span>
+                                    <a href="{% url 'listings:detail' review.listing.slug %}">{{ review.listing.title }}</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Răspunsul proprietarului -->
+                        {% if review.response %}
+                            <div class="review-response">
+                                <div class="response-header">
+                                    <i class="fas fa-reply"></i>
+                                    <strong>Răspunsul lui {{ review.reviewed_user.get_full_name|default:review.reviewed_user.username }}</strong>
+                                    <span class="response-date">{{ review.response.created_at|date:"d.m.Y" }}</span>
+                                </div>
+                                <p class="response-text">{{ review.response.response_text|linebreaks }}</p>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="review-footer">
+                            <div class="review-status">
+                                {% if review.is_approved %}
+                                    <span class="status approved">
+                                        <i class="fas fa-check-circle"></i> Aprobat
+                                    </span>
+                                {% else %}
+                                    <span class="status pending">
+                                        <i class="fas fa-clock"></i> În așteptarea aprobării
+                                    </span>
+                                {% endif %}
+                            </div>
+                            
+                            {% if review.updated_at != review.created_at %}
+                                <span class="updated-info">
+                                    <i class="fas fa-edit"></i> Actualizat la {{ review.updated_at|date:"d.m.Y H:i" }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Paginare -->
+            {% if page_obj.has_other_pages %}
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.transaction_type %}&transaction_type={{ request.GET.transaction_type }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="page-btn">
+                            <i class="fas fa-chevron-left"></i> Anterior
+                        </a>
+                    {% endif %}
+                    
+                    <span class="page-info">
+                        Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}
+                    </span>
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}{% if request.GET.transaction_type %}&transaction_type={{ request.GET.transaction_type }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="page-btn">
+                            Următorul <i class="fas fa-chevron-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+            
+        {% else %}
+            <div class="no-reviews">
+                <div class="empty-state">
+                    <i class="fas fa-star"></i>
+                    <h3>Nu ai lăsat încă review-uri</h3>
+                    <p>Începe să evaluezi experiențele tale cu ceilalți utilizatori pentru a ajuta comunitatea.</p>
+                    <a href="{% url 'listings:list' %}" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Explorează anunțuri
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.my-reviews-container {
+    min-height: 80vh;
+    background: #f8fafc;
+    padding: 2rem 0;
+}
+
+.page-header {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-content h1 {
+    margin: 0 0 0.5rem 0;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 2rem;
+}
+
+.header-content h1 i {
+    color: #667eea;
+}
+
+.page-subtitle {
+    color: #718096;
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.header-stats {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 1rem 1.5rem;
+    background: #f7fafc;
+    border-radius: 8px;
+    min-width: 120px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #718096;
+    font-weight: 500;
+}
+
+/* Filtru */
+.filters-card {
+    background: white;
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+}
+
+.filters-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-group label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 0.9rem;
+}
+
+.filter-group input,
+.filter-group select {
+    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* Review cards */
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.review-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.review-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.reviewed-user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-avatar img,
+.small-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.small-avatar {
+    background: #edf2f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a0aec0;
+    font-size: 1.2rem;
+}
+
+.user-details h3 {
+    margin: 0 0 0.5rem 0;
+}
+
+.user-details h3 a {
+    color: #2d3748;
+    text-decoration: none;
+    font-size: 1.2rem;
+}
+
+.user-details h3 a:hover {
+    color: #667eea;
+}
+
+.review-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.review-meta .stars {
+    color: #fbbf24;
+}
+
+.review-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #edf2f7;
+    color: #4a5568;
+}
+
+.btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+.btn-outline {
+    border: 1px solid #667eea;
+    color: #667eea;
+    background: white;
+}
+
+.btn-outline:hover {
+    background: #667eea;
+    color: white;
+}
+
+.btn-danger {
+    background: #e53e3e;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c53030;
+}
+
+.review-content {
+    margin-bottom: 1.5rem;
+}
+
+.review-title {
+    color: #2d3748;
+    margin: 0 0 0.75rem 0;
+    font-size: 1.1rem;
+}
+
+.review-comment {
+    color: #4a5568;
+    line-height: 1.6;
+    margin: 0 0 1rem 0;
+}
+
+.related-listing {
+    padding: 1rem;
+    background: #f7fafc;
+    border-radius: 8px;
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+.related-listing a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.related-listing a:hover {
+    text-decoration: underline;
+}
+
+.review-response {
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: #f7fafc;
+    border-left: 4px solid #667eea;
+    border-radius: 0 8px 8px 0;
+}
+
+.response-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    color: #667eea;
+    font-size: 0.9rem;
+}
+
+.response-text {
+    color: #4a5568;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.review-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid #edf2f7;
+    font-size: 0.85rem;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.status.approved {
+    color: #48bb78;
+}
+
+.status.pending {
+    color: #ed8936;
+}
+
+.updated-info {
+    color: #718096;
+}
+
+/* Empty state */
+.no-reviews {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+}
+
+.empty-state {
+    text-align: center;
+    color: #718096;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: #a0aec0;
+}
+
+.empty-state h3 {
+    color: #2d3748;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 3rem;
+}
+
+.page-btn {
+    background: #667eea;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.page-btn:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+.page-info {
+    color: #718096;
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+    
+    .header-stats {
+        width: 100%;
+        justify-content: space-around;
+    }
+    
+    .filters-form {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-actions {
+        justify-content: stretch;
+    }
+    
+    .filter-actions .btn {
+        flex: 1;
+        justify-content: center;
+    }
+    
+    .review-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .review-meta {
+        flex-wrap: wrap;
+    }
+    
+    .review-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+</style>
+{% endblock %}
