@@ -3,7 +3,7 @@ from .settings import *
 
 # Security settings pentru producție
 DEBUG = False
-ALLOWED_HOSTS = ['micutu.com', 'www.micutu.com', 'your-vps-ip']
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,market.micutu.com').split(',')
 
 # HTTPS settings
 SECURE_SSL_REDIRECT = True
