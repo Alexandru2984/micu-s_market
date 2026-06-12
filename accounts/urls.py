@@ -1,5 +1,6 @@
 # accounts/urls.py
 from django.urls import path
+from django.views.generic import RedirectView
 from . import views
 
 app_name = "accounts"
@@ -11,5 +12,6 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.profile_edit_view, name='profile_edit'),
     path('profile/<str:username>/', views.public_profile_view, name='public_profile'),
-    path('my-listings/', views.my_listings_view, name='my_listings'),
+    # Redirectează la view-ul canonic din listings app
+    path('my-listings/', RedirectView.as_view(pattern_name='listings:my_listings', permanent=True), name='my_listings'),
 ]

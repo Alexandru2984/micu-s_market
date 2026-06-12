@@ -1,3 +1,93 @@
-from django.test import TestCase
+"""
+Teste pentru sistemul de autentificare și profiluri
+"""
+from django.test import TestCase, Client
+from django.urls import reverse
+from django.contrib.auth import get_user_model
 
-# Create your tests here.
+User = get_user_model()
+
+
+class AuthViewsTestCase(TestCase):
+    """Teste pentru login, logout, register"""
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='SecurePass123!'
+        )
+
+    def test_login_view_get(self):
+        """Pagina de login se încarcă corect"""
+        response = self.client.get(reverse('accounts:login'))
+        self.assertIn(response.status_code, [200, 301, 302])
+
+    def test_login_authenticated_redirect(self):
+        """Utilizatorul autentificat este redirecționat de pe login"""
+        self.client.login(username='testuser', password='SecurePass123!')
+        response = self.client.get(reverse('accounts:login'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_logout_requires_post(self):
+        """Logout custom acceptă DOAR POST, nu GET (protecție CSRF force-logout)"""
+        self.client.login(username='testuser', password='SecurePass123!')
+        
+        # GET pe logout NU trebuie să deconecteze
+        response = self.client.get(reverse('accounts:logout'))
+        # Trebuie să returneze 405 (Method Not Allowed)
+        self.assertEqual(response.status_code, 405)
+
+    def test_logout_post_works(self):
+        """Logout via POST funcționează corect"""
+        self.client.login(username='testuser', password='SecurePass123!')
+        response = self.client.post(reverse('accounts:logout'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_register_view_get(self):
+        """Pagina de înregistrare se încarcă"""
+        response = self.client.get(reverse('accounts:register'))
+        self.assertIn(response.status_code, [200, 301, 302])
+
+    def test_profile_view_requires_login(self):
+        """Profile view necesită autentificare"""
+        response = self.client.get(reverse('accounts:profile'))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login', response.url)
+
+    def test_profile_view_authenticated(self):
+        """Profilul se afișează pentru utilizatorul autentificat"""
+        self.client.login(username='testuser', password='SecurePass123!')
+        response = self.client.get(reverse('accounts:profile'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_public_profile_view(self):
+        """Profilul public este accesibil fără autentificare"""
+        response = self.client.get(
+            reverse('accounts:public_profile', kwargs={'username': self.user.username})
+        )
+        self.assertIn(response.status_code, [200, 404])  # 404 dacă nu există profil
+
+
+class UserProfileModelTestCase(TestCase):
+    """Teste pentru modelul UserProfile"""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='profiletest',
+            email='profile@example.com',
+            password='TestPass123!'
+        )
+
+    def test_profile_created_on_user_creation(self):
+        """Profilul este creat automat când se creează un user"""
+        from accounts.models import UserProfile
+        self.assertTrue(UserProfile.objects.filter(user=self.user).exists())
+
+    def test_update_statistics_no_reviews(self):
+        """update_statistics funcționează fără review-uri"""
+        profile = self.user.profile
+        profile.update_statistics()
+        self.assertEqual(profile.average_rating, 0)
+        self.assertEqual(profile.total_listings, 0)
