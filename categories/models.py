@@ -25,8 +25,16 @@ class Category(models.Model):
     
     @property
     def get_all_children(self):
-        """Returnează toate subcategoriile recursiv"""
-        children = list(self.subcategories.filter(is_active=True))
+        """Returnează toate subcategoriile recursiv (cu protecție la loop infinit)"""
+        return self._collect_children(visited=set())
+
+    def _collect_children(self, visited):
+        """Colectare recursivă cu set de vizitate pentru a preveni cicluri infinite"""
+        children = []
+        if self.pk in visited:
+            return children  # previne recursia infinită
+        visited.add(self.pk)
         for child in self.subcategories.filter(is_active=True):
-            children.extend(child.get_all_children)
+            children.append(child)
+            children.extend(child._collect_children(visited))
         return children

@@ -54,6 +54,11 @@ class Listing(models.Model):
         ordering = ["-created_at"]
         verbose_name = "Anunț"
         verbose_name_plural = "Anunțuri"
+        indexes = [
+            models.Index(fields=['status', '-created_at']),
+            models.Index(fields=['owner', 'status']),
+            models.Index(fields=['category', 'status']),
+        ]
 
     def __str__(self):
         return self.title
@@ -61,10 +66,10 @@ class Listing(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
-            # Asigură unicitatea slug-ului
+            # Asigură unicitatea slug-ului, excluzând instanța curentă
             original_slug = self.slug
             counter = 1
-            while Listing.objects.filter(slug=self.slug).exists():
+            while Listing.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
                 self.slug = f"{original_slug}-{counter}"
                 counter += 1
         super().save(*args, **kwargs)

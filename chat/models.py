@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -50,14 +51,20 @@ class Message(models.Model):
         ordering = ['-created_at']
         verbose_name = "Mesaj"
         verbose_name_plural = "Mesaje"
+        indexes = [
+            models.Index(fields=['receiver', 'is_read']),
+            models.Index(fields=['conversation', '-created_at']),
+        ]
     
     def __str__(self):
         return f"De la {self.sender.username} către {self.receiver.username}: {self.content[:50]}..."
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # Actualizează timpul conversației
-        self.conversation.save()
+        # Actualizează updated_at pe conversație — fără write amplification
+        Conversation.objects.filter(pk=self.conversation_id).update(
+            updated_at=timezone.now()
+        )
 
 
 class MessageAttachment(models.Model):

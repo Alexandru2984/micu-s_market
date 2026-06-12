@@ -50,37 +50,40 @@ class UserProfile(models.Model):
         return self.user.get_full_name() or self.user.username
     
     def update_statistics(self):
-        """Actualizează statisticile utilizatorului"""
+        """Actualizează statisticile utilizatorului — query-uri SQL, nu Python loops"""
         from listings.models import Listing
         from reviews.models import Review
-        
-        # Actualizează numărul total de anunțuri active
-        self.total_listings = self.user.listings.filter(status='active').count()
-        
-        # Actualizează numărul de vânzări
-        self.total_sales = self.user.listings.filter(status='sold').count()
-        
-        # Actualizează rating-ul mediu
-        reviews = Review.objects.filter(reviewed_user=self.user)
-        if reviews.exists():
-            total_rating = sum([review.rating for review in reviews])
-            self.average_rating = round(total_rating / reviews.count(), 2)
-        else:
-            self.average_rating = 0.00
-        
-        self.save()
+        from django.db.models import Avg
+
+        # Contorizare anunțuri active și vândute
+        self.total_listings = Listing.objects.filter(owner=self.user, status='active').count()
+        self.total_sales = Listing.objects.filter(owner=self.user, status='sold').count()
+
+        # Rating mediu — Avg SQL, nu sum() în Python
+        result = Review.objects.filter(
+            reviewed_user=self.user,
+            is_approved=True
+        ).aggregate(avg=Avg('rating'))
+        self.average_rating = round(result['avg'] or 0, 2)
+
+        self.save(update_fields=['total_listings', 'total_sales', 'average_rating'])
 
 
 # Signal pentru a crea automat un profil când se creează un user nou
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
+    """Creează profilul şi preferințele la primul save al user-ului"""
     if created:
-        UserProfile.objects.create(user=instance)
+        UserProfile.objects.get_or_create(user=instance)
+        # Notă: NotificationPreference e creat din notifications/models.py signal
 
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    if hasattr(instance, 'profile'):
-        instance.profile.save()
+
+def _update_profile_stats(user):
+    """Helper: actualizează statisticile profilului dacă există"""
+    try:
+        user.profile.update_statistics()
+    except UserProfile.DoesNotExist:
+        pass
