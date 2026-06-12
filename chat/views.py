@@ -6,12 +6,14 @@ from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_exempt
+from django_ratelimit.decorators import ratelimit
 import json
+import logging
 
 from .models import Conversation, Message, MessageAttachment
 from listings.models import Listing
 
+logger = logging.getLogger(__name__)
 User = get_user_model()
 
 @login_required
@@ -33,9 +35,15 @@ def inbox_view(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
+    # Total mesaje necitite — un singur query direct (nu itera toate conversațiile)
+    total_unread = Message.objects.filter(
+        receiver=request.user,
+        is_read=False
+    ).count()
+    
     context = {
         'page_obj': page_obj,
-        'total_unread': sum(conv.unread_count for conv in conversations)
+        'total_unread': total_unread
     }
     return render(request, 'chat/inbox.html', context)
 
@@ -76,8 +84,9 @@ def start_conversation_view(request, listing_slug):
     try:
         listing = get_object_or_404(Listing, slug=listing_slug, status='active')
         
-        # Debug info
-        print(f"DEBUG: User {request.user} wants to chat about listing '{listing.title}' owned by {listing.owner}")
+        # Debug info (log server-side, nu în browser)
+        logger.debug("User %s vrea să contacteze proprietarul anunțului '%s' (owner: %s)",
+                     request.user, listing.title, listing.owner)
         
         # Nu permite utilizatorului să înceapă conversație cu sine însuși
         if listing.owner == request.user:
@@ -111,12 +120,14 @@ def start_conversation_view(request, listing_slug):
         return redirect('chat:conversation', pk=conversation.pk)
         
     except Exception as e:
-        print(f"ERROR in start_conversation_view: {e}")
-        messages.error(request, f"Eroare la începerea conversației: {e}")
+        logger.exception("Eroare în start_conversation_view pentru user=%s, listing=%s",
+                         request.user, listing_slug)
+        messages.error(request, "A apărut o eroare. Te rugăm încearcă din nou.")
         return redirect('listings:detail', slug=listing_slug)
 
 @login_required
 @require_POST
+@ratelimit(key='user', rate='60/m', block=True)
 def send_message_view(request, conversation_pk):
     """Trimite un mesaj într-o conversație"""
     conversation = get_object_or_404(
@@ -140,13 +151,39 @@ def send_message_view(request, conversation_pk):
         content=content
     )
     
-    # Procesează atașamentele dacă există
+    # Procesează atașamentele cu validare completă
     if 'attachments' in request.FILES:
-        for file in request.FILES.getlist('attachments'):
-            MessageAttachment.objects.create(
-                message=message,
-                file=file
-            )
+        ALLOWED_EXTENSIONS = {
+            'jpg', 'jpeg', 'png', 'gif', 'webp',  # imagini
+            'pdf', 'doc', 'docx', 'txt', 'xls', 'xlsx',  # documente
+        }
+        MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB per fișier
+        MAX_FILES = 5  # maxim 5 atașamente per mesaj
+
+        uploaded_files = request.FILES.getlist('attachments')[:MAX_FILES]  # ignoră restul
+
+        for file in uploaded_files:
+            # Verifică extensia
+            ext = file.name.rsplit('.', 1)[-1].lower() if '.' in file.name else ''
+            if ext not in ALLOWED_EXTENSIONS:
+                continue  # sări fișierele cu extensii nepermise
+
+            # Verifică dimensiunea
+            if file.size > MAX_FILE_SIZE:
+                continue  # sări fișierele prea mari
+
+            # Verifică conținutul imaginilor cu Pillow
+            if ext in {'jpg', 'jpeg', 'png', 'gif', 'webp'}:
+                try:
+                    from PIL import Image as PilImage
+                    file.seek(0)
+                    img = PilImage.open(file)
+                    img.verify()
+                    file.seek(0)
+                except Exception:
+                    continue  # fișier imagine invalid/fals
+
+            MessageAttachment.objects.create(message=message, file=file)
     
     # Returnează răspunsul JSON pentru AJAX
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -182,9 +219,9 @@ def search_users_view(request):
             Q(last_name__icontains=query)
         ).exclude(id=request.user.id)[:10]
     
+    # Nu expunăm ID-urile interne ale utilizatorilor
     users_data = [
         {
-            'id': user.id,
             'username': user.username,
             'display_name': user.get_full_name() or user.username,
             'avatar': user.profile.avatar.url if hasattr(user, 'profile') and user.profile.avatar else None

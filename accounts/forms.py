@@ -1,7 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from .models import UserProfile
+
+User = get_user_model()
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={
@@ -152,14 +154,24 @@ class UserProfileForm(forms.ModelForm):
     def clean_avatar(self):
         avatar = self.cleaned_data.get('avatar')
         if avatar:
-            # Verifică dimensiunea fișierului (max 5MB)
+            # Verifică dimensiunea fişierului (max 5MB)
             if avatar.size > 5 * 1024 * 1024:
                 raise forms.ValidationError('Imaginea nu poate fi mai mare de 5MB.')
             
-            # Verifică tipul fișierului
+            # Verifică extensia
             valid_extensions = ['jpg', 'jpeg', 'png', 'webp']
-            ext = avatar.name.split('.')[-1].lower()
+            ext = avatar.name.rsplit('.', 1)[-1].lower() if '.' in avatar.name else ''
             if ext not in valid_extensions:
-                raise forms.ValidationError('Doar fișierele JPG, PNG și WebP sunt acceptate.')
+                raise forms.ValidationError('Doar fişierele JPG, PNG şi WebP sunt acceptate.')
+            
+            # Verifică conținutul real al fişierului cu Pillow
+            try:
+                from PIL import Image as PilImage
+                avatar.seek(0)
+                img = PilImage.open(avatar)
+                img.verify()
+                avatar.seek(0)
+            except Exception:
+                raise forms.ValidationError('Fişierul nu este o imagine validă.')
         
         return avatar

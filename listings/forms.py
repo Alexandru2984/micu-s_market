@@ -1,6 +1,5 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db import models
 from .models import Listing, ListingImage
 from categories.models import Category
 
@@ -112,15 +111,25 @@ class ListingImageForm(forms.ModelForm):
     def clean_image(self):
         image = self.cleaned_data.get('image')
         if image:
-            # Verifică dimensiunea fișierului (max 5MB)
+            # Verifică dimensiunea fişierului (max 5MB)
             if image.size > 5 * 1024 * 1024:
                 raise ValidationError('Imaginea nu poate fi mai mare de 5MB.')
             
-            # Verifică tipul fișierului
+            # Verifică extensia fişierului
             valid_extensions = ['jpg', 'jpeg', 'png', 'webp']
-            ext = image.name.split('.')[-1].lower()
+            ext = image.name.rsplit('.', 1)[-1].lower() if '.' in image.name else ''
             if ext not in valid_extensions:
-                raise ValidationError('Doar fișierele JPG, PNG și WebP sunt acceptate.')
+                raise ValidationError('Doar fişierele JPG, PNG şi WebP sunt acceptate.')
+            
+            # Verifică conținutul real al fişierului cu Pillow (previne rename malware.php -> malware.jpg)
+            try:
+                from PIL import Image as PilImage
+                image.seek(0)
+                img = PilImage.open(image)
+                img.verify()  # verify() detectează fişiere corupte sau false
+                image.seek(0)  # resetăm cursorul după verify()
+            except Exception:
+                raise ValidationError('Fişierul nu este o imagine validă.')
         
         return image
 

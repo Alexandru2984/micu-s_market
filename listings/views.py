@@ -3,18 +3,22 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
+from django_ratelimit.decorators import ratelimit
+import logging
 from .models import Listing, ListingImage
 from .forms import ListingForm, ListingImageFormSet
 from categories.models import Category
+from favorites.models import Favorite
+
+logger = logging.getLogger(__name__)
 
 def home_view(request):
     """Homepage cu anunțuri recente și categorii"""
     recent_listings = Listing.objects.filter(status='active').select_related('category', 'owner').prefetch_related('images').order_by('-created_at')[:8]
     featured_listings = Listing.objects.filter(status='active', is_featured=True).select_related('category', 'owner').prefetch_related('images').order_by('-created_at')[:4]
     
-    # Adaugă starea de favorite pentru utilizatorul autentificat
+    # Adăugă starea de favorite pentru utilizatorul autentificat
     if request.user.is_authenticated:
-        from favorites.models import Favorite
         user_favorites = set(Favorite.objects.filter(user=request.user).values_list('listing_id', flat=True))
         
         for listing in recent_listings:
@@ -22,25 +26,20 @@ def home_view(request):
         for listing in featured_listings:
             listing.is_favorited = listing.id in user_favorites
     
-    # Calculez manual numărul de anunțuri pentru fiecare categorie incluzând subcategoriile
-    categories = Category.objects.filter(is_active=True)
-    categories_with_counts = []
-    
-    for category in categories:
-        # Include categoria principală și toate subcategoriile
-        category_ids = [category.id] + [sub.id for sub in category.get_all_children]
-        active_count = Listing.objects.filter(
-            category_id__in=category_ids, 
-            status='active'
-        ).count()
-        
-        # Adaug proprietatea temporară pentru count
-        category.active_listings_count = active_count
-        categories_with_counts.append(category)
-    
-    # Sortez după numărul de anunțuri și iau primele 12 categorii (în loc de 6)
-    categories_with_counts.sort(key=lambda x: x.active_listings_count, reverse=True)
-    top_categories = categories_with_counts[:12]
+    # Categorii cu număr de anunțuri — un singur query agregat (fix N+1)
+    # Folosim annotate pentru a obține numărul de anunțuri active per categorie
+    categories_with_counts = (
+        Category.objects.filter(is_active=True)
+        .annotate(
+            active_listings_count=Count(
+                'listings',
+                filter=Q(listings__status='active'),
+                distinct=True
+            )
+        )
+        .order_by('-active_listings_count', 'order', 'name')
+    )
+    top_categories = list(categories_with_counts[:12])
     
     context = {
         'recent_listings': recent_listings,
@@ -113,9 +112,8 @@ def listing_list_view(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    # Adaugă starea de favorite pentru utilizatorul autentificat
+    # Adăugă starea de favorite pentru utilizatorul autentificat
     if request.user.is_authenticated:
-        from favorites.models import Favorite
         user_favorites = set(Favorite.objects.filter(user=request.user).values_list('listing_id', flat=True))
         
         for listing in page_obj:
@@ -149,7 +147,7 @@ def listing_detail_view(request, slug):
     # Verifică dacă anunțul este în favorite pentru utilizatorul autentificat
     is_favorited = False
     if request.user.is_authenticated:
-        from favorites.models import Favorite
+
         is_favorited = Favorite.objects.filter(user=request.user, listing=listing).exists()
     
     # Anunțuri similare
@@ -166,7 +164,12 @@ def listing_detail_view(request, slug):
     return render(request, 'listings/detail.html', context)
 
 def process_images(request, listing):
+    """Procesează și salvează imaginile pentru un anunț (maxim 10)"""
     images = request.FILES.getlist('images')
+    
+    # Limită server-side (nu depăşete formset max_num=10)
+    if len(images) > 10:
+        images = images[:10]
     for image in images:
         if image:
             try:
@@ -175,10 +178,12 @@ def process_images(request, listing):
                     image=image,
                     alt_text=f"Imagine pentru {listing.title}"
                 )
-            except Exception as e:
-                messages.warning(request, f'Nu am putut încărca o imagine: {e}')
+            except Exception:
+                logger.exception("Eroare la încărcarea imaginii pentru anunțul %s", listing.pk)
+                messages.warning(request, 'Nu am putut încărca o imagine. Verifică formatul şi dimensiunea.')
 
 @login_required
+@ratelimit(key='user', rate='10/h', method='POST', block=True)
 def listing_create_view(request):
     """Creează anunț nou"""
     if request.method == 'POST':
