@@ -26,9 +26,9 @@ __pycache__/
 *.sqlite3
 db.sqlite3
 
-# Migrations (le generezi pe server sau alt mediu)
-*/migrations/*.py
-!*/migrations/__init__.py
+# Migrations (Trebuie salvate în Git pentru a menține consistența bazei de date între medii)
+# NU se ignoră migrarile în Django!
+
 
 # Fișiere media (imagini, upload-uri)
 media/
