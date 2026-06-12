@@ -5,6 +5,12 @@ env/
 
 # Fișiere de configurare mediul local
 *.env
+.env.*
+*.bak*
+
+# Date seed cu PII sau date sensibile
+backup_seed.json
+*.json.bak
 
 # Python cache
 __pycache__/
@@ -40,3 +46,11 @@ staticfiles/
 # Sistem
 .DS_Store
 Thumbs.db
+
+# Gunicorn socket
+gunicorn.sock
+
+# Fișiere temporare
+*.swp
+*.swo
+*.tmp

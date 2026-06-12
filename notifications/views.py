@@ -1,11 +1,38 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+
+from .models import Notification
 
 # Create your views here.
 
+@login_required
 def notifications_list_view(request):
-	context = {}
-	return render(request, 'notifications/list.html', context)
+    notifications = Notification.objects.filter(
+        recipient=request.user
+    ).order_by('-created_at')[:50]
 
-def mark_read_view(request):
-	context = {}
-	return render(request, 'notifications/mark_read.html', context)
+    context = {
+        'notifications': notifications,
+        'unread_count': notifications.filter(is_read=False).count(),
+    }
+    return render(request, 'notifications/list.html', context)
+
+@login_required
+@require_POST
+def mark_read_view(request, pk=None):
+    """Marchează o notificare (sau toate) ca citite"""
+    if pk:
+        notification = get_object_or_404(Notification, pk=pk, recipient=request.user)
+        notification.mark_as_read()
+    else:
+        # Marchează toate ca citite
+        Notification.objects.filter(
+            recipient=request.user,
+            is_read=False
+        ).update(is_read=True)
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'success': True})
+    return redirect('notifications:list')

@@ -4,7 +4,7 @@ from categories.models import Category
 # Create your views here.
 
 def home_view(request):
-    latest = Listing.objects.filter(is_active=True)[:8]
+    latest = Listing.objects.filter(status='active').order_by('-created_at')[:8]
     # Get main categories (no parent) for home page
     categories = Category.objects.filter(is_active=True, parent=None)[:12]  # Get 12 categories
     context = {

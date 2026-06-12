@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -42,6 +43,10 @@ class Notification(models.Model):
         ordering = ['-created_at']
         verbose_name = "Notificare"
         verbose_name_plural = "Notificări"
+        indexes = [
+            models.Index(fields=['recipient', 'is_read']),
+            models.Index(fields=['recipient', '-created_at']),
+        ]
     
     def __str__(self):
         return f"Notificare pentru {self.recipient.username}: {self.title}"
@@ -50,7 +55,7 @@ class Notification(models.Model):
         """Marchează notificarea ca citită"""
         if not self.is_read:
             self.is_read = True
-            self.read_at = models.timezone.now()
+            self.read_at = timezone.now()  # fix: models.timezone nu există
             self.save(update_fields=['is_read', 'read_at'])
 
 

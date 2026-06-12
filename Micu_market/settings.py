@@ -17,8 +17,14 @@ load_dotenv(BASE_DIR / ".env")
 # ======================
 # SECRET / DEBUG
 # ======================
-SECRET_KEY = os.getenv("SECRET_KEY", os.getenv("DJANGO_SECRET_KEY", "dev-secret-change-me"))
-DEBUG = os.getenv("DEBUG", os.getenv("DJANGO_DEBUG", "1")) == "1"
+# IMPORTANT: SECRET_KEY sau DJANGO_SECRET_KEY trebuie setat în .env — aplicația va crăpa intenționat dacă lipsesc
+SECRET_KEY = os.environ.get("SECRET_KEY") or os.environ.get("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError(
+        "SECRET_KEY (sau DJANGO_SECRET_KEY) nu este setat în variabilele de mediu. "
+        "Adaugă-l în fișierul .env."
+    )
+DEBUG = os.getenv("DJANGO_DEBUG", "0") == "1"
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost")).split(",")
 
 # ======================
@@ -76,7 +82,7 @@ TEMPLATES = [
         "APP_DIRS": True,  # apoi template-urile din aplicații
         "OPTIONS": {
             "context_processors": [
-                "django.template.context_processors.request",
+                "django.template.context_processors.debug",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.request",  # necesar pentru allauth
@@ -145,6 +151,24 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "True") == "True"
     SECURE_REFERRER_POLICY = "same-origin"
 
+# Security settings — active întotdeauna (nu doar în producție)
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
+X_FRAME_OPTIONS = "DENY"
+
+# Setări HTTPS active doar când nu suntem în dev local
+if not DEBUG:
+    SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "True") == "True"
+    SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "31536000"))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = os.getenv("SECURE_HSTS_INCLUDE_SUBDOMAINS", "True") == "True"
+    SECURE_HSTS_PRELOAD = os.getenv("SECURE_HSTS_PRELOAD", "True") == "True"
+    SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "True") == "True"
+    CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "True") == "True"
+
+# Sesiuni — expiră după 2 săptămâni (nu sesiuni permanente)
+SESSION_COOKIE_AGE = 1209600  # 14 zile în secunde
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
 # ======================
 # DEFAULT PK
 # ======================
@@ -180,11 +204,14 @@ ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 
 # Auto-generate username from email
 ACCOUNT_PRESERVE_USERNAME_CASING = False
-ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_SESSION_REMEMBER = None  # None = întreabă utilizatorul ("ține-mă minte")
 
-# Rate limits
+# Rate limits extinse
 ACCOUNT_RATE_LIMITS = {
-    'login_failed': '5/5m',  # 5 încercări la 5 minute
+    'login_failed': '5/5m',       # 5 încercări eșuate la 5 minute
+    'signup': '5/h',              # 5 înregistrări pe oră per IP
+    'send_email': '3/5m',         # 3 emailuri (reset parolă) la 5 minute
+    'confirm_email': '3/h',       # 3 confirmări email la oră
 }
 
 # Email confirmation settings
@@ -196,14 +223,18 @@ ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_GET = False
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
-ACCOUNT_SESSION_REMEMBER = True
+
 
 # Password reset settings
 ACCOUNT_PASSWORD_MIN_LENGTH = 8
 
 # Redirect URLs
+LOGIN_URL = '/accounts/custom/login/'
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/'
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/'
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 
 # ======================
 # EMAIL SETTINGS
@@ -214,10 +245,23 @@ EMAIL_HOST = os.getenv('EMAIL_HOST', 'micutu.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', '465'))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'False') == 'True'
 EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'True') == 'True'
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'market@micutu.com')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Micu\'s Market <market@micutu.com>')
-SERVER_EMAIL = os.getenv('SERVER_EMAIL', 'server@micutu.com')
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@micutu.com")
+SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
 
+# Validare mutual-exclusion TLS/SSL
+if EMAIL_USE_TLS and EMAIL_USE_SSL:
+    raise ValueError(
+        "EMAIL_USE_TLS și EMAIL_USE_SSL sunt mutual exclusive. "
+        "Setează doar una din ele în .env (SSL=True pentru port 465, TLS=True pentru port 587)."
+    )
+
+# dacă ești în spatele Nginx/HTTPS:
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# allauth
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 # Email backend for development (decomentează pentru testare în consolă)
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
