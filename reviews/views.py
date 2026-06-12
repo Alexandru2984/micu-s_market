@@ -6,6 +6,8 @@ from django.core.paginator import Paginator
 from django.db.models import Avg, Q
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django_ratelimit.decorators import ratelimit
+
 
 from .models import Review, ReviewResponse
 from listings.models import Listing
@@ -53,6 +55,7 @@ def user_reviews_view(request, username):
     return render(request, 'reviews/user_reviews.html', context)
 
 @login_required
+@ratelimit(key='user', rate='5/h', method='POST', block=True)
 def create_review_view(request, username, listing_slug=None):
     """Creează un review pentru un utilizator"""
     reviewed_user = get_object_or_404(User, username=username)
@@ -183,11 +186,9 @@ def reviews_stats_api(request, username):
         'rating_distribution': rating_distribution
     })
 
+@login_required
 def my_reviews_view(request):
     """Review-urile pe care le-am lăsat eu"""
-    if not request.user.is_authenticated:
-        return redirect('accounts:login')
-    
     reviews = Review.objects.filter(
         reviewer=request.user
     ).select_related('reviewed_user', 'listing').order_by('-created_at')
