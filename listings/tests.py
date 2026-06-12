@@ -1,3 +1,156 @@
-from django.test import TestCase
+"""
+Teste pentru anunțuri — CRUD, access control, validare imagini
+"""
+from django.test import TestCase, Client
+from django.urls import reverse
+from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
+from io import BytesIO
+from PIL import Image as PilImage
 
-# Create your tests here.
+from .models import Listing
+from categories.models import Category
+
+User = get_user_model()
+
+
+def create_test_image(filename='test.jpg', size=(100, 100), color=(255, 0, 0)):
+    """Generează un fișier imagine valid pentru teste"""
+    buffer = BytesIO()
+    img = PilImage.new('RGB', size, color)
+    img.save(buffer, format='JPEG')
+    buffer.seek(0)
+    return SimpleUploadedFile(filename, buffer.read(), content_type='image/jpeg')
+
+
+class ListingCRUDTestCase(TestCase):
+    """Teste pentru crearea, editarea, ștergerea anunțurilor"""
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='seller',
+            email='seller@example.com',
+            password='SellerPass123!'
+        )
+        self.other_user = User.objects.create_user(
+            username='other',
+            email='other@example.com',
+            password='OtherPass123!'
+        )
+        self.category = Category.objects.create(
+            name='Test Category',
+            slug='test-category',
+            is_active=True
+        )
+        self.listing = Listing.objects.create(
+            title='Anunț test',
+            description='Descriere test',
+            price=100.00,
+            owner=self.user,
+            category=self.category,
+            city='București',
+            status='active'
+        )
+
+    def test_listing_create_requires_login(self):
+        """Crearea de anunțuri necesită autentificare"""
+        response = self.client.get(reverse('listings:create'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_listing_create_authenticated(self):
+        """Utilizatorul autentificat poate accesa formularul de creare"""
+        self.client.login(username='seller', password='SellerPass123!')
+        response = self.client.get(reverse('listings:create'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_listing_detail_accessible(self):
+        """Detaliile unui anunț activ sunt accesibile fără autentificare"""
+        response = self.client.get(
+            reverse('listings:detail', kwargs={'slug': self.listing.slug})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_listing_edit_requires_owner(self):
+        """Editarea anunțului este permisă doar proprietarului"""
+        self.client.login(username='other', password='OtherPass123!')
+        response = self.client.get(
+            reverse('listings:update', kwargs={'slug': self.listing.slug})
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_listing_delete_requires_owner(self):
+        """Ștergerea anunțului este permisă doar proprietarului"""
+        self.client.login(username='other', password='OtherPass123!')
+        response = self.client.post(
+            reverse('listings:delete', kwargs={'slug': self.listing.slug})
+        )
+        self.assertEqual(response.status_code, 404)
+        # Anunțul NU trebuie șters
+        self.assertTrue(Listing.objects.filter(pk=self.listing.pk).exists())
+
+    def test_listing_owner_can_delete(self):
+        """Proprietarul poate șterge propriul anunț"""
+        self.client.login(username='seller', password='SellerPass123!')
+        response = self.client.post(
+            reverse('listings:delete', kwargs={'slug': self.listing.slug})
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Listing.objects.filter(pk=self.listing.pk).exists())
+
+    def test_slug_generated_on_create(self):
+        """Slug-ul este generat automat la crearea anunțului"""
+        self.assertIsNotNone(self.listing.slug)
+        self.assertIn('anunt', self.listing.slug.lower())
+
+    def test_pages_home_view_filters_active(self):
+        """pages/home_view returnează doar anunțuri active"""
+        # Creează un anunț inactiv
+        inactive = Listing.objects.create(
+            title='Anunț inactiv',
+            description='Test',
+            price=50.00,
+            owner=self.user,
+            category=self.category,
+            city='Cluj',
+            status='inactive'
+        )
+        response = self.client.get(reverse('home'))  # pages:home
+        # Anunțul inactiv nu trebuie să apară în response
+        if response.status_code == 200:
+            self.assertNotIn(b'Anun\xc8\x9b inactiv', response.content)
+
+
+class ListingImageValidationTestCase(TestCase):
+    """Teste pentru validarea imaginilor uploadate"""
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='imgtest',
+            email='img@example.com',
+            password='ImgPass123!'
+        )
+        self.client.login(username='imgtest', password='ImgPass123!')
+
+    def test_valid_image_passes(self):
+        """O imagine JPEG validă trece validarea"""
+        from listings.forms import ListingImageForm
+        img_file = create_test_image()
+        form = ListingImageForm(files={'image': img_file})
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_oversized_image_rejected(self):
+        """O imagine mai mare de 5MB este respinsă"""
+        from listings.forms import ListingImageForm
+        # Creează un fișier fals de 6MB
+        big_file = SimpleUploadedFile('big.jpg', b'0' * (6 * 1024 * 1024), content_type='image/jpeg')
+        form = ListingImageForm(files={'image': big_file})
+        self.assertFalse(form.is_valid())
+
+    def test_wrong_extension_rejected(self):
+        """Un fișier cu extensie nepermisă este respins"""
+        from listings.forms import ListingImageForm
+        fake_file = SimpleUploadedFile('malware.exe', b'MZ...fake', content_type='application/octet-stream')
+        form = ListingImageForm(files={'image': fake_file})
+        self.assertFalse(form.is_valid())

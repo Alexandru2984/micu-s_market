@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="{% static 'css/buttons.css' %}">
 <link rel="stylesheet" href="{% static 'css/spectacular-elements.css' %}">
 <style>
-/* ANIMAȚII PENTRU BUTOANE SPECTACULOASE */
+
 @keyframes pulse {
     0%, 100% { 
         transform: scale(1); 
@@ -461,7 +461,7 @@
                             {% if page_obj.has_next %}
                                 <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if current_category_slug %}&category={{ current_category_slug }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if current_city %}&city={{ current_city }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
                                    class="btn btn-outline">
-                                    Următorul <i class="fas fa-chevron-right"></i>
+                                    Următoarea <i class="fas fa-chevron-right"></i>
                                 </a>
                                 <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if current_category_slug %}&category={{ current_category_slug }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if current_city %}&city={{ current_city }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
                                    class="btn btn-outline">
