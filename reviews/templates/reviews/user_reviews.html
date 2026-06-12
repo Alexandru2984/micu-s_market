@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Recenzii — {{ reviewed_user.username|default:reviewed_user }}{% endblock %}
+
+{% block content %}
+
+{# Alegem valorile din context (fără variabile inexistente) #}
+{% firstof reviewed_user.username reviewed_user.get_username reviewed_user as display_user %}
+{% firstof avg_rating average_rating 0 as avg %}
+{% firstof total_reviews page_obj.paginator.count 0 as cnt %}
+
+<h1 style="margin:0 0 .5rem">Recenzii pentru {{ display_user }}</h1>
+<p style="color:#667085;margin:.25rem 0 1rem">
+  <strong>{{ avg|floatformat:1 }}</strong>/5 din {{ cnt }} recenzi{{ cnt|pluralize:"e" }}
+</p>
+
+<div style="background:#fff;border:1px solid #eee;border-radius:10px;padding:1rem">
+  {% for r in page_obj.object_list %}
+    <div style="padding:.6rem 0;border-bottom:1px solid #f2f4f7">
+      <div style="font-size:.95rem;color:#334155">
+        <strong>{{ r.author.username|default:"Utilizator" }}</strong>
+        <span style="color:#94a3b8"> • {{ r.created_at|date:"j M Y" }}</span>
+      </div>
+      <div style="color:#f59e0b;letter-spacing:.05em;margin:.15rem 0">
+        {# stele simple, fără dependențe #}
+        {% with rating=r.rating|default:0 %}
+          {% for _ in "12345"|make_list %}
+            {% if forloop.counter <= rating %}★{% else %}☆{% endif %}
+          {% endfor %}
+        {% endwith %}
+      </div>
+      {% if r.title %}<div><strong>{{ r.title }}</strong></div>{% endif %}
+      <div>{{ r.comment|default:r.content|default:r.text|linebreaksbr }}</div>
+    </div>
+  {% empty %}
+    <div style="text-align:center;color:#667085;padding:1.5rem">
+      Încă nu sunt recenzii pentru acest utilizator.
+    </div>
+  {% endfor %}
+</div>
+
+{% if page_obj %}
+  <nav style="display:flex;gap:.5rem;justify-content:center;margin-top:1rem">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}" style="padding:.35rem .6rem;border:1px solid #ddd;border-radius:6px">&laquo; Înapoi</a>
+    {% else %}
+      <span style="padding:.35rem .6rem;border:1px solid #eee;border-radius:6px;color:#94a3b8">&laquo; Înapoi</span>
+    {% endif %}
+
+    <span style="padding:.35rem .6rem;border:1px solid #cbd5e1;border-radius:6px;background:#f1f5f9">
+      Pagina {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}" style="padding:.35rem .6rem;border:1px solid #ddd;border-radius:6px">Înainte &raquo;</a>
+    {% else %}
+      <span style="padding:.35rem .6rem;border:1px solid #eee;border-radius:6px;color:#94a3b8">Înainte &raquo;</span>
+    {% endif %}
+  </nav>
+{% endif %}
+
+{% endblock %}
