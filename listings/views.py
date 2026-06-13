@@ -183,6 +183,7 @@ def listing_detail_view(request, slug):
 
 @login_required
 @require_POST
+@ratelimit(key='user', rate=settings.REPORT_WRITE_RATE, method='POST', block=True)
 def report_listing_view(request, slug):
     """Creează un raport de moderare pentru un anunț."""
     listing = get_object_or_404(Listing, slug=slug, status='active')

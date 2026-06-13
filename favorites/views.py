@@ -4,6 +4,8 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.contrib import messages
+from django.conf import settings
+from django_ratelimit.decorators import ratelimit
 from .models import Favorite
 from listings.models import Listing
 
@@ -25,6 +27,7 @@ def favorites_list_view(request):
 
 @login_required
 @require_POST
+@ratelimit(key='user', rate=settings.AJAX_WRITE_RATE, method='POST', block=True)
 def toggle_favorite_view(request):
     """Toggle favorite pentru un anunț (AJAX)"""
     listing_id = request.POST.get('listing_id')
@@ -70,6 +73,7 @@ def toggle_favorite_view(request):
 
 @login_required
 @require_POST
+@ratelimit(key='user', rate=settings.AJAX_WRITE_RATE, method='POST', block=True)
 def remove_favorite_view(request, favorite_id):
     """Șterge un favorit din lista de favorite"""
     favorite = get_object_or_404(Favorite, id=favorite_id, user=request.user)

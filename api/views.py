@@ -1,12 +1,14 @@
 import json
 from decimal import Decimal, InvalidOperation
 
+from django.conf import settings
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
+from django_ratelimit.decorators import ratelimit
 
 from categories.models import Category
 from favorites.models import Favorite
@@ -104,6 +106,7 @@ def _filter_decimal(queryset, field_name, raw_value, lookup):
 
 
 @require_GET
+@ratelimit(key='ip', rate=settings.API_READ_RATE, method='GET', block=True)
 def listing_list_api(request):
     listings = (
         Listing.objects.filter(status='active')
@@ -169,6 +172,7 @@ def listing_list_api(request):
 
 
 @require_GET
+@ratelimit(key='ip', rate=settings.API_READ_RATE, method='GET', block=True)
 def listing_detail_api(request, slug):
     listing = get_object_or_404(
         Listing.objects.select_related('category', 'owner').prefetch_related('images'),
@@ -179,6 +183,7 @@ def listing_detail_api(request, slug):
 
 
 @require_POST
+@ratelimit(key='ip', rate=settings.API_WRITE_RATE, method='POST', block=True)
 def listing_create_api(request):
     auth_response = _auth_required(request)
     if auth_response:
@@ -199,6 +204,7 @@ def listing_create_api(request):
 
 
 @require_POST
+@ratelimit(key='ip', rate=settings.API_WRITE_RATE, method='POST', block=True)
 def favorite_toggle_api(request):
     auth_response = _auth_required(request)
     if auth_response:

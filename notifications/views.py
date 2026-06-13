@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
+from django.conf import settings
+from django_ratelimit.decorators import ratelimit
 
 from .models import Notification
 
@@ -21,6 +23,7 @@ def notifications_list_view(request):
 
 @login_required
 @require_POST
+@ratelimit(key='user', rate=settings.AJAX_WRITE_RATE, method='POST', block=True)
 def mark_read_view(request, pk=None):
     """Marchează o notificare (sau toate) ca citite"""
     if pk:
