@@ -50,3 +50,19 @@ def send_notification_email(notification):
     notification.save(update_fields=["is_emailed"])
     logger.info("notification_email_sent", extra={"notification_id": notification.pk})
     return True
+
+
+def send_pending_notification_emails(limit=100):
+    from notifications.models import Notification
+
+    notifications = (
+        Notification.objects.filter(is_emailed=False)
+        .select_related("recipient", "recipient__notification_preferences")
+        .order_by("created_at")[:limit]
+    )
+
+    sent = 0
+    for notification in notifications:
+        if send_notification_email(notification):
+            sent += 1
+    return sent

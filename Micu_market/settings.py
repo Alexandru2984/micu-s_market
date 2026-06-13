@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     "api",
     "audit.apps.AuditConfig",
     "billing.apps.BillingConfig",
+    "jobs.apps.JobsConfig",
     # "ws",  # doar dacă ai app ws
 ]
 

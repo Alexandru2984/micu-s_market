@@ -123,11 +123,21 @@ Install scheduled operations:
 sudo cp /home/micu/Micu_market/deploy/systemd/micu-market-backup.* /etc/systemd/system/
 sudo cp /home/micu/Micu_market/deploy/systemd/micu-market-notification-emails.* /etc/systemd/system/
 sudo cp /home/micu/Micu_market/deploy/systemd/micu-market-media-cleanup.* /etc/systemd/system/
+sudo cp /home/micu/Micu_market/deploy/systemd/micu-market-jobs.* /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now micu-market-backup.timer
 sudo systemctl enable --now micu-market-notification-emails.timer
 sudo systemctl enable --now micu-market-media-cleanup.timer
+sudo systemctl enable --now micu-market-jobs.timer
 systemctl list-timers 'micu-market-*'
+```
+
+Queue a background job manually:
+
+```bash
+venv/bin/python manage.py enqueue_periodic_jobs --settings=Micu_market.settings_production
+venv/bin/python manage.py enqueue_job notifications.send_pending_emails --payload '{"limit": 200}' --settings=Micu_market.settings_production
+venv/bin/python manage.py run_jobs --limit 10 --settings=Micu_market.settings_production
 ```
 
 ## Nginx vhost

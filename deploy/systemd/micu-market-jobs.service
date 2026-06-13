@@ -1,0 +1,18 @@
+[Unit]
+Description=Micu Market background job worker
+After=network.target postgresql.service
+
+[Service]
+Type=oneshot
+User=micu
+Group=www-data
+WorkingDirectory=/home/micu/Micu_market
+EnvironmentFile=/home/micu/Micu_market/.env
+Environment=DJANGO_SETTINGS_MODULE=Micu_market.settings_production
+ExecStartPre=/home/micu/Micu_market/venv/bin/python /home/micu/Micu_market/manage.py enqueue_periodic_jobs --settings=Micu_market.settings_production
+ExecStart=/home/micu/Micu_market/venv/bin/python /home/micu/Micu_market/manage.py run_jobs --limit 50 --settings=Micu_market.settings_production
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/home/micu/Micu_market/media /var/log/micu_market
