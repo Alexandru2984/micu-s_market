@@ -7,15 +7,19 @@ Data verificarii: 2026-06-13.
 Comenzi rulate:
 
 ```bash
-venv/bin/python manage.py check --settings=Micu_market.settings
-DJANGO_DEBUG=1 venv/bin/python manage.py test --settings=Micu_market.settings
+venv/bin/python manage.py check --settings=Micu_market.settings_test
+venv/bin/python manage.py makemigrations --check --dry-run --settings=Micu_market.settings_test
+venv/bin/python manage.py test --settings=Micu_market.settings_test
+venv/bin/pip-audit -r requirements.txt
 ```
 
 Rezultat:
 
 - `manage.py check`: OK.
-- `manage.py test`: 49 teste, OK cu `DJANGO_DEBUG=1`.
-- Fara `DJANGO_DEBUG=1`, testele locale primesc redirect `301` spre HTTPS deoarece `.env` local activeaza comportament de productie.
+- `makemigrations --check --dry-run`: OK.
+- `manage.py test`: 49 teste, OK.
+- `pip-audit -r requirements.txt`: fara vulnerabilitati cunoscute.
+- `settings_test` face testele independente de `.env` local si dezactiveaza redirecturile HTTPS pentru suita automata.
 
 ## Corectii fata de auditul initial
 
@@ -26,18 +30,18 @@ Rezultat:
 - Email templates pentru allauth exista in `templates/account/email/`.
 - `is_featured` exista pe `Listing`, dar fluxul de promovare/monetizare nu este implementat.
 - WebSocket/Channels nu este activ in configuratia reproductibila: app-ul `ws` exista, dar nu este in `INSTALLED_APPS`, iar dependintele Channels/Redis nu sunt declarate in `requirements.txt`.
-- Exista o discrepanta intre `requirements.txt` si mediul local: requirements cere `Django==6.0.6`, iar `venv` are `Django==5.2.15`.
+- `requirements.txt` cere `Django==6.0.6`; versiunea a fost instalata local si validata cu suita existenta de teste.
 
 ## Prioritati
 
 ### P0 - Stabilizare si reproductibilitate
 
 1. Alinierea dependintelor:
-   - decizie explicita intre Django 5.2 LTS si Django 6.x;
-   - actualizare `requirements.txt`;
+   - Django 6.0.6 este tinta declarata si validata local;
+   - urmatorul pas este curatarea pachetelor instalate local dar nedeclarate in `requirements.txt`;
    - eliminarea dependintelor implicite din `venv` care nu sunt documentate.
 2. Separarea clara intre setarile de development, test si productie:
-   - testele trebuie sa ruleze predictibil fara sa depinda de `.env` local;
+   - `settings_test` acopera testele automate;
    - HTTPS redirect sa ramana activ in productie, dar sa nu mascheze rezultatele testelor locale.
 3. Actualizarea README si runbook-ului pentru comenzi reale de setup, test si deploy.
 
