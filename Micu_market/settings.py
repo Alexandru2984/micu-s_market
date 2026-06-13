@@ -66,11 +66,13 @@ INSTALLED_APPS = [
     "notifications",
     "dashboard",
     "api",
+    "audit.apps.AuditConfig",
     # "ws",  # doar dacă ai app ws
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "Micu_market.observability.RequestIdMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",

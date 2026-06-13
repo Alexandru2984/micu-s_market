@@ -1,4 +1,5 @@
 from django.contrib import admin
+from audit.utils import audit_log
 from .models import UserProfile
 
 
@@ -43,8 +44,10 @@ class UserProfileAdmin(admin.ModelAdmin):
     def approve_profiles(self, request, queryset):
         for profile in queryset:
             profile.approve_verification()
+            audit_log("profile.verification_approved", request=request, obj=profile)
 
     @admin.action(description="Respinge verificarea")
     def reject_profiles(self, request, queryset):
         for profile in queryset:
             profile.reject_verification("Respins din admin.")
+            audit_log("profile.verification_rejected", request=request, obj=profile)

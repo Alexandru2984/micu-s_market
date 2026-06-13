@@ -10,6 +10,7 @@ from django.db.models import Count
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfileForm
 from .models import UserProfile
 from listings.models import Listing
+from audit.utils import audit_log
 
 User = get_user_model()
 
@@ -51,6 +52,7 @@ def login_view(request):
                 ):
                     next_url = reverse('listings:home')
                 messages.success(request, f'Bine ai venit, {user.get_full_name() or user.username}!')
+                audit_log("auth.login", request=request, actor=user)
                 return redirect(next_url)
     else:
         form = CustomAuthenticationForm()
@@ -60,6 +62,8 @@ def login_view(request):
 @require_POST
 def logout_view(request):
     """Deconectare utilizator — acceptă doar POST pentru a preveni CSRF force-logout"""
+    actor = request.user if request.user.is_authenticated else None
+    audit_log("auth.logout", request=request, actor=actor)
     logout(request)
     messages.info(request, 'Te-ai deconectat cu succes!')
     return redirect('listings:home')
@@ -124,6 +128,7 @@ def request_verification_view(request):
         messages.info(request, 'Cererea ta de verificare este deja în analiză.')
     elif profile.request_verification():
         messages.success(request, 'Cererea de verificare a fost trimisă.')
+        audit_log("profile.verification_requested", request=request, obj=profile)
     else:
         messages.error(request, 'Cererea de verificare nu a putut fi trimisă.')
 

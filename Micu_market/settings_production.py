@@ -1,6 +1,19 @@
 # settings_production.py
 from .settings import *
 
+SENTRY_DSN = os.getenv('SENTRY_DSN', '')
+if SENTRY_DSN:
+    import sentry_sdk
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        send_default_pii=False,
+        traces_sample_rate=float(os.getenv('SENTRY_TRACES_SAMPLE_RATE', '0.05')),
+        profiles_sample_rate=float(os.getenv('SENTRY_PROFILES_SAMPLE_RATE', '0.0')),
+        environment=os.getenv('SENTRY_ENVIRONMENT', 'production'),
+        release=os.getenv('SENTRY_RELEASE', ''),
+    )
+
 # Security settings pentru producție
 DEBUG = False
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,market.micutu.com').split(',')
@@ -41,26 +54,46 @@ DATABASES = {
 LOG_DIR = os.getenv('DJANGO_LOG_DIR', '/var/log/micu_market')
 LOG_FILE = os.path.join(LOG_DIR, 'django.log')
 LOG_TO_FILE = os.getenv('DJANGO_LOG_TO_FILE', 'False') == 'True'
+LOG_LEVEL = os.getenv('DJANGO_LOG_LEVEL', 'INFO')
 LOG_HANDLER = {
-    'level': 'ERROR',
+    'level': LOG_LEVEL,
     'class': 'logging.FileHandler',
     'filename': LOG_FILE,
+    'formatter': 'production',
+    'filters': ['request_id'],
 } if LOG_TO_FILE else {
-    'level': 'ERROR',
+    'level': LOG_LEVEL,
     'class': 'logging.StreamHandler',
+    'formatter': 'production',
+    'filters': ['request_id'],
 }
 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'filters': {
+        'request_id': {
+            '()': 'Micu_market.observability.RequestIdFilter',
+        },
+    },
+    'formatters': {
+        'production': {
+            'format': '%(asctime)s %(levelname)s [%(request_id)s] %(name)s %(message)s',
+        },
+    },
     'handlers': {
         'default': LOG_HANDLER,
     },
     'loggers': {
         'django': {
             'handlers': ['default'],
-            'level': 'ERROR',
+            'level': LOG_LEVEL,
             'propagate': True,
+        },
+        'audit': {
+            'handlers': ['default'],
+            'level': 'INFO',
+            'propagate': False,
         },
     },
 }

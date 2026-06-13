@@ -11,6 +11,7 @@ from .models import Listing, ListingImage, ListingReport
 from .forms import ListingForm, ListingImageFormSet, ListingReportForm
 from categories.models import Category
 from favorites.models import Favorite
+from audit.utils import audit_log
 
 logger = logging.getLogger(__name__)
 
@@ -199,6 +200,7 @@ def report_listing_view(request, slug):
         report.listing = listing
         report.reporter = request.user
         report.save()
+        audit_log("listing.report", request=request, obj=listing, metadata={"report_id": report.pk, "reason": report.reason})
         messages.success(request, "Raportul a fost trimis către moderare.")
     else:
         messages.error(request, "Raportul nu a putut fi trimis. Verifică motivul selectat.")
