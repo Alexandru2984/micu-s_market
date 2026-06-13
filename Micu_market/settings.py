@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
     # third-party
     "corsheaders",
+    "storages",
 
     # allauth
     "allauth",

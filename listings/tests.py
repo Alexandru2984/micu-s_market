@@ -1,12 +1,16 @@
 """
 Teste pentru anunțuri — CRUD, access control, validare imagini
 """
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management import call_command
 from django.utils import timezone
 from io import BytesIO
+from pathlib import Path
+from io import StringIO
+import tempfile
 from datetime import timedelta
 from PIL import Image as PilImage
 
@@ -243,3 +247,18 @@ class ListingImageValidationTestCase(TestCase):
         fake_file = SimpleUploadedFile('malware.exe', b'MZ...fake', content_type='application/octet-stream')
         form = ListingImageForm(files={'image': fake_file})
         self.assertFalse(form.is_valid())
+
+
+class MediaCleanupCommandTestCase(TestCase):
+    def test_cleanup_orphan_media_reports_files_without_deleting_by_default(self):
+        with tempfile.TemporaryDirectory() as media_root:
+            with override_settings(MEDIA_ROOT=media_root):
+                orphan = Path(media_root) / "orphans" / "old.txt"
+                orphan.parent.mkdir(parents=True)
+                orphan.write_text("orphan", encoding="utf-8")
+
+                output = StringIO()
+                call_command("cleanup_orphan_media", stdout=output)
+
+                self.assertIn("orphans/old.txt", output.getvalue())
+                self.assertTrue(orphan.exists())

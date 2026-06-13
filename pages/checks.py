@@ -79,4 +79,18 @@ def production_environment_checks(app_configs, **kwargs):
             )
         )
 
+    if getattr(settings, "MEDIA_STORAGE_BACKEND", "filesystem") == "s3":
+        missing_s3 = [
+            name for name in ("AWS_STORAGE_BUCKET_NAME", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY")
+            if not getattr(settings, name, "")
+        ]
+        if missing_s3:
+            errors.append(
+                Error(
+                    "Storage-ul S3/R2 este activ, dar configurarea este incompletă.",
+                    hint=f"Setează variabilele lipsă: {', '.join(missing_s3)}.",
+                    id="micu.E004",
+                )
+            )
+
     return errors
