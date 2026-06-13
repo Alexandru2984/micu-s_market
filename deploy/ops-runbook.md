@@ -84,6 +84,31 @@ Smoke checks only:
 APP_BASE_URL=https://market.micutu.com scripts/smoke_check.sh
 ```
 
+## systemd service
+
+Install or refresh the service unit:
+
+```bash
+sudo cp /home/micu/Micu_market/deploy/systemd/micu-market.service /etc/systemd/system/micu-market.service
+sudo systemctl daemon-reload
+sudo systemctl enable micu-market
+sudo systemctl restart micu-market
+sudo systemctl status micu-market --no-pager
+```
+
+The service reads `/home/micu/Micu_market/.env` and starts Gunicorn through the project virtualenv.
+
+## Nginx vhost
+
+Install or refresh the vhost after adjusting certificate paths in `deploy/nginx/micu-market.conf`:
+
+```bash
+sudo cp /home/micu/Micu_market/deploy/nginx/micu-market.conf /etc/nginx/sites-available/micu-market.conf
+sudo ln -sfn /etc/nginx/sites-available/micu-market.conf /etc/nginx/sites-enabled/micu-market.conf
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
 ## Cloudflare/origin checks
 
 - Cloudflare SSL/TLS mode: `Full (strict)`.
