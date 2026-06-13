@@ -23,6 +23,7 @@ fi
 
 venv/bin/python -m pip install -r requirements.txt
 venv/bin/python manage.py check --deploy --settings="$SETTINGS_MODULE"
+venv/bin/python manage.py doctor --settings="$SETTINGS_MODULE"
 venv/bin/python manage.py makemigrations --check --dry-run --settings="$SETTINGS_MODULE"
 venv/bin/python manage.py migrate --noinput --settings="$SETTINGS_MODULE"
 venv/bin/python manage.py collectstatic --noinput --settings="$SETTINGS_MODULE"

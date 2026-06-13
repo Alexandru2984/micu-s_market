@@ -83,6 +83,18 @@ Smoke checks only:
 APP_BASE_URL=https://market.micutu.com scripts/smoke_check.sh
 ```
 
+External service checks only:
+
+```bash
+venv/bin/python manage.py doctor --settings=Micu_market.settings_production
+```
+
+To verify SMTP delivery explicitly, pass a real inbox:
+
+```bash
+venv/bin/python manage.py doctor --settings=Micu_market.settings_production --send-test-email you@example.com
+```
+
 ## systemd service
 
 Install or refresh the service unit:
