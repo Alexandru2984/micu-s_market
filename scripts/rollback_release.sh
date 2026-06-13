@@ -11,6 +11,8 @@ RUN_RESTART="${RUN_RESTART:-1}"
 RUN_SMOKE="${RUN_SMOKE:-1}"
 
 cd "$ROOT_DIR"
+source scripts/lib_security.sh
+check_env_file_permissions .env
 
 if [[ -z "$TARGET_REF" ]]; then
   echo "Usage: ROLLBACK_CONFIRM=1 scripts/rollback_release.sh <git-ref>" >&2

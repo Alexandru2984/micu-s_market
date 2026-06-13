@@ -8,6 +8,8 @@ RUN_RESTART="${RUN_RESTART:-1}"
 RUN_SMOKE="${RUN_SMOKE:-1}"
 
 cd "$ROOT_DIR"
+source scripts/lib_security.sh
+check_env_file_permissions .env
 
 if [[ -n "$(git status --short)" ]]; then
   echo "Worktree is dirty. Commit or stash changes before deploy." >&2

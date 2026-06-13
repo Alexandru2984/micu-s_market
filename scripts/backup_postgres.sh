@@ -6,6 +6,8 @@ BACKUP_DIR="${BACKUP_DIR:-/var/backups/micu_market}"
 RETENTION_DAYS="${BACKUP_RETENTION_DAYS:-14}"
 
 cd "$ROOT_DIR"
+source scripts/lib_security.sh
+check_env_file_permissions .env
 
 if [[ ! -f .env ]]; then
   echo ".env is missing in $ROOT_DIR" >&2

@@ -8,6 +8,8 @@ RUN_AUDIT="${RUN_AUDIT:-1}"
 RUN_DOCTOR="${RUN_DOCTOR:-1}"
 
 cd "$ROOT_DIR"
+source scripts/lib_security.sh
+check_env_file_permissions .env
 
 if [[ -f .env ]]; then
   set -a
