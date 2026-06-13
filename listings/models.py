@@ -48,6 +48,9 @@ class Listing(models.Model):
     is_featured = models.BooleanField(default=False, verbose_name="Promovat")
     featured_until = models.DateTimeField(null=True, blank=True, verbose_name="Promovat până la")
     views_count = models.IntegerField(default=0, verbose_name="Număr vizualizări")
+    risk_score = models.PositiveSmallIntegerField(default=0, verbose_name="Scor risc")
+    needs_moderation_review = models.BooleanField(default=False, verbose_name="Necesită moderare")
+    moderation_note = models.TextField(blank=True, verbose_name="Notă moderare")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creat la")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Actualizat la")
     expires_at = models.DateTimeField(null=True, blank=True, verbose_name="Expiră la")
@@ -64,6 +67,7 @@ class Listing(models.Model):
             models.Index(fields=['status', 'price']),
             models.Index(fields=['status', 'city']),
             models.Index(fields=['status', 'is_featured', 'featured_until', '-created_at']),
+            models.Index(fields=['needs_moderation_review', '-created_at']),
         ]
 
     def __str__(self):

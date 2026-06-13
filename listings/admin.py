@@ -12,12 +12,12 @@ class ListingImageInline(admin.TabularInline):
 
 @admin.register(Listing)
 class ListingAdmin(admin.ModelAdmin):
-    list_display = ("title", "price", "status_display", "este_activ", "este_promovat", "oras", "data_creare")
-    list_filter = ("status", "is_featured", "featured_until", "created_at", "category", "condition", "city")
+    list_display = ("title", "price", "status_display", "este_activ", "este_promovat", "needs_moderation_review", "risk_score", "oras", "data_creare")
+    list_filter = ("status", "needs_moderation_review", "is_featured", "featured_until", "created_at", "category", "condition", "city")
     search_fields = ("title", "description", "city")
-    readonly_fields = ("slug", "views_count", "created_at", "updated_at")
+    readonly_fields = ("slug", "views_count", "risk_score", "moderation_note", "created_at", "updated_at")
     inlines = [ListingImageInline]
-    actions = ("promote_7_days", "promote_30_days", "stop_promotion")
+    actions = ("approve_moderation", "send_to_moderation", "promote_7_days", "promote_30_days", "stop_promotion")
     
     fieldsets = (
         ('Informații de bază', {
@@ -31,6 +31,9 @@ class ListingAdmin(admin.ModelAdmin):
         }),
         ('Setări avansate', {
             'fields': ('status', 'is_featured', 'featured_until', 'expires_at')
+        }),
+        ('Moderare', {
+            'fields': ('needs_moderation_review', 'risk_score', 'moderation_note')
         }),
         ('Informații sistem', {
             'fields': ('slug', 'views_count', 'created_at', 'updated_at'),
@@ -77,6 +80,14 @@ class ListingAdmin(admin.ModelAdmin):
     @admin.action(description="Oprește promovarea")
     def stop_promotion(self, request, queryset):
         queryset.update(is_featured=False, featured_until=None)
+
+    @admin.action(description="Aprobă moderarea și activează")
+    def approve_moderation(self, request, queryset):
+        queryset.update(needs_moderation_review=False, risk_score=0, moderation_note="", status="active")
+
+    @admin.action(description="Trimite la moderare")
+    def send_to_moderation(self, request, queryset):
+        queryset.update(needs_moderation_review=True, status="inactive")
 
 
 @admin.register(ListingReport)

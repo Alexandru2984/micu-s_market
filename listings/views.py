@@ -12,6 +12,7 @@ import logging
 from .models import Listing, ListingImage, ListingReport
 from .forms import ListingForm, ListingImageFormSet, ListingReportForm
 from .search import apply_listing_search, order_search_results
+from .moderation import apply_listing_risk_review
 from categories.models import Category
 from favorites.models import Favorite
 from audit.utils import audit_log
@@ -263,9 +264,14 @@ def listing_create_view(request):
             listing = form.save(commit=False)
             listing.owner = request.user
             listing.save()
+            apply_listing_risk_review(listing, request.user, request=request)
             
             # Folosește funcția auxiliară
             process_images(request, listing)
+
+            if listing.needs_moderation_review:
+                messages.warning(request, "Anunțul a fost trimis la moderare înainte de publicare.")
+                return redirect('listings:my_listings')
             
             messages.success(request, 'Anunțul a fost creat cu succes!')
             return redirect('listings:detail', slug=listing.slug)
@@ -288,8 +294,13 @@ def listing_update_view(request, slug):
         formset = ListingImageFormSet(request.POST, request.FILES, queryset=listing.images.all())
         
         if form.is_valid() and formset.is_valid():
-            form.save()
+            listing = form.save()
+            apply_listing_risk_review(listing, request.user, request=request)
             formset.save() # Aceasta se va ocupa de salvarea/ștergerea imaginilor
+
+            if listing.needs_moderation_review:
+                messages.warning(request, "Anunțul a fost trimis la moderare înainte de republicare.")
+                return redirect('listings:my_listings')
             
             messages.success(request, 'Anunțul a fost actualizat!')
             return redirect('listings:detail', slug=listing.slug)

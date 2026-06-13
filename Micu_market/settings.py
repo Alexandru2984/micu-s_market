@@ -183,6 +183,11 @@ AJAX_WRITE_RATE = os.getenv("AJAX_WRITE_RATE", "120/m")
 REPORT_WRITE_RATE = os.getenv("REPORT_WRITE_RATE", "10/h")
 HOMEPAGE_CACHE_SECONDS = int(os.getenv("HOMEPAGE_CACHE_SECONDS", "300"))
 LISTING_AUTO_HIDE_REPORT_THRESHOLD = int(os.getenv("LISTING_AUTO_HIDE_REPORT_THRESHOLD", "3"))
+LISTING_RISK_REVIEW_THRESHOLD = int(os.getenv("LISTING_RISK_REVIEW_THRESHOLD", "70"))
+LISTING_RISK_TERMS = _split_env(
+    "LISTING_RISK_TERMS",
+    "whatsapp,telegram,avans,western union,crypto,bitcoin,revolut only,livrare doar cu plata in avans",
+)
 
 # Security settings pentru producție
 if not DEBUG:

@@ -250,6 +250,57 @@ class ListingCRUDTestCase(TestCase):
         self.assertIn(active_promoted, response.context['featured_listings'])
         self.assertNotIn(expired_promoted, response.context['featured_listings'])
 
+    @override_settings(LISTING_RISK_REVIEW_THRESHOLD=70)
+    def test_suspicious_listing_is_sent_to_moderation_on_create(self):
+        """Anunțurile cu risc mare sunt ascunse temporar pentru review."""
+        self.client.login(username='seller', password='SellerPass123!')
+
+        response = self.client.post(
+            reverse('listings:create'),
+            {
+                'title': 'Telefon urgent whatsapp',
+                'description': 'Plata in avans prin western union. Scrie pe whatsapp.',
+                'category': self.category.id,
+                'price': '1.00',
+                'city': 'București',
+                'county': 'București',
+                'condition': 'good',
+                'negotiable': 'on',
+            },
+        )
+
+        listing = Listing.objects.get(title='Telefon urgent whatsapp')
+        self.assertRedirects(response, reverse('listings:my_listings'))
+        self.assertEqual(listing.status, 'inactive')
+        self.assertTrue(listing.needs_moderation_review)
+        self.assertGreaterEqual(listing.risk_score, 70)
+        self.assertIn('Termeni sensibili', listing.moderation_note)
+        self.assertTrue(Notification.objects.filter(recipient=self.user, notification_type='listing_rejected').exists())
+
+    @override_settings(LISTING_RISK_REVIEW_THRESHOLD=70)
+    def test_normal_listing_remains_public_on_create(self):
+        """Anunțurile normale rămân active după creare."""
+        self.client.login(username='seller', password='SellerPass123!')
+
+        response = self.client.post(
+            reverse('listings:create'),
+            {
+                'title': 'Scaun birou ergonomic',
+                'description': 'Scaun reglabil, stare bună, disponibil pentru ridicare locală.',
+                'category': self.category.id,
+                'price': '250.00',
+                'city': 'București',
+                'county': 'București',
+                'condition': 'good',
+                'negotiable': 'on',
+            },
+        )
+
+        listing = Listing.objects.get(title='Scaun birou ergonomic')
+        self.assertRedirects(response, reverse('listings:detail', kwargs={'slug': listing.slug}))
+        self.assertEqual(listing.status, 'active')
+        self.assertFalse(listing.needs_moderation_review)
+
 
 class ListingImageValidationTestCase(TestCase):
     """Teste pentru validarea imaginilor uploadate"""
