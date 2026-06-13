@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 
+from categories.models import Category
 from favorites.models import Favorite
 from listings.forms import ListingForm
 from listings.models import Listing
@@ -115,10 +116,18 @@ def listing_list_api(request):
 
     category = request.GET.get('category')
     if category:
-        category_filter = Q(category__slug=category)
-        if category.isdigit():
-            category_filter |= Q(category_id=int(category))
-        listings = listings.filter(category_filter)
+        category_obj = None
+        try:
+            category_obj = Category.objects.get(slug=category, is_active=True)
+        except Category.DoesNotExist:
+            if category.isdigit():
+                try:
+                    category_obj = Category.objects.get(id=int(category), is_active=True)
+                except Category.DoesNotExist:
+                    category_obj = None
+        if category_obj:
+            category_ids = [category_obj.id] + [child.id for child in category_obj.get_all_children]
+            listings = listings.filter(category_id__in=category_ids)
 
     city = request.GET.get('city')
     if city:

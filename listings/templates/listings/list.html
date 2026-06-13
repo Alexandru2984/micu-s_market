@@ -142,7 +142,7 @@
                 <div class="header-stats">
                     <span class="results-count">
                         <i class="fas fa-chart-bar"></i>
-                        {{ page_obj.paginator.count }} anunțuri găsite
+                        <span data-listings-count>{{ page_obj.paginator.count }}</span> anunțuri găsite
                     </span>
                     {% if search_query or current_category or current_city %} 
                         <a href="{% url 'listings:list' %}" class="reset-filters">
@@ -404,7 +404,7 @@
             <main class="listings-main">
                 {% if page_obj %}
                     <!-- Grila cu anunțuri -->
-                    <div class="listings-grid">
+                    <div class="listings-grid" data-listings-grid>
                         {% for listing in page_obj %}
                             <a href="{% url 'listings:detail' listing.slug %}" class="listing-card">
                                 <div class="listing-image">
@@ -442,7 +442,7 @@
                     
                     <!-- Paginare -->
                     {% if page_obj.has_other_pages %}
-                        <div class="pagination">
+                        <div class="pagination" data-listings-pagination>
                             {% if page_obj.has_previous %}
                                 <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if current_category_slug %}&category={{ current_category_slug }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if current_city %}&city={{ current_city }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
                                    class="btn btn-outline">
@@ -473,7 +473,7 @@
                     
                 {% else %}
                     <!-- Stare goală -->
-                    <div class="no-listings">
+                    <div class="no-listings" data-listings-empty>
                         <i class="fas fa-search"></i>
                         <h3>Nu am găsit anunțuri</h3>
                         <p>
@@ -502,4 +502,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/listings-api.js' %}"></script>
 {% endblock %}

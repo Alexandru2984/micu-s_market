@@ -29,6 +29,12 @@ class ListingApiTests(TestCase):
             slug='api-category',
             is_active=True,
         )
+        self.child_category = Category.objects.create(
+            name='API Child Category',
+            slug='api-child-category',
+            parent=self.category,
+            is_active=True,
+        )
         self.listing = Listing.objects.create(
             title='Telefon API',
             description='Telefon test API',
@@ -48,6 +54,15 @@ class ListingApiTests(TestCase):
             city='Cluj',
             status='inactive',
         )
+        self.child_listing = Listing.objects.create(
+            title='Subcategorie API',
+            description='Apare la filtrarea categoriei parinte',
+            price=250,
+            owner=self.owner,
+            category=self.child_category,
+            city='Brasov',
+            status='active',
+        )
 
     def test_listing_list_returns_only_active_listings(self):
         response = self.client.get(reverse('api:listing_list'))
@@ -66,6 +81,16 @@ class ListingApiTests(TestCase):
         self.assertEqual(payload['slug'], self.listing.slug)
         self.assertEqual(payload['category']['slug'], self.category.slug)
         self.assertFalse(payload['is_favorited'])
+
+    def test_parent_category_filter_includes_child_categories(self):
+        response = self.client.get(
+            reverse('api:listing_list'),
+            {'category': self.category.slug},
+        )
+        self.assertEqual(response.status_code, 200)
+        slugs = [item['slug'] for item in response.json()['results']]
+        self.assertIn(self.listing.slug, slugs)
+        self.assertIn(self.child_listing.slug, slugs)
 
     def test_listing_create_requires_authentication(self):
         response = self.client.post(
