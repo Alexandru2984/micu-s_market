@@ -1,6 +1,6 @@
 # 🏪 Micu's Market
 
-**Micu's Market** este o platformă modernă de tip marketplace local (anunțuri de mică publicitate), dezvoltată în Python folosind framework-ul **Django**. Platforma permite utilizatorilor să publice anunțuri, să comunice securizat în timp real, să își salveze anunțurile favorite și să își acorde recenzii reciproce pentru tranzacții.
+**Micu's Market** este o platformă modernă de tip marketplace local (anunțuri de mică publicitate), dezvoltată în Python folosind framework-ul **Django**. Platforma permite utilizatorilor să publice anunțuri, să comunice securizat prin chat, să își salveze anunțurile favorite și să își acorde recenzii reciproce pentru tranzacții.
 
 ---
 
@@ -20,7 +20,7 @@
 ### 💬 Sistem de Chat & Atașamente
 * **Conversații AJAX:** Trimitere și primire mesaje direct din pagină, cu mesaje automate de întâmpinare la inițierea contactului.
 * **Atașamente Securizate:** Permite atașarea de imagini sau documente (PDF, Word, Excel, TXT) cu limite stricte de securitate (max. 10MB per fișier și verificare integritate imagini).
-* **Notificări inbox:** Contorizarea în timp real a mesajelor necitite.
+* **Notificări inbox:** Contorizarea mesajelor necitite.
 
 ### ⭐ Recenzii & Rating-uri
 * **Feedback Tranzacțional:** Cumpărătorii și vânzătorii își pot acorda note (1-5 stele) asociate unui anunț specific.
@@ -28,16 +28,16 @@
 * **Prevenire Abuse:** Sistemul blochează auto-recenziile (self-review), recenziile duplicate și permite limitarea frecvenței acestora.
 
 ### 🔔 Notificări & Favorite
-* **Sistem de Notificări:** Alerte vizuale în timp real pentru mesaje noi sau recenzii primite.
+* **Sistem de Notificări:** Alerte vizuale pentru mesaje noi sau recenzii primite.
 * **Listă Favorite:** Salvarea anunțurilor de interes direct în contul de utilizator.
 
 ---
 
 ## 🛠️ Stack Tehnologic
 
-* **Backend:** Python 3.10+ / Django 5.2+
-* **Bază de date:** PostgreSQL (Producție) / SQLite (Dezvoltare locală)
-* **Servire Asincronă / WebSockets:** Django Channels / Redis
+* **Backend:** Python / Django (vezi versiunile fixate în `requirements.txt`)
+* **Bază de date:** PostgreSQL
+* **Chat:** HTTP/AJAX, fără WebSockets active în configurația curentă
 * **Server Web (Producție):** Gunicorn cu Uvicorn Workers (`uvicorn.workers.UvicornWorker`)
 * **Fișiere Statice:** WhiteNoise (comprimare și caching)
 * **Validări imagini:** Pillow (PIL)
@@ -115,8 +115,10 @@ Aplicația va fi accesibilă la adresa `http://127.0.0.1:8000/`.
 Pentru a rula suita de teste asigurându-vă că nu sunt afectate testele de redirecționări HTTPS locale, folosiți variabila `DJANGO_DEBUG=1`:
 
 ```bash
-DJANGO_DEBUG=1 python manage.py test
+DJANGO_DEBUG=1 python manage.py test --settings=Micu_market.settings
 ```
+
+În mediul local din acest repo, `python` poate lipsi din PATH; folosiți `venv/bin/python` după activarea sau crearea mediului virtual.
 
 ---
 
