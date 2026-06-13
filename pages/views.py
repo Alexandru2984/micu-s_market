@@ -2,6 +2,8 @@ from django.db import connections
 from django.db.utils import OperationalError
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.templatetags.static import static
+from django.views.decorators.cache import cache_control
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
 from listings.models import Listing
@@ -52,3 +54,43 @@ def terms_view(request):
 def privacy_view(request):
 	context = {}
 	return render(request, 'pages/privacy.html', context)
+
+
+@require_GET
+@cache_control(public=True, max_age=3600)
+def manifest_view(request):
+    return JsonResponse(
+        {
+            "name": "Micu's Market",
+            "short_name": "Micu Market",
+            "description": "Marketplace pentru anunțuri locale în România.",
+            "start_url": "/",
+            "scope": "/",
+            "display": "standalone",
+            "background_color": "#ffffff",
+            "theme_color": "#2563eb",
+            "lang": "ro-RO",
+            "categories": ["shopping", "business"],
+            "icons": [
+                {
+                    "src": static("images/favicon.svg"),
+                    "sizes": "any",
+                    "type": "image/svg+xml",
+                    "purpose": "any maskable",
+                }
+            ],
+        },
+        content_type="application/manifest+json",
+    )
+
+
+@require_GET
+@cache_control(public=True, max_age=3600)
+def service_worker_view(request):
+    return render(request, "pages/service-worker.js", content_type="application/javascript")
+
+
+@require_GET
+@cache_control(public=True, max_age=3600)
+def offline_view(request):
+    return render(request, "pages/offline.html")

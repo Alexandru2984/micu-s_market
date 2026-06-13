@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Offline - Micu's Market{% endblock %}
+{% block meta_description %}Nu există conexiune la internet. Reîncearcă după ce conexiunea revine.{% endblock %}
+{% block meta_robots %}noindex,nofollow{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="empty-state">
+        <h1>Ești offline</h1>
+        <p>Conexiunea nu este disponibilă momentan. Verifică internetul și reîncarcă pagina.</p>
+        <a href="{% url 'listings:home' %}" class="btn btn-primary">Reîncearcă</a>
+    </section>
+</div>
+{% endblock %}

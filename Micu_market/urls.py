@@ -2,10 +2,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
-from pages.views import healthcheck_view
+from pages.views import healthcheck_view, manifest_view, offline_view, service_worker_view
 
 urlpatterns = [
     path("healthz", healthcheck_view, name="healthcheck"),
+    path("manifest.webmanifest", manifest_view, name="manifest"),
+    path("sw.js", service_worker_view, name="service_worker"),
+    path("offline/", offline_view, name="offline"),
     path(settings.ADMIN_URL, admin.site.urls),
 
     # Django Allauth URLs

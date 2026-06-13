@@ -27,6 +27,32 @@ class ProjectUrlSecurityTests(TestCase):
         self.assertEqual(response['X-Permitted-Cross-Domain-Policies'], 'none')
         self.assertEqual(response['Cross-Origin-Resource-Policy'], 'same-site')
 
+    def test_manifest_endpoint_returns_pwa_metadata(self):
+        response = self.client.get(reverse('manifest'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/manifest+json')
+        self.assertEqual(response.json()['short_name'], 'Micu Market')
+
+    def test_service_worker_endpoint_is_root_scoped(self):
+        response = self.client.get(reverse('service_worker'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('application/javascript', response['Content-Type'])
+        self.assertContains(response, 'self.addEventListener("fetch"', status_code=200)
+
+    def test_offline_page_is_noindex(self):
+        response = self.client.get(reverse('offline'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<meta name="robots" content="noindex,nofollow">')
+
+    def test_home_links_manifest_and_pwa_registration(self):
+        response = self.client.get(reverse('listings:home'))
+
+        self.assertContains(response, '<link rel="manifest" href="/manifest.webmanifest">')
+        self.assertContains(response, '/static/js/pwa.js')
+
 
 class DoctorCommandTests(TestCase):
     def test_doctor_checks_core_services(self):
