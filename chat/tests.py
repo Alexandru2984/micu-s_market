@@ -88,6 +88,18 @@ class ChatConversationTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 405)
 
+    def test_unread_count_requires_get(self):
+        self.client.login(username='buyer', password='BuyerPass123!')
+        response = self.client.post(reverse('chat:unread_count'))
+
+        self.assertEqual(response.status_code, 405)
+
+    def test_search_users_requires_get(self):
+        self.client.login(username='buyer', password='BuyerPass123!')
+        response = self.client.post(reverse('chat:search_users'), {'q': 'seller'})
+
+        self.assertEqual(response.status_code, 405)
+
     def test_third_user_cannot_access_conversation(self):
         """Un utilizator terț nu poate accesa conversația altora"""
         # Creează conversația între buyer și seller

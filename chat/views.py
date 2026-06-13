@@ -6,7 +6,7 @@ from django.db.models import Q, Count
 from django.http import FileResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.conf import settings
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 from django_ratelimit.decorators import ratelimit
 import logging
 import mimetypes
@@ -197,6 +197,7 @@ def send_message_view(request, conversation_pk):
     return redirect('chat:conversation', pk=conversation_pk)
 
 @login_required
+@require_GET
 @ratelimit(key='user', rate=settings.SENSITIVE_READ_RATE, method='GET', block=True)
 def search_users_view(request):
     """Caută utilizatori pentru a începe o conversație"""
@@ -223,6 +224,7 @@ def search_users_view(request):
     return JsonResponse({'users': users_data})
 
 @login_required
+@require_GET
 @ratelimit(key='user', rate=settings.SENSITIVE_READ_RATE, method='GET', block=True)
 def get_unread_count(request):
     """Returnează numărul de mesaje necitite"""
@@ -234,6 +236,7 @@ def get_unread_count(request):
     return JsonResponse({'unread_count': count})
 
 @login_required
+@require_GET
 def attachment_download_view(request, pk):
     """Servește atașamentele doar participanților conversației."""
     attachment = get_object_or_404(

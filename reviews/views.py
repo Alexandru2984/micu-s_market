@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Avg, Q
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 from django.conf import settings
 from django_ratelimit.decorators import ratelimit
 
@@ -166,6 +166,7 @@ def delete_review_view(request, review_id):
     messages.success(request, "Review-ul a fost șters cu succes!")
     return redirect('reviews:user_reviews', username=username)
 
+@require_GET
 @ratelimit(key='ip', rate=settings.SENSITIVE_READ_RATE, method='GET', block=True)
 def reviews_stats_api(request, username):
     """API pentru statistici review-uri"""

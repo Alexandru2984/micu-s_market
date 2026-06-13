@@ -98,6 +98,13 @@ class ReviewSecurityTestCase(TestCase):
         response = self.client.get(reverse('reviews:my_reviews'))
         self.assertEqual(response.status_code, 302)
 
+    def test_review_stats_api_requires_get(self):
+        response = self.client.post(
+            reverse('reviews:stats_api', kwargs={'username': self.reviewed.username})
+        )
+
+        self.assertEqual(response.status_code, 405)
+
     def test_delete_review_only_by_author(self):
         """Doar autorul poate șterge propriul review"""
         review = Review.objects.create(
