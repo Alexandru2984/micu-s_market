@@ -129,6 +129,81 @@ class ChatConversationTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
+    def test_send_message_accepts_valid_text_attachment(self):
+        """Atașamentele text valide sunt salvate."""
+        with tempfile.TemporaryDirectory() as media_root:
+            with override_settings(MEDIA_ROOT=media_root):
+                conv = Conversation.objects.create(listing=self.listing)
+                conv.participants.add(self.buyer, self.seller)
+
+                self.client.login(username='buyer', password='BuyerPass123!')
+                response = self.client.post(
+                    reverse('chat:send_message', kwargs={'conversation_pk': conv.pk}),
+                    {
+                        'content': 'mesaj cu atasament',
+                        'attachments': SimpleUploadedFile(
+                            'nota.txt',
+                            b'continut valid',
+                            content_type='text/plain',
+                        ),
+                    },
+                    HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+                )
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(MessageAttachment.objects.count(), 1)
+                self.assertEqual(response.json()['message']['attachments'][0]['filename'], 'nota.txt')
+
+    def test_send_message_skips_spoofed_pdf_attachment(self):
+        """Fișierele care doar pretind că sunt PDF sunt ignorate."""
+        with tempfile.TemporaryDirectory() as media_root:
+            with override_settings(MEDIA_ROOT=media_root):
+                conv = Conversation.objects.create(listing=self.listing)
+                conv.participants.add(self.buyer, self.seller)
+
+                self.client.login(username='buyer', password='BuyerPass123!')
+                response = self.client.post(
+                    reverse('chat:send_message', kwargs={'conversation_pk': conv.pk}),
+                    {
+                        'content': 'mesaj cu pdf fals',
+                        'attachments': SimpleUploadedFile(
+                            'contract.pdf',
+                            b'nu este pdf',
+                            content_type='application/pdf',
+                        ),
+                    },
+                    HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+                )
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(MessageAttachment.objects.count(), 0)
+                self.assertEqual(response.json()['message']['attachments'], [])
+
+    def test_send_message_skips_invalid_image_attachment(self):
+        """Imaginile corupte sau false sunt ignorate."""
+        with tempfile.TemporaryDirectory() as media_root:
+            with override_settings(MEDIA_ROOT=media_root):
+                conv = Conversation.objects.create(listing=self.listing)
+                conv.participants.add(self.buyer, self.seller)
+
+                self.client.login(username='buyer', password='BuyerPass123!')
+                response = self.client.post(
+                    reverse('chat:send_message', kwargs={'conversation_pk': conv.pk}),
+                    {
+                        'content': 'mesaj cu imagine falsa',
+                        'attachments': SimpleUploadedFile(
+                            'poza.jpg',
+                            b'nu este imagine',
+                            content_type='image/jpeg',
+                        ),
+                    },
+                    HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+                )
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(MessageAttachment.objects.count(), 0)
+                self.assertEqual(response.json()['message']['attachments'], [])
+
     def test_attachment_download_allowed_for_participant(self):
         """Participanții conversației pot descărca atașamentele."""
         with tempfile.TemporaryDirectory() as media_root:

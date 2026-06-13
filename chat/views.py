@@ -11,6 +11,7 @@ import logging
 import mimetypes
 
 from .models import Conversation, Message, MessageAttachment
+from .validators import MAX_ATTACHMENTS_PER_MESSAGE, is_allowed_chat_attachment
 from listings.models import Listing
 
 logger = logging.getLogger(__name__)
@@ -152,39 +153,12 @@ def send_message_view(request, conversation_pk):
         content=content
     )
     
-    # Procesează atașamentele cu validare completă
+    # Procesează atașamentele cu validare server-side.
     if 'attachments' in request.FILES:
-        ALLOWED_EXTENSIONS = {
-            'jpg', 'jpeg', 'png', 'gif', 'webp',  # imagini
-            'pdf', 'doc', 'docx', 'txt', 'xls', 'xlsx',  # documente
-        }
-        MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB per fișier
-        MAX_FILES = 5  # maxim 5 atașamente per mesaj
-
-        uploaded_files = request.FILES.getlist('attachments')[:MAX_FILES]  # ignoră restul
-
+        uploaded_files = request.FILES.getlist('attachments')[:MAX_ATTACHMENTS_PER_MESSAGE]
         for file in uploaded_files:
-            # Verifică extensia
-            ext = file.name.rsplit('.', 1)[-1].lower() if '.' in file.name else ''
-            if ext not in ALLOWED_EXTENSIONS:
-                continue  # sări fișierele cu extensii nepermise
-
-            # Verifică dimensiunea
-            if file.size > MAX_FILE_SIZE:
-                continue  # sări fișierele prea mari
-
-            # Verifică conținutul imaginilor cu Pillow
-            if ext in {'jpg', 'jpeg', 'png', 'gif', 'webp'}:
-                try:
-                    from PIL import Image as PilImage
-                    file.seek(0)
-                    img = PilImage.open(file)
-                    img.verify()
-                    file.seek(0)
-                except Exception:
-                    continue  # fișier imagine invalid/fals
-
-            MessageAttachment.objects.create(message=message, file=file)
+            if is_allowed_chat_attachment(file):
+                MessageAttachment.objects.create(message=message, file=file)
     
     # Returnează răspunsul JSON pentru AJAX
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
