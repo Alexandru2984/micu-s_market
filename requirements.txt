@@ -1,7 +1,7 @@
 argon2-cffi==25.1.0
 Django==5.2.15
 django-allauth==65.18.0
-django-cors-headers==4.7.0
+django-cors-headers==4.9.0
 django-ratelimit==4.1.0
 pillow==12.2.0
 psycopg[binary]==3.3.4
