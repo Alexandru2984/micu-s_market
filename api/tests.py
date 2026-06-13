@@ -1,7 +1,7 @@
 import json
 
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from categories.models import Category
@@ -165,6 +165,33 @@ class ListingApiTests(TestCase):
         listing = Listing.objects.get(slug=payload['slug'])
         self.assertEqual(listing.owner, self.buyer)
         self.assertEqual(payload['title'], 'Laptop API')
+
+    @override_settings(LISTING_RISK_REVIEW_THRESHOLD=70)
+    def test_listing_create_api_applies_risk_review(self):
+        self.client.login(username='api-buyer', password='BuyerPass123!')
+
+        response = self.client.post(
+            reverse('api:listing_create'),
+            data=json.dumps(
+                {
+                    'title': 'Telefon whatsapp urgent',
+                    'description': 'Plata in avans prin western union, discutam pe whatsapp.',
+                    'category': self.category.id,
+                    'price': '1.00',
+                    'city': 'Iasi',
+                    'county': 'Iasi',
+                    'condition': 'good',
+                    'negotiable': True,
+                }
+            ),
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, 201, response.content)
+        listing = Listing.objects.get(slug=response.json()['slug'])
+        self.assertEqual(listing.status, 'inactive')
+        self.assertTrue(listing.needs_moderation_review)
+        self.assertGreaterEqual(listing.risk_score, 70)
 
     def test_favorite_toggle_requires_authentication(self):
         response = self.client.post(

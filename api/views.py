@@ -14,6 +14,7 @@ from categories.models import Category
 from favorites.models import Favorite
 from listings.forms import ListingForm
 from listings.models import Listing
+from listings.moderation import apply_listing_risk_review
 from listings.search import apply_listing_search, order_search_results
 
 
@@ -202,6 +203,7 @@ def listing_create_api(request):
     listing = form.save(commit=False)
     listing.owner = request.user
     listing.save()
+    apply_listing_risk_review(listing, request.user, request=request)
     return JsonResponse(_listing_detail(request, listing), status=201)
 
 
