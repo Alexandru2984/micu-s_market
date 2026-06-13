@@ -83,6 +83,14 @@ Smoke checks only:
 APP_BASE_URL=https://market.micutu.com scripts/smoke_check.sh
 ```
 
+Load test from a non-production shell:
+
+```bash
+BASE_URL=https://market.micutu.com SEARCH_TERM=telefon LISTING_SLUG=slug-real scripts/run_load_test.sh
+```
+
+Default thresholds fail the run if page p95 is above 800ms, API p95 is above 500ms, or the HTTP error rate reaches 1%.
+
 External service checks only:
 
 ```bash
