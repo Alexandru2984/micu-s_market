@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     # "allauth.socialaccount.providers.facebook",  # dacă vrei Facebook login
 
     # apps proiect
-    "pages",
+    "pages.apps.PagesConfig",
     "accounts",
     "listings",
     "categories",
@@ -295,6 +295,7 @@ if EMAIL_USE_TLS and EMAIL_USE_SSL:
 
 if os.getenv("DJANGO_USE_X_FORWARDED_PROTO", "False") == "True":
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+TRUSTED_PROXY_CHAIN_CONFIGURED = os.getenv("DJANGO_TRUSTED_PROXY_CHAIN_CONFIGURED", "False") == "True"
 
 # allauth
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
