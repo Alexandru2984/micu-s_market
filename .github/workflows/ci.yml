@@ -43,9 +43,8 @@ jobs:
           --health-retries 5
 
     env:
-      DJANGO_SETTINGS_MODULE: Micu_market.settings
+      DJANGO_SETTINGS_MODULE: Micu_market.settings_test
       DJANGO_SECRET_KEY: ci-secret-key-for-micu-market-tests-change-in-prod-2026
-      DJANGO_DEBUG: "1"
       DJANGO_ALLOWED_HOSTS: 127.0.0.1,localhost,testserver
       CSRF_TRUSTED_ORIGINS: https://market.micutu.com
       EMAIL_BACKEND: django.core.mail.backends.locmem.EmailBackend
@@ -73,13 +72,13 @@ jobs:
           pip install pip-audit
 
       - name: Django system check
-        run: python manage.py check --settings=Micu_market.settings
+        run: python manage.py check --settings=Micu_market.settings_test
 
       - name: Check migrations are committed
         run: python manage.py makemigrations --check --dry-run
 
       - name: Run tests
-        run: python manage.py test --settings=Micu_market.settings
+        run: python manage.py test --settings=Micu_market.settings_test
 
       - name: Audit Python dependencies
         run: pip-audit -r requirements.txt

@@ -112,10 +112,10 @@ Aplicația va fi accesibilă la adresa `http://127.0.0.1:8000/`.
 
 ## 🧪 Rularea Testelor Unitare
 
-Pentru a rula suita de teste asigurându-vă că nu sunt afectate testele de redirecționări HTTPS locale, folosiți variabila `DJANGO_DEBUG=1`:
+Pentru a rula suita de teste fără să depindeți de valorile din `.env` local:
 
 ```bash
-DJANGO_DEBUG=1 python manage.py test --settings=Micu_market.settings
+python manage.py test --settings=Micu_market.settings_test
 ```
 
 În mediul local din acest repo, `python` poate lipsi din PATH; folosiți `venv/bin/python` după activarea sau crearea mediului virtual.
