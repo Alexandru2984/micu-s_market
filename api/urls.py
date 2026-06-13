@@ -1,11 +1,10 @@
 from django.urls import path
-from .views import api_create_listing_view
-from .views import api_listing_detail_view
-from .views import api_listing_list_view
+
+from . import views
 
 urlpatterns = [
-
-	path("api_listing_list", api_listing_list_view),
-	path("api_listing_detail", api_listing_detail_view),
-	path("api_create_listing", api_create_listing_view),
+    path("listings/", views.listing_list_api, name="listing_list"),
+    path("listings/create/", views.listing_create_api, name="listing_create"),
+    path("listings/<slug:slug>/", views.listing_detail_api, name="listing_detail"),
+    path("favorites/toggle/", views.favorite_toggle_api, name="favorite_toggle"),
 ]
