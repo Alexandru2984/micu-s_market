@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Insights vânzător - Micu's Market{% endblock %}
+
+{% block content %}
+<section class="seller-insights">
+    <div class="container">
+        <div class="insights-header">
+            <h1>Insights vânzător</h1>
+            <a href="{% url 'listings:create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Adaugă anunț
+            </a>
+        </div>
+
+        <div class="insights-stats">
+            <div class="stat-card">
+                <span>Total anunțuri</span>
+                <strong>{{ stats.total_listings }}</strong>
+            </div>
+            <div class="stat-card">
+                <span>Active</span>
+                <strong>{{ stats.active_listings }}</strong>
+            </div>
+            <div class="stat-card">
+                <span>Vândute</span>
+                <strong>{{ stats.sold_listings }}</strong>
+            </div>
+            <div class="stat-card">
+                <span>Vizualizări</span>
+                <strong>{{ stats.total_views }}</strong>
+            </div>
+            <div class="stat-card">
+                <span>Favorite primite</span>
+                <strong>{{ stats.total_favorites }}</strong>
+            </div>
+            <div class="stat-card">
+                <span>Promovări active</span>
+                <strong>{{ stats.active_promotions }}</strong>
+            </div>
+        </div>
+
+        <div class="insights-section">
+            <div class="section-heading">
+                <h2>Top anunțuri</h2>
+                <a href="{% url 'listings:my_listings' %}">Vezi toate</a>
+            </div>
+
+            {% if top_listings %}
+                <div class="insights-table-wrap">
+                    <table class="insights-table">
+                        <thead>
+                            <tr>
+                                <th>Anunț</th>
+                                <th>Status</th>
+                                <th>Vizualizări</th>
+                                <th>Favorite</th>
+                                <th>Rapoarte</th>
+                                <th>Promovat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for listing in top_listings %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'listings:detail' listing.slug %}">{{ listing.title }}</a>
+                                        <small>{{ listing.created_at|date:"d.m.Y" }}</small>
+                                    </td>
+                                    <td>{{ listing.get_status_display }}</td>
+                                    <td>{{ listing.views_count }}</td>
+                                    <td>{{ listing.favorite_count }}</td>
+                                    <td>{{ listing.report_count }}</td>
+                                    <td>
+                                        {% if listing.is_promoted %}
+                                            <span class="status-pill active">Activ</span>
+                                        {% else %}
+                                            <span class="status-pill">Nu</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Nu ai încă date de analizat</h3>
+                    <p>Publică primul anunț pentru a vedea performanța lui aici.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="insights-section">
+            <div class="section-heading">
+                <h2>Rapoarte active</h2>
+            </div>
+
+            {% if open_reports %}
+                <div class="report-list">
+                    {% for report in open_reports %}
+                        <div class="report-row">
+                            <div>
+                                <strong>{{ report.get_reason_display }}</strong>
+                                <span>{{ report.listing.title }}</span>
+                            </div>
+                            <small>{{ report.created_at|date:"d.m.Y H:i" }}</small>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="muted-text">Nu există rapoarte active pentru anunțurile tale.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.seller-insights {
+    padding: 2rem 0 3rem;
+}
+
+.insights-header,
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.insights-header h1,
+.section-heading h2 {
+    margin: 0;
+}
+
+.insights-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.stat-card span {
+    color: #64748b;
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card strong {
+    color: #0f172a;
+    font-size: 1.6rem;
+}
+
+.insights-section {
+    margin-top: 2rem;
+}
+
+.insights-table-wrap {
+    overflow-x: auto;
+}
+
+.insights-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+}
+
+.insights-table th,
+.insights-table td {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0.85rem;
+    text-align: left;
+}
+
+.insights-table th {
+    color: #475569;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.insights-table td small {
+    color: #64748b;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.status-pill {
+    background: #f1f5f9;
+    border-radius: 999px;
+    color: #475569;
+    display: inline-flex;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+}
+
+.status-pill.active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.empty-state,
+.report-row {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.report-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.report-row {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.report-row span,
+.muted-text {
+    color: #64748b;
+}
+
+@media (max-width: 640px) {
+    .insights-header,
+    .section-heading,
+    .report-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
