@@ -13,6 +13,10 @@ class Favorite(models.Model):
         ordering = ['-created_at']
         verbose_name = "Favorit"
         verbose_name_plural = "Favorite"
+        indexes = [
+            models.Index(fields=['user', '-created_at']),
+            models.Index(fields=['listing', '-created_at']),
+        ]
     
     def __str__(self):
         return f"{self.user.username} - {self.listing.title}"
@@ -37,6 +41,10 @@ class SavedSearch(models.Model):
         ordering = ['-created_at']
         verbose_name = "Căutare salvată"
         verbose_name_plural = "Căutări salvate"
+        indexes = [
+            models.Index(fields=['user', 'is_active']),
+            models.Index(fields=['is_active', 'email_notifications']),
+        ]
     
     def __str__(self):
         return f"{self.user.username} - {self.name}"

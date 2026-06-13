@@ -59,7 +59,11 @@ class Listing(models.Model):
         indexes = [
             models.Index(fields=['status', '-created_at']),
             models.Index(fields=['owner', 'status']),
+            models.Index(fields=['owner', '-created_at']),
             models.Index(fields=['category', 'status']),
+            models.Index(fields=['status', 'price']),
+            models.Index(fields=['status', 'city']),
+            models.Index(fields=['status', 'is_featured', 'featured_until', '-created_at']),
         ]
 
     def __str__(self):
@@ -106,6 +110,9 @@ class ListingImage(models.Model):
         ordering = ['order']
         verbose_name = "Imagine anunț"
         verbose_name_plural = "Imagini anunțuri"
+        indexes = [
+            models.Index(fields=['listing', 'order']),
+        ]
     
     def __str__(self):
         return f"Imagine pentru {self.listing.title}"

@@ -19,6 +19,10 @@ class Conversation(models.Model):
         ordering = ['-updated_at']
         verbose_name = "Conversație"
         verbose_name_plural = "Conversații"
+        indexes = [
+            models.Index(fields=['listing', 'is_active']),
+            models.Index(fields=['is_active', '-updated_at']),
+        ]
     
     def __str__(self):
         participants_names = " & ".join([p.username for p in self.participants.all()])
