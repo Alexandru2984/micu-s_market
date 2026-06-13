@@ -92,6 +92,48 @@ class ListingApiTests(TestCase):
         self.assertIn(self.listing.slug, slugs)
         self.assertIn(self.child_listing.slug, slugs)
 
+    def test_search_orders_results_by_relevance(self):
+        relevant = Listing.objects.create(
+            title='Laptop gaming Asus ROG',
+            description='Placă video dedicată și ecran rapid',
+            price=3500,
+            owner=self.owner,
+            category=self.category,
+            city='Iasi',
+            status='active',
+        )
+        Listing.objects.create(
+            title='Husă laptop',
+            description='Accesoriu simplu pentru transport, fără gaming',
+            price=80,
+            owner=self.owner,
+            category=self.category,
+            city='Iasi',
+            status='active',
+        )
+
+        response = self.client.get(reverse('api:listing_list'), {'q': 'laptop gaming'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['results'][0]['slug'], relevant.slug)
+
+    def test_search_tolerates_small_typos(self):
+        Listing.objects.create(
+            title='Bicicletă electrică pliabilă',
+            description='Autonomie bună pentru oraș',
+            price=2200,
+            owner=self.owner,
+            category=self.category,
+            city='Timisoara',
+            status='active',
+        )
+
+        response = self.client.get(reverse('api:listing_list'), {'q': 'bicicleta electrica'})
+
+        self.assertEqual(response.status_code, 200)
+        slugs = [item['slug'] for item in response.json()['results']]
+        self.assertIn('bicicleta-electrica-pliabila', slugs)
+
     def test_listing_create_requires_authentication(self):
         response = self.client.post(
             reverse('api:listing_create'),

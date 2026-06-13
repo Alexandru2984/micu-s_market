@@ -14,6 +14,7 @@ from categories.models import Category
 from favorites.models import Favorite
 from listings.forms import ListingForm
 from listings.models import Listing
+from listings.search import apply_listing_search, order_search_results
 
 
 def _json_body(request):
@@ -138,16 +139,17 @@ def listing_list_api(request):
         listings = listings.filter(city__icontains=city)
 
     query = request.GET.get('q') or request.GET.get('search')
-    if query:
-        listings = listings.filter(Q(title__icontains=query) | Q(description__icontains=query))
+    listings, search_applied = apply_listing_search(listings, query)
 
     listings = _filter_decimal(listings, 'price', request.GET.get('min_price'), 'gte')
     listings = _filter_decimal(listings, 'price', request.GET.get('max_price'), 'lte')
 
-    sort_by = request.GET.get('sort', '-created_at')
-    if sort_by not in {'-created_at', 'created_at', 'price', '-price', 'title', '-title'}:
+    sort_by = request.GET.get('sort', 'relevance' if search_applied else '-created_at')
+    if sort_by not in {'relevance', '-created_at', 'created_at', 'price', '-price', 'title', '-title'}:
         sort_by = '-created_at'
-    listings = listings.order_by(sort_by)
+    listings = order_search_results(listings, sort_by, search_applied)
+    if sort_by != 'relevance':
+        listings = listings.order_by(sort_by)
 
     page_number = request.GET.get('page', 1)
     try:

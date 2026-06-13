@@ -11,6 +11,7 @@ from django_ratelimit.decorators import ratelimit
 import logging
 from .models import Listing, ListingImage, ListingReport
 from .forms import ListingForm, ListingImageFormSet, ListingReportForm
+from .search import apply_listing_search, order_search_results
 from categories.models import Category
 from favorites.models import Favorite
 from audit.utils import audit_log
@@ -109,17 +110,15 @@ def listing_list_view(request):
     
     # Căutare
     search = request.GET.get('search')
-    if search:
-        listings = listings.filter(
-            Q(title__icontains=search) | 
-            Q(description__icontains=search)
-        )
+    listings, search_applied = apply_listing_search(listings, search)
     
     # Sortare
-    sort_by = request.GET.get('sort', '-created_at')
-    valid_sorts = ['-created_at', 'created_at', 'price', '-price', 'title', '-title']
+    sort_by = request.GET.get('sort', 'relevance' if search_applied else '-created_at')
+    valid_sorts = ['relevance', '-created_at', 'created_at', 'price', '-price', 'title', '-title']
     if sort_by in valid_sorts:
-        listings = listings.order_by(sort_by)
+        listings = order_search_results(listings, sort_by, search_applied)
+        if sort_by != 'relevance':
+            listings = listings.order_by(sort_by)
     else:
         listings = listings.order_by('-created_at')
     
