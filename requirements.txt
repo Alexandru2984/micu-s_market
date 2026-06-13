@@ -1,5 +1,5 @@
 argon2-cffi==25.1.0
-Django==5.2.15
+Django==6.0.6
 django-allauth==65.18.0
 django-cors-headers==4.9.0
 django-ratelimit==4.1.0
