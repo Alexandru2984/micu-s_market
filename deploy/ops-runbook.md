@@ -5,6 +5,7 @@
 The application exposes:
 
 ```text
+GET /healthz
 GET /pages/healthz
 ```
 
@@ -24,36 +25,16 @@ Create a backup directory owned by the deploy user:
 sudo install -d -o micu -g micu -m 750 /var/backups/micu_market
 ```
 
-Example daily backup script:
+Use the bundled script:
 
 ```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-cd /home/micu/Micu_market
-set -a
-source .env
-set +a
-
-timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
-out="/var/backups/micu_market/micu_market_${timestamp}.dump"
-
-PGPASSWORD="$DB_PASS" pg_dump \
-  --host "$DB_HOST" \
-  --port "$DB_PORT" \
-  --username "$DB_USER" \
-  --format custom \
-  --file "$out" \
-  "$DB_NAME"
-
-chmod 600 "$out"
-find /var/backups/micu_market -type f -name 'micu_market_*.dump' -mtime +14 -delete
+/home/micu/Micu_market/scripts/backup_postgres.sh
 ```
 
 Cron:
 
 ```cron
-15 2 * * * /home/micu/Micu_market/scripts/backup_postgres.sh
+15 2 * * * BACKUP_DIR=/var/backups/micu_market /home/micu/Micu_market/scripts/backup_postgres.sh >/var/log/micu_market/backup.log 2>&1
 ```
 
 Restore drill:
@@ -94,13 +75,13 @@ sudo install -d -o www-data -g adm -m 750 /var/log/micu_market
 ```bash
 cd /home/micu/Micu_market
 git pull --ff-only
-source venv/bin/activate
-pip install -r requirements.txt
-python manage.py migrate --settings=Micu_market.settings_production
-python manage.py collectstatic --noinput --settings=Micu_market.settings_production
-python manage.py check --deploy --settings=Micu_market.settings_production
-sudo systemctl restart micu-market
-curl -fsS https://market.micutu.com/pages/healthz
+APP_BASE_URL=https://market.micutu.com scripts/deploy_release.sh
+```
+
+Smoke checks only:
+
+```bash
+APP_BASE_URL=https://market.micutu.com scripts/smoke_check.sh
 ```
 
 ## Cloudflare/origin checks
