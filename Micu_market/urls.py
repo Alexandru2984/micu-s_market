@@ -2,8 +2,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from pages.views import healthcheck_view
 
 urlpatterns = [
+    path("healthz", healthcheck_view, name="healthcheck"),
     path(settings.ADMIN_URL, admin.site.urls),
 
     # Django Allauth URLs

@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.checks import Tags, Warning, register
+from django.core.checks import Error, Tags, Warning, register
 
 
 @register(Tags.security, deploy=True)
@@ -38,3 +38,45 @@ def deployment_security_checks(app_configs, **kwargs):
             )
 
     return warnings
+
+
+@register(Tags.compatibility, deploy=True)
+def production_environment_checks(app_configs, **kwargs):
+    errors = []
+
+    if settings.DEBUG:
+        return errors
+
+    required_database_keys = ("NAME", "USER", "PASSWORD", "HOST", "PORT")
+    missing_db = [
+        key for key in required_database_keys
+        if not settings.DATABASES["default"].get(key)
+    ]
+    if missing_db:
+        errors.append(
+            Error(
+                "Configurarea PostgreSQL de producție este incompletă.",
+                hint=f"Setează variabilele DB lipsă: {', '.join(missing_db)}.",
+                id="micu.E001",
+            )
+        )
+
+    if not settings.ALLOWED_HOSTS or settings.ALLOWED_HOSTS == ["*"]:
+        errors.append(
+            Error(
+                "ALLOWED_HOSTS nu este configurat strict pentru producție.",
+                hint="Setează DJANGO_ALLOWED_HOSTS cu domeniile publice exacte.",
+                id="micu.E002",
+            )
+        )
+
+    if not getattr(settings, "DEFAULT_FROM_EMAIL", "") or "example.com" in settings.DEFAULT_FROM_EMAIL:
+        errors.append(
+            Error(
+                "DEFAULT_FROM_EMAIL nu este configurat pentru producție.",
+                hint="Setează DEFAULT_FROM_EMAIL la o adresă reală de pe domeniul aplicației.",
+                id="micu.E003",
+            )
+        )
+
+    return errors

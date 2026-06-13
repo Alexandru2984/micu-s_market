@@ -11,3 +11,8 @@ class ProjectUrlSecurityTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['status'], 'ok')
         self.assertEqual(response.json()['database'], 'ok')
+
+    def test_root_healthcheck_returns_ok(self):
+        response = self.client.get(reverse('healthcheck'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['status'], 'ok')
