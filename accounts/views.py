@@ -7,8 +7,8 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 from django.db.models import Count
-from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfileForm
-from .models import UserProfile
+from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfileForm, UserReportForm
+from .models import UserProfile, UserReport
 from listings.models import Listing
 from audit.utils import audit_log
 
@@ -164,8 +164,39 @@ def public_profile_view(request, username):
         'profile': profile,
         'listings': listings,
         'user_stats': user_stats,
+        'report_form': UserReportForm(),
     }
     return render(request, 'accounts/public_profile.html', context)
+
+
+@login_required
+@require_POST
+def report_user_view(request, username):
+    reported_user = get_object_or_404(User, username=username)
+    if reported_user == request.user:
+        messages.error(request, 'Nu îți poți raporta propriul profil.')
+        return redirect('accounts:public_profile', username=username)
+
+    active_exists = UserReport.objects.filter(
+        reported_user=reported_user,
+        reporter=request.user,
+        status__in=["pending", "reviewed"],
+    ).exists()
+    if active_exists:
+        messages.info(request, 'Ai deja un raport activ pentru acest utilizator.')
+        return redirect('accounts:public_profile', username=username)
+
+    form = UserReportForm(request.POST)
+    if form.is_valid():
+        report = form.save(commit=False)
+        report.reported_user = reported_user
+        report.reporter = request.user
+        report.save()
+        messages.success(request, 'Raportul a fost trimis către moderare.')
+    else:
+        messages.error(request, 'Raportul nu a putut fi trimis.')
+
+    return redirect('accounts:public_profile', username=username)
 
 # my_listings_view a fost mutat în listings/views.py (versiunea canonică cu filtrare status)
 # URL-ul accounts:my_listings poate redirecta acolo dacă e nevoie

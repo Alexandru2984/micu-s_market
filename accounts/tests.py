@@ -4,6 +4,7 @@ Teste pentru sistemul de autentificare și profiluri
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from .models import UserReport
 
 User = get_user_model()
 
@@ -105,6 +106,35 @@ class AuthViewsTestCase(TestCase):
             reverse('accounts:public_profile', kwargs={'username': self.user.username})
         )
         self.assertIn(response.status_code, [200, 404])  # 404 dacă nu există profil
+
+    def test_report_user_requires_login(self):
+        response = self.client.post(
+            reverse('accounts:report_user', kwargs={'username': self.user.username}),
+            {'reason': 'spam', 'details': 'test'},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(UserReport.objects.exists())
+
+    def test_user_can_report_another_user_once(self):
+        reporter = User.objects.create_user(
+            username='reporter',
+            email='reporter@example.com',
+            password='ReporterPass123!',
+        )
+        self.client.login(username='reporter', password='ReporterPass123!')
+        response = self.client.post(
+            reverse('accounts:report_user', kwargs={'username': self.user.username}),
+            {'reason': 'spam', 'details': 'Trimite spam.'},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(UserReport.objects.count(), 1)
+
+        response = self.client.post(
+            reverse('accounts:report_user', kwargs={'username': self.user.username}),
+            {'reason': 'fake_profile', 'details': ''},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(UserReport.objects.count(), 1)
 
 
 class UserProfileModelTestCase(TestCase):

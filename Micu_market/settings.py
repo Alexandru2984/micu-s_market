@@ -174,6 +174,7 @@ CACHES = {
 }
 RATELIMIT_USE_CACHE = os.getenv("RATELIMIT_USE_CACHE", "default")
 HOMEPAGE_CACHE_SECONDS = int(os.getenv("HOMEPAGE_CACHE_SECONDS", "300"))
+LISTING_AUTO_HIDE_REPORT_THRESHOLD = int(os.getenv("LISTING_AUTO_HIDE_REPORT_THRESHOLD", "3"))
 
 # Security settings pentru producție
 if not DEBUG:

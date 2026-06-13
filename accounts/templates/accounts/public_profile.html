@@ -118,6 +118,21 @@
                 <a href="{% url 'reviews:user_reviews' username=profile_user.username %}" class="btn btn-outline-secondary w-100" style="background-color: #fff; color: #4a5568; border: 1px solid #cbd5e0; padding: 0.6rem 1rem; border-radius: 0.375rem; text-decoration: none; display: block; text-align: center; font-weight: 600;">
                     <i class="fas fa-comments me-2"></i>Vezi recenziile
                 </a>
+                {% if user.is_authenticated and user != profile_user %}
+                    <details style="margin-top: 1rem;">
+                        <summary style="cursor: pointer; color: #718096;">
+                            <i class="fas fa-flag"></i> Raportează utilizatorul
+                        </summary>
+                        <form method="post" action="{% url 'accounts:report_user' username=profile_user.username %}" style="display: grid; gap: 0.75rem; margin-top: 1rem;">
+                            {% csrf_token %}
+                            {{ report_form.reason }}
+                            {{ report_form.details }}
+                            <button type="submit" class="btn btn-outline-secondary w-100">
+                                Trimite raport
+                            </button>
+                        </form>
+                    </details>
+                {% endif %}
             </div>
         </div>
     </div>

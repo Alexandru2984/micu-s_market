@@ -1,6 +1,6 @@
 from django.contrib import admin
 from audit.utils import audit_log
-from .models import UserProfile
+from .models import UserProfile, UserReport, UserStrike
 
 
 @admin.register(UserProfile)
@@ -51,3 +51,32 @@ class UserProfileAdmin(admin.ModelAdmin):
         for profile in queryset:
             profile.reject_verification("Respins din admin.")
             audit_log("profile.verification_rejected", request=request, obj=profile)
+
+
+@admin.register(UserReport)
+class UserReportAdmin(admin.ModelAdmin):
+    list_display = ("reported_user", "reporter", "reason", "status", "created_at")
+    list_filter = ("status", "reason", "created_at")
+    search_fields = ("reported_user__username", "reporter__username", "details", "moderator_note")
+    readonly_fields = ("reported_user", "reporter", "reason", "details", "created_at", "updated_at")
+    actions = ("mark_reviewed", "mark_dismissed", "mark_action_taken")
+
+    @admin.action(description="Marchează ca verificat")
+    def mark_reviewed(self, request, queryset):
+        queryset.update(status="reviewed")
+
+    @admin.action(description="Respinge raportul")
+    def mark_dismissed(self, request, queryset):
+        queryset.update(status="dismissed")
+
+    @admin.action(description="Marchează cu acțiune aplicată")
+    def mark_action_taken(self, request, queryset):
+        queryset.update(status="action_taken")
+
+
+@admin.register(UserStrike)
+class UserStrikeAdmin(admin.ModelAdmin):
+    list_display = ("user", "reason", "is_active", "created_by", "created_at")
+    list_filter = ("is_active", "created_at")
+    search_fields = ("user__username", "user__email", "reason", "notes")
+    autocomplete_fields = ("user", "created_by")

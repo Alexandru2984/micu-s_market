@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
-from .models import UserProfile
+from .models import UserProfile, UserReport
 
 User = get_user_model()
 
@@ -175,3 +175,21 @@ class UserProfileForm(forms.ModelForm):
                 raise forms.ValidationError('Fişierul nu este o imagine validă.')
         
         return avatar
+
+
+class UserReportForm(forms.ModelForm):
+    class Meta:
+        model = UserReport
+        fields = ["reason", "details"]
+        widgets = {
+            "reason": forms.Select(attrs={"class": "form-control"}),
+            "details": forms.Textarea(attrs={
+                "class": "form-control",
+                "rows": 4,
+                "placeholder": "Descrie pe scurt problema (opțional)",
+            }),
+        }
+        labels = {
+            "reason": "Motiv",
+            "details": "Detalii",
+        }

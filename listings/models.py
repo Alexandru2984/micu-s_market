@@ -77,7 +77,7 @@ class Listing(models.Model):
         super().save(*args, **kwargs)
     
     def get_absolute_url(self):
-        return reverse('listings:listing_detail', kwargs={'slug': self.slug})
+        return reverse('listings:detail', kwargs={'slug': self.slug})
     
     @property
     def is_active(self):

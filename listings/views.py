@@ -14,6 +14,7 @@ from .forms import ListingForm, ListingImageFormSet, ListingReportForm
 from categories.models import Category
 from favorites.models import Favorite
 from audit.utils import audit_log
+from notifications.models import Notification
 
 logger = logging.getLogger(__name__)
 
@@ -200,16 +201,36 @@ def report_listing_view(request, slug):
         return redirect('listings:detail', slug=listing.slug)
 
     form = ListingReportForm(request.POST)
+    listing_hidden = False
     if form.is_valid():
         report = form.save(commit=False)
         report.listing = listing
         report.reporter = request.user
         report.save()
         audit_log("listing.report", request=request, obj=listing, metadata={"report_id": report.pk, "reason": report.reason})
+        active_reports = ListingReport.objects.filter(
+            listing=listing,
+            status__in=["pending", "reviewed"],
+        ).count()
+        if active_reports >= settings.LISTING_AUTO_HIDE_REPORT_THRESHOLD and listing.status == "active":
+            listing.status = "inactive"
+            listing.save(update_fields=["status", "updated_at"])
+            listing_hidden = True
+            Notification.objects.create(
+                recipient=listing.owner,
+                notification_type="listing_rejected",
+                title="Anunț ascuns temporar",
+                message="Anunțul tău a fost ascuns temporar pentru moderare după mai multe rapoarte.",
+                related_object_type="Listing",
+                related_object_id=listing.pk,
+                action_url=listing.get_absolute_url(),
+            )
         messages.success(request, "Raportul a fost trimis către moderare.")
     else:
         messages.error(request, "Raportul nu a putut fi trimis. Verifică motivul selectat.")
 
+    if listing_hidden:
+        return redirect('listings:list')
     return redirect('listings:detail', slug=listing.slug)
 
 def process_images(request, listing):

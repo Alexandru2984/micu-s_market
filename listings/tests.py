@@ -16,6 +16,7 @@ from PIL import Image as PilImage
 
 from .models import Listing, ListingReport
 from categories.models import Category
+from notifications.models import Notification
 
 User = get_user_model()
 
@@ -172,6 +173,31 @@ class ListingCRUDTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(ListingReport.objects.count(), 1)
+
+    @override_settings(LISTING_AUTO_HIDE_REPORT_THRESHOLD=2)
+    def test_listing_auto_hides_after_report_threshold(self):
+        """Anunțul este ascuns temporar după pragul de rapoarte active."""
+        reporter_one = User.objects.create_user(
+            username='reporter1',
+            email='reporter1@example.com',
+            password='ReporterPass123!',
+        )
+        ListingReport.objects.create(
+            listing=self.listing,
+            reporter=reporter_one,
+            reason='scam',
+        )
+
+        self.client.login(username='other', password='OtherPass123!')
+        response = self.client.post(
+            reverse('listings:report', kwargs={'slug': self.listing.slug}),
+            {'reason': 'misleading', 'details': ''},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.listing.refresh_from_db()
+        self.assertEqual(self.listing.status, 'inactive')
+        self.assertTrue(Notification.objects.filter(recipient=self.user, notification_type='listing_rejected').exists())
 
     def test_promoted_listing_property_respects_expiry(self):
         """Promovarea este activă doar cât timp nu a expirat."""

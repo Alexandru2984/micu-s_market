@@ -139,3 +139,61 @@ def _update_profile_stats(user):
         user.profile.update_statistics()
     except UserProfile.DoesNotExist:
         pass
+
+
+class UserReport(models.Model):
+    REASON_CHOICES = [
+        ("scam", "Înșelătorie"),
+        ("harassment", "Hărțuire"),
+        ("fake_profile", "Profil fals"),
+        ("spam", "Spam"),
+        ("other", "Alt motiv"),
+    ]
+
+    STATUS_CHOICES = [
+        ("pending", "În așteptare"),
+        ("reviewed", "Verificat"),
+        ("dismissed", "Respins"),
+        ("action_taken", "Acțiune aplicată"),
+    ]
+
+    reported_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reports_received", verbose_name="Utilizator raportat")
+    reporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_reports_made", verbose_name="Raportat de")
+    reason = models.CharField(max_length=30, choices=REASON_CHOICES, verbose_name="Motiv")
+    details = models.TextField(blank=True, verbose_name="Detalii")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending", verbose_name="Status")
+    moderator_note = models.TextField(blank=True, verbose_name="Notă moderator")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creat la")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Actualizat la")
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Raport utilizator"
+        verbose_name_plural = "Rapoarte utilizatori"
+        indexes = [
+            models.Index(fields=["reported_user", "status"]),
+            models.Index(fields=["reporter", "-created_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.get_reason_display()} - {self.reported_user.username}"
+
+
+class UserStrike(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="strikes", verbose_name="Utilizator")
+    reason = models.CharField(max_length=200, verbose_name="Motiv")
+    notes = models.TextField(blank=True, verbose_name="Note")
+    is_active = models.BooleanField(default=True, verbose_name="Activ")
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="strikes_created", verbose_name="Creat de")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creat la")
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Strike utilizator"
+        verbose_name_plural = "Strike-uri utilizatori"
+        indexes = [
+            models.Index(fields=["user", "is_active"]),
+        ]
+
+    def __str__(self):
+        return f"Strike pentru {self.user.username}: {self.reason}"
