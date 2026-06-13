@@ -124,6 +124,18 @@
 
 
 <script>
+function escapeHTML(value) {
+    return String(value || '').replace(/[&<>"']/g, function(char) {
+        return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[char];
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const messagesContainer = document.getElementById('messagesList');
     const messageForm = document.getElementById('messageForm');
@@ -151,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 item.className = 'attachment-item';
                 item.innerHTML = `
                     <i class="fas fa-${file.type.startsWith('image/') ? 'image' : 'file'}"></i>
-                    ${file.name}
+                    ${escapeHTML(file.name)}
                     <button type="button" class="remove-attachment" onclick="removeAttachment(${index})">×</button>
                 `;
                 attachmentPreview.appendChild(item);
@@ -230,6 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function addMessageToUI(message) {
     const messagesContainer = document.getElementById('messagesList');
+    const attachments = message.attachments || [];
     const messageHTML = `
         <div class="message sent">
             <div class="message-avatar">
@@ -239,12 +252,14 @@ function addMessageToUI(message) {
             </div>
             <div class="message-content">
                 <div class="message-bubble">
-                    <p>${message.content.replace(/\n/g, '<br>')}</p>
-                    ${message.attachments.map(att => 
-                        att.file_type === 'image' 
-                            ? `<div class="message-attachments"><img src="${att.url}" alt="${att.filename}" class="attachment-image"></div>`
-                            : `<div class="message-attachments"><a href="${att.url}" target="_blank" class="attachment-file"><i class="fas fa-file"></i> ${att.filename}</a></div>`
-                    ).join('')}
+                    <p>${escapeHTML(message.content).replace(/\n/g, '<br>')}</p>
+                    ${attachments.map(att => {
+                        const attachmentUrl = escapeHTML(att.download_url || att.url || '#');
+                        const attachmentName = escapeHTML(att.filename || 'attachment');
+                        return att.file_type === 'image'
+                            ? `<div class="message-attachments"><img src="${attachmentUrl}" alt="${attachmentName}" class="attachment-image"></div>`
+                            : `<div class="message-attachments"><a href="${attachmentUrl}" target="_blank" class="attachment-file"><i class="fas fa-file"></i> ${attachmentName}</a></div>`;
+                    }).join('')}
                 </div>
                 <div class="message-time">
                     ${message.created_at}

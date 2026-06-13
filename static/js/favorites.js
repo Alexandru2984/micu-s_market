@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 'X-CSRFToken': csrfToken,
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            body: `listing_id=${listingId}`
+            body: `listing_id=${encodeURIComponent(listingId)}`
         })
         .then(response => {
             return response.json();
@@ -234,12 +234,26 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        toast.innerHTML = `
-            <div class="toast-content">
-                <span>${message}</span>
-                <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: #666; margin-left: 10px; cursor: pointer;">&times;</button>
-            </div>
-        `;
+
+        const content = document.createElement('div');
+        content.className = 'toast-content';
+
+        const messageNode = document.createElement('span');
+        messageNode.textContent = message;
+
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.textContent = 'x';
+        closeButton.style.background = 'none';
+        closeButton.style.border = 'none';
+        closeButton.style.color = '#666';
+        closeButton.style.marginLeft = '10px';
+        closeButton.style.cursor = 'pointer';
+        closeButton.addEventListener('click', () => toast.remove());
+
+        content.appendChild(messageNode);
+        content.appendChild(closeButton);
+        toast.appendChild(content);
         
         document.body.appendChild(toast);
         

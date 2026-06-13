@@ -1,4 +1,15 @@
 // Image compression functionality for listings forms
+function escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, function(char) {
+        return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[char];
+    });
+}
 
 // Function for automatic image compression
 function compressImage(file, maxWidth = 800, maxHeight = 800, quality = 0.8) {
@@ -93,7 +104,7 @@ function showImagePreview(file, compressedSize = null, originalSize = null) {
     reader.onload = function(e) {
         previewDiv.innerHTML = `
             <img src="${e.target.result}" alt="Preview" class="image-preview w-full h-32 object-cover rounded-lg border">
-            <p class="text-xs text-gray-500 mt-1 text-center">${file.name}</p>
+            <p class="text-xs text-gray-500 mt-1 text-center">${escapeHTML(file.name)}</p>
             ${compressedSize ? `
                 <div class="compression-info text-center">
                     <i class="fas fa-check-circle"></i>

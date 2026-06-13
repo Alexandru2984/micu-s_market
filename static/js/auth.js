@@ -187,7 +187,10 @@ function showFieldError(field, message) {
         field.parentNode.appendChild(errorDiv);
     }
     
-    errorDiv.innerHTML = `<span>${message}</span>`;
+    errorDiv.textContent = '';
+    const messageSpan = document.createElement('span');
+    messageSpan.textContent = message;
+    errorDiv.appendChild(messageSpan);
 }
 
 function clearFieldError(field) {

@@ -1,4 +1,16 @@
 // Chat Conversation JavaScript - Dynamic Height Version
+function escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, function(char) {
+        return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[char];
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const messagesContainer = document.getElementById('messagesList');
     const messageForm = document.getElementById('messageForm');
@@ -252,8 +264,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="file-info">
                 <i class="fas fa-${fileIcon}"></i>
                 <div class="file-details">
-                    <span class="file-name">${file.name}</span>
-                    <span class="file-size">${fileSize}</span>
+                    <span class="file-name">${escapeHTML(file.name)}</span>
+                    <span class="file-size">${escapeHTML(fileSize)}</span>
                 </div>
             </div>
             <button type="button" class="remove-attachment" onclick="removeAttachment(${index})">
@@ -376,7 +388,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="message-content">
                 <div class="message-bubble">
-                    <p>${content.replace(/\n/g, '<br>')}</p>
+                    <p>${escapeHTML(content).replace(/\n/g, '<br>')}</p>
                 </div>
                 <div class="message-time">
                     Trimite...
@@ -469,6 +481,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function addMessageToUI(message) {
     const messagesContainer = document.getElementById('messagesList');
     if (!messagesContainer) return;
+    const attachments = message.attachments || [];
     
     const messageHTML = `
         <div class="message sent new-message">
@@ -479,12 +492,14 @@ function addMessageToUI(message) {
             </div>
             <div class="message-content">
                 <div class="message-bubble">
-                    <p>${message.content.replace(/\n/g, '<br>')}</p>
-                    ${message.attachments ? message.attachments.map(att => 
-                        att.file_type === 'image' 
-                            ? `<div class="message-attachments"><img src="${att.url}" alt="${att.filename}" class="attachment-image"></div>`
-                            : `<div class="message-attachments"><a href="${att.url}" target="_blank" class="attachment-file"><i class="fas fa-file"></i> ${att.filename}</a></div>`
-                    ).join('') : ''}
+                    <p>${escapeHTML(message.content).replace(/\n/g, '<br>')}</p>
+                    ${attachments.map(att => {
+                        const attachmentUrl = escapeHTML(att.download_url || att.url || '#');
+                        const attachmentName = escapeHTML(att.filename || 'attachment');
+                        return att.file_type === 'image'
+                            ? `<div class="message-attachments"><img src="${attachmentUrl}" alt="${attachmentName}" class="attachment-image"></div>`
+                            : `<div class="message-attachments"><a href="${attachmentUrl}" target="_blank" class="attachment-file"><i class="fas fa-file"></i> ${attachmentName}</a></div>`;
+                    }).join('')}
                 </div>
                 <div class="message-time">
                     ${message.created_at}
