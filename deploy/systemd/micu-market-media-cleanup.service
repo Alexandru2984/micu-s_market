@@ -1,0 +1,11 @@
+[Unit]
+Description=Micu Market orphan media cleanup
+
+[Service]
+Type=oneshot
+User=micu
+Group=www-data
+WorkingDirectory=/home/micu/Micu_market
+EnvironmentFile=/home/micu/Micu_market/.env
+Environment=DJANGO_SETTINGS_MODULE=Micu_market.settings_production
+ExecStart=/home/micu/Micu_market/venv/bin/python /home/micu/Micu_market/manage.py cleanup_orphan_media --delete --settings=Micu_market.settings_production

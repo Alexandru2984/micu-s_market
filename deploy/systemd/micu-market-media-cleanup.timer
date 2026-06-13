@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Micu Market orphan media cleanup monthly
+
+[Timer]
+OnCalendar=monthly
+Persistent=true
+RandomizedDelaySec=1h
+
+[Install]
+WantedBy=timers.target

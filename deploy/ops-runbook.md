@@ -98,6 +98,19 @@ sudo systemctl status micu-market --no-pager
 
 The service reads `/home/micu/Micu_market/.env` and starts Gunicorn through the project virtualenv.
 
+Install scheduled operations:
+
+```bash
+sudo cp /home/micu/Micu_market/deploy/systemd/micu-market-backup.* /etc/systemd/system/
+sudo cp /home/micu/Micu_market/deploy/systemd/micu-market-notification-emails.* /etc/systemd/system/
+sudo cp /home/micu/Micu_market/deploy/systemd/micu-market-media-cleanup.* /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now micu-market-backup.timer
+sudo systemctl enable --now micu-market-notification-emails.timer
+sudo systemctl enable --now micu-market-media-cleanup.timer
+systemctl list-timers 'micu-market-*'
+```
+
 ## Nginx vhost
 
 Install or refresh the vhost after adjusting certificate paths in `deploy/nginx/micu-market.conf`:

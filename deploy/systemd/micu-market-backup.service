@@ -1,0 +1,11 @@
+[Unit]
+Description=Micu Market PostgreSQL backup
+
+[Service]
+Type=oneshot
+User=micu
+Group=micu
+WorkingDirectory=/home/micu/Micu_market
+EnvironmentFile=/home/micu/Micu_market/.env
+Environment=BACKUP_DIR=/var/backups/micu_market
+ExecStart=/home/micu/Micu_market/scripts/backup_postgres.sh
