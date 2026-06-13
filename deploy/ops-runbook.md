@@ -160,6 +160,8 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
+Keep the explicit security headers inside `/static/` and `/media/`: Nginx does not reliably inherit parent `add_header` directives after a location defines its own headers.
+
 ## Cloudflare/origin checks
 
 - Cloudflare SSL/TLS mode: `Full (strict)`.
