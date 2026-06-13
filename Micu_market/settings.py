@@ -198,6 +198,18 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 # ======================
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+ADMIN_URL = os.getenv("DJANGO_ADMIN_URL", "portal-secret-micu/").strip("/")
+if not ADMIN_URL:
+    raise RuntimeError("DJANGO_ADMIN_URL nu poate fi gol.")
+ADMIN_URL = f"{ADMIN_URL}/"
+
+PILLOW_MAX_IMAGE_PIXELS = int(os.getenv("PILLOW_MAX_IMAGE_PIXELS", "25000000"))
+try:
+    from PIL import Image as PilImage
+    PilImage.MAX_IMAGE_PIXELS = PILLOW_MAX_IMAGE_PIXELS
+except ImportError:
+    pass
+
 # ======================
 # DJANGO-ALLAUTH SETTINGS
 # ======================
