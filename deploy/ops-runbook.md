@@ -40,8 +40,7 @@ Cron:
 Restore drill:
 
 ```bash
-createdb micu_market_restore
-pg_restore --dbname micu_market_restore /var/backups/micu_market/<backup>.dump
+scripts/verify_postgres_backup.sh /var/backups/micu_market/<backup>.dump
 ```
 
 ## Logs
