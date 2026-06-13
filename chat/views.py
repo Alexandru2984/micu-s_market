@@ -83,6 +83,7 @@ def conversation_view(request, pk):
 
 @login_required
 @require_POST
+@ratelimit(key='user', rate=settings.CHAT_START_RATE, method='POST', block=True)
 def start_conversation_view(request, listing_slug):
     """Începe o conversație nouă despre un anunț"""
     try:
@@ -196,6 +197,7 @@ def send_message_view(request, conversation_pk):
     return redirect('chat:conversation', pk=conversation_pk)
 
 @login_required
+@ratelimit(key='user', rate=settings.SENSITIVE_READ_RATE, method='GET', block=True)
 def search_users_view(request):
     """Caută utilizatori pentru a începe o conversație"""
     query = request.GET.get('q', '').strip()
@@ -221,6 +223,7 @@ def search_users_view(request):
     return JsonResponse({'users': users_data})
 
 @login_required
+@ratelimit(key='user', rate=settings.SENSITIVE_READ_RATE, method='GET', block=True)
 def get_unread_count(request):
     """Returnează numărul de mesaje necitite"""
     count = Message.objects.filter(

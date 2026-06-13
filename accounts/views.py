@@ -7,6 +7,8 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 from django.db.models import Count
+from django.conf import settings
+from django_ratelimit.decorators import ratelimit
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfileForm, UserReportForm
 from .models import UserProfile, UserReport
 from listings.models import Listing
@@ -171,6 +173,7 @@ def public_profile_view(request, username):
 
 @login_required
 @require_POST
+@ratelimit(key='user', rate=settings.REPORT_WRITE_RATE, method='POST', block=True)
 def report_user_view(request, username):
     reported_user = get_object_or_404(User, username=username)
     if reported_user == request.user:
