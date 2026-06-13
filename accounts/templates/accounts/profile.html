@@ -30,6 +30,14 @@
                                 <span class="verification-badge">
                                     <i class="fas fa-check-circle"></i> Verificat
                                 </span>
+                            {% elif profile.verification_status == "pending" %}
+                                <span class="verification-badge not-verified">
+                                    <i class="fas fa-hourglass-half"></i> În verificare
+                                </span>
+                            {% elif profile.verification_status == "rejected" %}
+                                <span class="verification-badge not-verified">
+                                    <i class="fas fa-times-circle"></i> Respins
+                                </span>
                             {% else %}
                                 <span class="verification-badge not-verified">
                                     <i class="fas fa-clock"></i> Neverificat
@@ -82,6 +90,24 @@
                     <a href="{% url 'accounts:profile_edit' %}" class="btn btn-edit-profile">
                         <i class="fas fa-edit me-2"></i>Editează profilul
                     </a>
+                </div>
+
+                <div class="verification-request-panel mb-3">
+                    {% if profile.is_verified %}
+                        <p class="text-success mb-0"><i class="fas fa-check-circle"></i> Profilul tău este verificat.</p>
+                    {% elif profile.verification_status == "pending" %}
+                        <p class="text-primary mb-0"><i class="fas fa-hourglass-half"></i> Cererea de verificare este în analiză.</p>
+                    {% else %}
+                        {% if profile.verification_status == "rejected" and profile.verification_note %}
+                            <p class="text-muted">{{ profile.verification_note }}</p>
+                        {% endif %}
+                        <form method="post" action="{% url 'accounts:request_verification' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline">
+                                <i class="fas fa-shield-alt"></i> Cere verificarea profilului
+                            </button>
+                        </form>
+                    {% endif %}
                 </div>
                 
                 <div class="row">

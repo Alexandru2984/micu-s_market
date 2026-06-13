@@ -71,6 +71,34 @@ class AuthViewsTestCase(TestCase):
         response = self.client.get(reverse('accounts:profile'))
         self.assertEqual(response.status_code, 200)
 
+    def test_request_verification_requires_login(self):
+        """Cererea de verificare necesită autentificare."""
+        response = self.client.post(reverse('accounts:request_verification'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_authenticated_user_can_request_verification(self):
+        """Utilizatorul autentificat poate cere verificarea profilului."""
+        self.client.login(username='testuser', password='SecurePass123!')
+        response = self.client.post(reverse('accounts:request_verification'))
+
+        self.assertEqual(response.status_code, 302)
+        self.user.profile.refresh_from_db()
+        self.assertEqual(self.user.profile.verification_status, 'pending')
+        self.assertIsNotNone(self.user.profile.verification_requested_at)
+
+    def test_pending_verification_request_is_not_duplicated(self):
+        """Cererea pending nu este rescrisă la POST-uri repetate."""
+        self.user.profile.request_verification()
+        requested_at = self.user.profile.verification_requested_at
+
+        self.client.login(username='testuser', password='SecurePass123!')
+        response = self.client.post(reverse('accounts:request_verification'))
+
+        self.assertEqual(response.status_code, 302)
+        self.user.profile.refresh_from_db()
+        self.assertEqual(self.user.profile.verification_status, 'pending')
+        self.assertEqual(self.user.profile.verification_requested_at, requested_at)
+
     def test_public_profile_view(self):
         """Profilul public este accesibil fără autentificare"""
         response = self.client.get(
@@ -100,3 +128,25 @@ class UserProfileModelTestCase(TestCase):
         profile.update_statistics()
         self.assertEqual(profile.average_rating, 0)
         self.assertEqual(profile.total_listings, 0)
+
+    def test_approve_verification_marks_profile_verified(self):
+        """Aprobarea verificării setează badge-ul real."""
+        profile = self.user.profile
+        profile.request_verification()
+        profile.approve_verification()
+
+        profile.refresh_from_db()
+        self.assertTrue(profile.is_verified)
+        self.assertEqual(profile.verification_status, 'verified')
+        self.assertIsNotNone(profile.verification_reviewed_at)
+
+    def test_reject_verification_marks_profile_rejected(self):
+        """Respingerea verificării păstrează profilul neverificat."""
+        profile = self.user.profile
+        profile.request_verification()
+        profile.reject_verification('Date insuficiente.')
+
+        profile.refresh_from_db()
+        self.assertFalse(profile.is_verified)
+        self.assertEqual(profile.verification_status, 'rejected')
+        self.assertEqual(profile.verification_note, 'Date insuficiente.')

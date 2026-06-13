@@ -111,6 +111,24 @@ def profile_edit_view(request):
     }
     return render(request, 'accounts/profile_edit.html', context)
 
+
+@login_required
+@require_POST
+def request_verification_view(request):
+    """Trimite profilul utilizatorului către verificare manuală."""
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+    if profile.is_verified:
+        messages.info(request, 'Profilul este deja verificat.')
+    elif profile.verification_status == "pending":
+        messages.info(request, 'Cererea ta de verificare este deja în analiză.')
+    elif profile.request_verification():
+        messages.success(request, 'Cererea de verificare a fost trimisă.')
+    else:
+        messages.error(request, 'Cererea de verificare nu a putut fi trimisă.')
+
+    return redirect('accounts:profile')
+
 def public_profile_view(request, username):
     """Profilul public al unui utilizator"""
     user = get_object_or_404(User, username=username)

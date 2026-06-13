@@ -1,12 +1,20 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.utils import timezone
 from PIL import Image
 import os
 
 User = get_user_model()
 
 class UserProfile(models.Model):
+    VERIFICATION_STATUS_CHOICES = [
+        ("unverified", "Neverificat"),
+        ("pending", "În verificare"),
+        ("verified", "Verificat"),
+        ("rejected", "Respins"),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name="Avatar")
     bio = models.TextField(max_length=500, blank=True, verbose_name="Descriere")
@@ -15,7 +23,16 @@ class UserProfile(models.Model):
     county = models.CharField(max_length=100, blank=True, verbose_name="Județ")
     date_of_birth = models.DateField(null=True, blank=True, verbose_name="Data nașterii")
     is_verified = models.BooleanField(default=False, verbose_name="Verificat")
+    verification_status = models.CharField(
+        max_length=20,
+        choices=VERIFICATION_STATUS_CHOICES,
+        default="unverified",
+        verbose_name="Status verificare",
+    )
     verification_token = models.CharField(max_length=100, blank=True)
+    verification_requested_at = models.DateTimeField(null=True, blank=True, verbose_name="Verificare cerută la")
+    verification_reviewed_at = models.DateTimeField(null=True, blank=True, verbose_name="Verificare analizată la")
+    verification_note = models.TextField(blank=True, verbose_name="Notă verificare")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -48,6 +65,41 @@ class UserProfile(models.Model):
     @property
     def display_name(self):
         return self.user.get_full_name() or self.user.username
+
+    def request_verification(self):
+        if self.is_verified or self.verification_status == "pending":
+            return False
+        self.verification_status = "pending"
+        self.verification_requested_at = timezone.now()
+        self.verification_reviewed_at = None
+        self.verification_note = ""
+        self.save(update_fields=[
+            "verification_status",
+            "verification_requested_at",
+            "verification_reviewed_at",
+            "verification_note",
+            "updated_at",
+        ])
+        return True
+
+    def approve_verification(self):
+        self.is_verified = True
+        self.verification_status = "verified"
+        self.verification_reviewed_at = timezone.now()
+        self.save(update_fields=["is_verified", "verification_status", "verification_reviewed_at", "updated_at"])
+
+    def reject_verification(self, note=""):
+        self.is_verified = False
+        self.verification_status = "rejected"
+        self.verification_reviewed_at = timezone.now()
+        self.verification_note = note
+        self.save(update_fields=[
+            "is_verified",
+            "verification_status",
+            "verification_reviewed_at",
+            "verification_note",
+            "updated_at",
+        ])
     
     def update_statistics(self):
         """Actualizează statisticile utilizatorului — query-uri SQL, nu Python loops"""
