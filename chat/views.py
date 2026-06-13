@@ -79,6 +79,7 @@ def conversation_view(request, pk):
     return render(request, 'chat/conversation.html', context)
 
 @login_required
+@require_POST
 def start_conversation_view(request, listing_slug):
     """Începe o conversație nouă despre un anunț"""
     try:
@@ -242,6 +243,7 @@ def get_unread_count(request):
     return JsonResponse({'unread_count': count})
 
 @login_required
+@require_POST
 def mark_conversation_read(request, pk):
     """Marchează o conversație ca citită"""
     conversation = get_object_or_404(

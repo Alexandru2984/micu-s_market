@@ -69,6 +69,7 @@ def toggle_favorite_view(request):
         return JsonResponse({'error': 'A apărut o eroare'}, status=500)
 
 @login_required
+@require_POST
 def remove_favorite_view(request, favorite_id):
     """Șterge un favorit din lista de favorite"""
     favorite = get_object_or_404(Favorite, id=favorite_id, user=request.user)

@@ -95,9 +95,12 @@
                 <!-- Actions -->
                 <div class="listing-actions" style="position: static !important; opacity: 1 !important; display: flex !important; gap: 1rem !important;">
                     {% if user.is_authenticated and user != listing.owner %}
-                        <a href="{% url 'chat:start_conversation' listing.slug %}" class="btn btn-primary">
-                            <i class="fas fa-envelope"></i> Trimite mesaj
-                        </a>
+                        <form method="post" action="{% url 'chat:start_conversation' listing.slug %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-envelope"></i> Trimite mesaj
+                            </button>
+                        </form>
                     {% elif user == listing.owner %}
                         <a href="{% url 'listings:update' listing.slug %}" class="btn btn-primary">
                             <i class="fas fa-edit"></i> Editează anunțul
@@ -153,9 +156,14 @@
                     </div>
                 </div>
                 <div class="seller-actions">
-                    <button class="btn btn-outline">
-                        <i class="fas fa-envelope"></i> Trimite mesaj
-                    </button>
+                    {% if user.is_authenticated and user != listing.owner %}
+                        <form method="post" action="{% url 'chat:start_conversation' listing.slug %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline">
+                                <i class="fas fa-envelope"></i> Trimite mesaj
+                            </button>
+                        </form>
+                    {% endif %}
                     <a href="{% url 'listings:list' %}?seller={{ listing.owner.username }}" class="btn btn-outline">
                         <i class="fas fa-list"></i> Vezi toate anunțurile
                     </a>

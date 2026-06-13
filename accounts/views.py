@@ -3,6 +3,7 @@ from django.contrib.auth import login, authenticate, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 from django.db.models import Count
@@ -42,7 +43,13 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                next_url = request.GET.get('next', 'listings:home')
+                next_url = request.GET.get('next')
+                if not url_has_allowed_host_and_scheme(
+                    url=next_url,
+                    allowed_hosts={request.get_host()},
+                    require_https=request.is_secure(),
+                ):
+                    next_url = reverse('listings:home')
                 messages.success(request, f'Bine ai venit, {user.get_full_name() or user.username}!')
                 return redirect(next_url)
     else:
@@ -139,4 +146,3 @@ def public_profile_view(request, username):
 
 # my_listings_view a fost mutat în listings/views.py (versiunea canonică cu filtrare status)
 # URL-ul accounts:my_listings poate redirecta acolo dacă e nevoie
-

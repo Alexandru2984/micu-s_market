@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Make request to remove favorite
         fetch(`/favorites/remove/${favoriteId}/`, {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'X-CSRFToken': getCSRFToken(),
                 'X-Requested-With': 'XMLHttpRequest'

@@ -30,6 +30,15 @@ class AuthViewsTestCase(TestCase):
         response = self.client.get(reverse('accounts:login'))
         self.assertEqual(response.status_code, 302)
 
+    def test_login_rejects_external_next_url(self):
+        """Loginul nu redirecționează către domenii externe din next"""
+        response = self.client.post(
+            reverse('accounts:login') + '?next=https://evil.example/phish',
+            {'username': 'testuser', 'password': 'SecurePass123!'},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('listings:home'))
+
     def test_logout_requires_post(self):
         """Logout custom acceptă DOAR POST, nu GET (protecție CSRF force-logout)"""
         self.client.login(username='testuser', password='SecurePass123!')
