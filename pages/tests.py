@@ -5,6 +5,7 @@ from django.core.management import call_command, CommandError
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 
+from .checks import production_environment_checks
 from .views import bad_request_view, permission_denied_view, server_error_view
 
 
@@ -107,3 +108,26 @@ class DoctorCommandTests(TestCase):
     def test_doctor_fails_when_cache_roundtrip_fails(self, _cache_get):
         with self.assertRaises(CommandError):
             call_command("doctor", "--skip-email", "--skip-storage", stdout=StringIO(), stderr=StringIO())
+
+
+class DeploymentCheckTests(TestCase):
+    @override_settings(
+        DEBUG=False,
+        ALLOWED_HOSTS=['market.micutu.com'],
+        DEFAULT_FROM_EMAIL='noreply@micutu.com',
+        DATABASES={
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': 'micu_market',
+                'USER': 'micu',
+                'PASSWORD': 'secret',
+                'HOST': '127.0.0.1',
+                'PORT': '5432',
+            }
+        },
+    )
+    @patch.dict('os.environ', {}, clear=True)
+    def test_deploy_check_requires_explicit_allowed_hosts_env(self):
+        issues = production_environment_checks(None)
+
+        self.assertIn('micu.E005', {issue.id for issue in issues})

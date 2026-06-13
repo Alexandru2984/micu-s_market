@@ -1,3 +1,5 @@
+import os
+
 from django.conf import settings
 from django.core.checks import Error, Tags, Warning, register
 
@@ -67,6 +69,15 @@ def production_environment_checks(app_configs, **kwargs):
                 "ALLOWED_HOSTS nu este configurat strict pentru producție.",
                 hint="Setează DJANGO_ALLOWED_HOSTS cu domeniile publice exacte.",
                 id="micu.E002",
+            )
+        )
+
+    if not os.getenv("DJANGO_ALLOWED_HOSTS"):
+        errors.append(
+            Error(
+                "DJANGO_ALLOWED_HOSTS trebuie setat explicit în producție.",
+                hint="Setează DJANGO_ALLOWED_HOSTS în .env cu domeniile publice exacte, separate prin virgulă.",
+                id="micu.E005",
             )
         )
 
