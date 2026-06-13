@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Cerere invalidă - Micu's Market{% endblock %}
+{% block meta_description %}Cererea nu a putut fi procesată.{% endblock %}
+{% block meta_robots %}noindex,nofollow{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="empty-state">
+        <h1>Cerere invalidă</h1>
+        <p>Pagina a primit date pe care nu le poate procesa.</p>
+        <a href="{% url 'listings:home' %}" class="btn btn-primary">Înapoi acasă</a>
+    </section>
+</div>
+{% endblock %}

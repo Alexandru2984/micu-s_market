@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Acces restricționat - Micu's Market{% endblock %}
+{% block meta_description %}Nu ai permisiunea necesară pentru această pagină.{% endblock %}
+{% block meta_robots %}noindex,nofollow{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="empty-state">
+        <h1>Acces restricționat</h1>
+        <p>Nu ai permisiunea necesară pentru această acțiune.</p>
+        <a href="{% url 'listings:home' %}" class="btn btn-primary">Înapoi acasă</a>
+    </section>
+</div>
+{% endblock %}

@@ -33,3 +33,8 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler400 = "pages.views.bad_request_view"
+handler403 = "pages.views.permission_denied_view"
+handler404 = "pages.views.page_not_found_view"
+handler500 = "pages.views.server_error_view"

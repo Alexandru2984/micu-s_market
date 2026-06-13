@@ -2,8 +2,10 @@ from io import StringIO
 from unittest.mock import patch
 
 from django.core.management import call_command, CommandError
-from django.test import TestCase
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
+
+from .views import bad_request_view, permission_denied_view, server_error_view
 
 
 class ProjectUrlSecurityTests(TestCase):
@@ -66,6 +68,26 @@ class ProjectUrlSecurityTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Politica de confidențialitate')
         self.assertContains(response, 'Cookie-uri')
+
+    @override_settings(DEBUG=False, ALLOWED_HOSTS=['testserver'])
+    def test_custom_404_page_is_rendered(self):
+        response = self.client.get('/pagina-care-nu-exista/')
+
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, 'Pagina nu există', status_code=404)
+        self.assertContains(response, 'noindex,nofollow', status_code=404)
+
+    def test_custom_error_views_render_noindex_pages(self):
+        request = RequestFactory().get('/error-test/')
+
+        response_400 = bad_request_view(request, Exception('bad request'))
+        response_403 = permission_denied_view(request, Exception('denied'))
+        response_500 = server_error_view(request)
+
+        self.assertEqual(response_400.status_code, 400)
+        self.assertContains(response_400, 'Cerere invalidă', status_code=400)
+        self.assertContains(response_403, 'Acces restricționat', status_code=403)
+        self.assertContains(response_500, 'Eroare server', status_code=500)
 
 
 class DoctorCommandTests(TestCase):
