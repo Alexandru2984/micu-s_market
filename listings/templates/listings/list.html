@@ -265,7 +265,7 @@
                                     {% for category in categories %}
                                         <option value="{{ category.slug }}" 
                                             {% if current_category_slug == category.slug %}selected{% endif %}>
-                                            {% if category.icon %}{{ category.icon|safe }}{% endif %} {{ category.name }}
+                                            {% if category.icon %}{{ category.icon }}{% endif %} {{ category.name }}
                                         </option>
                                     {% endfor %}
                                 </select>

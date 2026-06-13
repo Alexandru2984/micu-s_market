@@ -301,6 +301,17 @@ class ListingCRUDTestCase(TestCase):
         self.assertEqual(listing.status, 'active')
         self.assertFalse(listing.needs_moderation_review)
 
+    def test_category_icon_is_escaped_in_listing_filter(self):
+        """Iconul categoriei nu este randat ca HTML raw în filtrul de listare."""
+        self.category.icon = '<script>alert(1)</script>'
+        self.category.save(update_fields=['icon'])
+
+        response = self.client.get(reverse('listings:list'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, '<script>alert(1)</script>', html=False)
+        self.assertContains(response, '&lt;script&gt;alert(1)&lt;/script&gt;')
+
 
 class ListingImageValidationTestCase(TestCase):
     """Teste pentru validarea imaginilor uploadate"""
