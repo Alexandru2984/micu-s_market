@@ -11,6 +11,7 @@ from django.contrib.auth import get_user_model
 from .models import Conversation, Message, MessageAttachment
 from listings.models import Listing
 from categories.models import Category
+from notifications.models import Notification
 
 User = get_user_model()
 
@@ -128,6 +129,22 @@ class ChatConversationTestCase(TestCase):
             HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
         self.assertEqual(response.status_code, 400)
+
+    def test_send_message_creates_receiver_notification(self):
+        """Un mesaj nou creează notificare pentru destinatar."""
+        conv = Conversation.objects.create(listing=self.listing)
+        conv.participants.add(self.buyer, self.seller)
+
+        self.client.login(username='buyer', password='BuyerPass123!')
+        response = self.client.post(
+            reverse('chat:send_message', kwargs={'conversation_pk': conv.pk}),
+            {'content': 'Salut'},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        notification = Notification.objects.get(recipient=self.seller, notification_type='new_message')
+        self.assertEqual(notification.related_object_id, conv.pk)
 
     def test_send_message_accepts_valid_text_attachment(self):
         """Atașamentele text valide sunt salvate."""

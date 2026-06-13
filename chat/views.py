@@ -13,6 +13,7 @@ import mimetypes
 from .models import Conversation, Message, MessageAttachment
 from .validators import MAX_ATTACHMENTS_PER_MESSAGE, is_allowed_chat_attachment
 from listings.models import Listing
+from notifications.models import Notification
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -151,6 +152,15 @@ def send_message_view(request, conversation_pk):
         sender=request.user,
         receiver=receiver,
         content=content
+    )
+    Notification.objects.create(
+        recipient=receiver,
+        notification_type="new_message",
+        title="Mesaj nou",
+        message=f"{request.user.get_full_name() or request.user.username} ți-a trimis un mesaj.",
+        related_object_type="Conversation",
+        related_object_id=conversation.pk,
+        action_url=conversation.get_absolute_url(),
     )
     
     # Procesează atașamentele cu validare server-side.

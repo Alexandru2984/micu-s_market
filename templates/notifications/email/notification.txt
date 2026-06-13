@@ -1,0 +1,7 @@
+{{ notification.title }}
+
+{{ notification.message }}
+
+{% if notification.action_url %}Deschide: {{ notification.action_url }}{% endif %}
+
+Micu's Market
