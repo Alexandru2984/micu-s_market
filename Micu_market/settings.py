@@ -166,6 +166,15 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("FILE_UPLOAD_MAX_MEMORY_SIZE", str(5
 CORS_ALLOWED_ORIGINS = _split_env("CORS_ALLOWED_ORIGINS")
 CSRF_TRUSTED_ORIGINS = _split_env("CSRF_TRUSTED_ORIGINS")
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "micu-market-local",
+    }
+}
+RATELIMIT_USE_CACHE = os.getenv("RATELIMIT_USE_CACHE", "default")
+HOMEPAGE_CACHE_SECONDS = int(os.getenv("HOMEPAGE_CACHE_SECONDS", "300"))
+
 # Security settings pentru producție
 if not DEBUG:
     SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "True") == "True"

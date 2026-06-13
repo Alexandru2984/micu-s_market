@@ -93,4 +93,13 @@ def production_environment_checks(app_configs, **kwargs):
                 )
             )
 
+    if not getattr(settings, "REDIS_URL", ""):
+        errors.append(
+            Warning(
+                "REDIS_URL nu este setat; cache-ul și rate-limit pot fi locale per proces.",
+                hint="Setează REDIS_URL în producție pentru cache distribuit și rate-limit predictibil.",
+                id="micu.W004",
+            )
+        )
+
     return errors

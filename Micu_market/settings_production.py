@@ -73,6 +73,17 @@ DATABASES = {
     }
 }
 
+REDIS_URL = os.getenv('REDIS_URL', '')
+if REDIS_URL:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': REDIS_URL,
+        }
+    }
+RATELIMIT_USE_CACHE = os.getenv('RATELIMIT_USE_CACHE', 'default')
+HOMEPAGE_CACHE_SECONDS = int(os.getenv('HOMEPAGE_CACHE_SECONDS', '300'))
+
 # Logging
 LOG_DIR = os.getenv('DJANGO_LOG_DIR', '/var/log/micu_market')
 LOG_FILE = os.path.join(LOG_DIR, 'django.log')

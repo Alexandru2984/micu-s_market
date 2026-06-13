@@ -5,6 +5,8 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.utils import timezone
 from django.views.decorators.http import require_POST
+from django.conf import settings
+from django.core.cache import cache
 from django_ratelimit.decorators import ratelimit
 import logging
 from .models import Listing, ListingImage, ListingReport
@@ -38,18 +40,21 @@ def home_view(request):
     
     # Categorii cu număr de anunțuri — un singur query agregat (fix N+1)
     # Folosim annotate pentru a obține numărul de anunțuri active per categorie
-    categories_with_counts = (
-        Category.objects.filter(is_active=True)
-        .annotate(
-            active_listings_count=Count(
-                'listings',
-                filter=Q(listings__status='active'),
-                distinct=True
+    top_categories = cache.get("home:top_categories")
+    if top_categories is None:
+        categories_with_counts = (
+            Category.objects.filter(is_active=True)
+            .annotate(
+                active_listings_count=Count(
+                    'listings',
+                    filter=Q(listings__status='active'),
+                    distinct=True
+                )
             )
+            .order_by('-active_listings_count', 'order', 'name')
         )
-        .order_by('-active_listings_count', 'order', 'name')
-    )
-    top_categories = list(categories_with_counts[:12])
+        top_categories = list(categories_with_counts[:12])
+        cache.set("home:top_categories", top_categories, settings.HOMEPAGE_CACHE_SECONDS)
     
     context = {
         'recent_listings': recent_listings,
