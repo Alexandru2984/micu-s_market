@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
             imageWrap.appendChild(noImage);
         }
 
-        if (listing.is_featured) {
+        if (listing.is_promoted ?? listing.is_featured) {
             const badge = document.createElement('div');
             badge.className = 'featured-badge';
             badge.textContent = 'Recomandat';

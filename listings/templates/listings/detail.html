@@ -17,7 +17,7 @@
                 {% if listing.images.all %}
                     <div class="main-image">
                         <img id="mainImage" src="{{ listing.main_image.url }}" alt="{{ listing.title }}">
-                        {% if listing.is_featured %}
+                        {% if listing.is_promoted %}
                             <div class="featured-badge">
                                 <i class="fas fa-star"></i> Recomandat
                             </div>

@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.utils import timezone
+from datetime import timedelta
 from .models import Listing, ListingImage, ListingReport
 
 class ListingImageInline(admin.TabularInline):
@@ -10,11 +12,12 @@ class ListingImageInline(admin.TabularInline):
 
 @admin.register(Listing)
 class ListingAdmin(admin.ModelAdmin):
-    list_display = ("title", "price", "status_display", "este_activ", "oras", "data_creare")
-    list_filter = ("status", "created_at", "category", "condition", "city")
+    list_display = ("title", "price", "status_display", "este_activ", "este_promovat", "oras", "data_creare")
+    list_filter = ("status", "is_featured", "featured_until", "created_at", "category", "condition", "city")
     search_fields = ("title", "description", "city")
     readonly_fields = ("slug", "views_count", "created_at", "updated_at")
     inlines = [ListingImageInline]
+    actions = ("promote_7_days", "promote_30_days", "stop_promotion")
     
     fieldsets = (
         ('Informații de bază', {
@@ -27,7 +30,7 @@ class ListingAdmin(admin.ModelAdmin):
             'fields': ('city', 'county')
         }),
         ('Setări avansate', {
-            'fields': ('status', 'is_featured', 'expires_at')
+            'fields': ('status', 'is_featured', 'featured_until', 'expires_at')
         }),
         ('Informații sistem', {
             'fields': ('slug', 'views_count', 'created_at', 'updated_at'),
@@ -49,6 +52,11 @@ class ListingAdmin(admin.ModelAdmin):
         return obj.is_active
     este_activ.short_description = 'Activ'
     este_activ.boolean = True
+
+    def este_promovat(self, obj):
+        return obj.is_promoted
+    este_promovat.short_description = 'Promovat'
+    este_promovat.boolean = True
     
     def oras(self, obj):
         return f"{obj.city}, {obj.county}"
@@ -57,6 +65,18 @@ class ListingAdmin(admin.ModelAdmin):
     def data_creare(self, obj):
         return obj.created_at.strftime('%d.%m.%Y %H:%M')
     data_creare.short_description = 'Creat la'
+
+    @admin.action(description="Promovează 7 zile")
+    def promote_7_days(self, request, queryset):
+        queryset.update(is_featured=True, featured_until=timezone.now() + timedelta(days=7))
+
+    @admin.action(description="Promovează 30 zile")
+    def promote_30_days(self, request, queryset):
+        queryset.update(is_featured=True, featured_until=timezone.now() + timedelta(days=30))
+
+    @admin.action(description="Oprește promovarea")
+    def stop_promotion(self, request, queryset):
+        queryset.update(is_featured=False, featured_until=None)
 
 
 @admin.register(ListingReport)

@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django_ratelimit.decorators import ratelimit
 import logging
@@ -16,7 +17,14 @@ logger = logging.getLogger(__name__)
 def home_view(request):
     """Homepage cu anunțuri recente și categorii"""
     recent_listings = Listing.objects.filter(status='active').select_related('category', 'owner').prefetch_related('images').order_by('-created_at')[:8]
-    featured_listings = Listing.objects.filter(status='active', is_featured=True).select_related('category', 'owner').prefetch_related('images').order_by('-created_at')[:4]
+    now = timezone.now()
+    featured_listings = (
+        Listing.objects.filter(status='active', is_featured=True)
+        .filter(Q(featured_until__isnull=True) | Q(featured_until__gt=now))
+        .select_related('category', 'owner')
+        .prefetch_related('images')
+        .order_by('-created_at')[:4]
+    )
     
     # Adăugă starea de favorite pentru utilizatorul autentificat
     if request.user.is_authenticated:

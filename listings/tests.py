@@ -5,7 +5,9 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils import timezone
 from io import BytesIO
+from datetime import timedelta
 from PIL import Image as PilImage
 
 from .models import Listing, ListingReport
@@ -166,6 +168,46 @@ class ListingCRUDTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(ListingReport.objects.count(), 1)
+
+    def test_promoted_listing_property_respects_expiry(self):
+        """Promovarea este activă doar cât timp nu a expirat."""
+        self.listing.is_featured = True
+        self.listing.featured_until = timezone.now() + timedelta(days=1)
+        self.assertTrue(self.listing.is_promoted)
+
+        self.listing.featured_until = timezone.now() - timedelta(minutes=1)
+        self.assertFalse(self.listing.is_promoted)
+
+    def test_home_shows_only_active_promoted_listings(self):
+        """Homepage afișează doar promovările active în secțiunea recomandată."""
+        active_promoted = Listing.objects.create(
+            title='Promovat activ',
+            description='Test',
+            price=120.00,
+            owner=self.user,
+            category=self.category,
+            city='Iași',
+            status='active',
+            is_featured=True,
+            featured_until=timezone.now() + timedelta(days=3),
+        )
+        expired_promoted = Listing.objects.create(
+            title='Promovat expirat',
+            description='Test',
+            price=130.00,
+            owner=self.user,
+            category=self.category,
+            city='Iași',
+            status='active',
+            is_featured=True,
+            featured_until=timezone.now() - timedelta(days=1),
+        )
+
+        response = self.client.get(reverse('listings:home'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(active_promoted, response.context['featured_listings'])
+        self.assertNotIn(expired_promoted, response.context['featured_listings'])
 
 
 class ListingImageValidationTestCase(TestCase):

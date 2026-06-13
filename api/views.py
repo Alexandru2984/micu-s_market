@@ -62,6 +62,7 @@ def _listing_summary(request, listing):
         'main_image': _image_url(request, main_image),
         'views_count': listing.views_count,
         'is_featured': listing.is_featured,
+        'is_promoted': listing.is_promoted,
         'created_at': listing.created_at.isoformat(),
         'url': _absolute_url(request, reverse('listings:detail', kwargs={'slug': listing.slug})),
     }

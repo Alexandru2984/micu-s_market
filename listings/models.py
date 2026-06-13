@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.text import slugify
 from PIL import Image
 import os
@@ -45,6 +46,7 @@ class Listing(models.Model):
     # Status și date
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active', verbose_name="Status")
     is_featured = models.BooleanField(default=False, verbose_name="Promovat")
+    featured_until = models.DateTimeField(null=True, blank=True, verbose_name="Promovat până la")
     views_count = models.IntegerField(default=0, verbose_name="Număr vizualizări")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creat la")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Actualizat la")
@@ -80,6 +82,12 @@ class Listing(models.Model):
     @property
     def is_active(self):
         return self.status == 'active'
+
+    @property
+    def is_promoted(self):
+        if not self.is_featured:
+            return False
+        return self.featured_until is None or self.featured_until > timezone.now()
     
     @property
     def main_image(self):
