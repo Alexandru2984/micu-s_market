@@ -5,6 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Micu's Market{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Micu's Market este marketplace-ul pentru anunțuri locale, cumpărături sigure și vânzări rapide în România.{% endblock %}">
+    <meta name="robots" content="{% block meta_robots %}index,follow{% endblock %}">
+    <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    <meta property="og:site_name" content="Micu's Market">
+    <meta property="og:title" content="{% block og_title %}Micu's Market{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Anunțuri locale, vânzători verificați și cumpărături rapide în România.{% endblock %}">
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    {% block og_image %}{% endblock %}
+    <meta name="twitter:card" content="{% block twitter_card %}summary{% endblock %}">
+    <meta name="twitter:title" content="{% block twitter_title %}Micu's Market{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Anunțuri locale, vânzători verificați și cumpărături rapide în România.{% endblock %}">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
@@ -21,6 +33,7 @@
     <link rel="stylesheet" href="{% static 'css/buttons.css' %}">
     
     {% block extra_css %}{% endblock %}
+    {% block structured_data %}{% endblock %}
 </head>
 <body>
     {% include "partials/header.html" %}

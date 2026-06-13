@@ -78,6 +78,17 @@ class ListingCRUDTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
+    def test_listing_detail_has_seo_metadata(self):
+        """Pagina de anunț expune meta tags și structured data pentru indexare/share."""
+        response = self.client.get(
+            reverse('listings:detail', kwargs={'slug': self.listing.slug})
+        )
+
+        self.assertContains(response, '<meta property="og:type" content="product">')
+        self.assertContains(response, '<script type="application/ld+json">')
+        self.assertContains(response, '"@type": "Product"')
+        self.assertContains(response, f'<link rel="canonical" href="http://testserver{self.listing.get_absolute_url()}">')
+
     def test_listing_edit_requires_owner(self):
         """Editarea anunțului este permisă doar proprietarului"""
         self.client.login(username='other', password='OtherPass123!')

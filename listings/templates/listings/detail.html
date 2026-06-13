@@ -4,6 +4,39 @@
 {% csrf_token %}
 
 {% block title %}{{ listing.title }} - Micu's Market{% endblock %}
+{% block meta_description %}{{ listing.title }} în {{ listing.city }}, {{ listing.county }} - {{ listing.price }} RON. {{ listing.description|striptags|truncatechars:120 }}{% endblock %}
+{% block canonical_url %}{{ request.scheme }}://{{ request.get_host }}{{ listing.get_absolute_url }}{% endblock %}
+{% block og_title %}{{ listing.title }} - {{ listing.price }} RON{% endblock %}
+{% block og_description %}{{ listing.description|striptags|truncatechars:180 }}{% endblock %}
+{% block og_type %}product{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}{{ listing.get_absolute_url }}{% endblock %}
+{% block og_image %}{% if listing.main_image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ listing.main_image.url }}"><meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ listing.main_image.url }}">{% endif %}{% endblock %}
+{% block twitter_card %}{% if listing.main_image %}summary_large_image{% else %}summary{% endif %}{% endblock %}
+{% block twitter_title %}{{ listing.title }} - {{ listing.price }} RON{% endblock %}
+{% block twitter_description %}{{ listing.description|striptags|truncatechars:180 }}{% endblock %}
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "{{ listing.title|escapejs }}",
+  "description": "{{ listing.description|striptags|truncatechars:300|escapejs }}",
+  {% if listing.main_image %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ listing.main_image.url }}",{% endif %}
+  "category": "{{ listing.category.name|default:'Anunțuri'|escapejs }}",
+  "offers": {
+    "@type": "Offer",
+    "price": "{{ listing.price|floatformat:2 }}",
+    "priceCurrency": "RON",
+    "availability": "https://schema.org/InStock",
+    "url": "{{ request.scheme }}://{{ request.get_host }}{{ listing.get_absolute_url }}"
+  },
+  "seller": {
+    "@type": "Person",
+    "name": "{{ listing.owner.get_full_name|default:listing.owner.username|escapejs }}"
+  }
+}
+</script>
+{% endblock %}
 
 {% block content %}
 

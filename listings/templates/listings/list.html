@@ -2,6 +2,11 @@
 {% load static %}
 
 {% block title %}Toate Anunțurile - Micu's Market{% endblock %}
+{% block meta_description %}{% if search_query %}Rezultate pentru {{ search_query }} pe Micu's Market: filtrează anunțuri după preț, oraș și categorie.{% elif current_category %}Anunțuri din categoria {{ current_category.name }} pe Micu's Market, cu filtre după preț și oraș.{% else %}Explorează toate anunțurile active de pe Micu's Market și filtrează rapid după categorie, oraș sau preț.{% endif %}{% endblock %}
+{% block og_title %}{% if search_query %}Rezultate pentru {{ search_query }}{% elif current_category %}{{ current_category.name }}{% else %}Toate anunțurile{% endif %} - Micu's Market{% endblock %}
+{% block og_description %}{% if search_query %}Anunțuri găsite pentru {{ search_query }} pe Micu's Market.{% elif current_category %}Anunțuri active din categoria {{ current_category.name }}.{% else %}Toate anunțurile active disponibile pe Micu's Market.{% endif %}{% endblock %}
+{% block twitter_title %}{% if search_query %}Rezultate pentru {{ search_query }}{% elif current_category %}{{ current_category.name }}{% else %}Toate anunțurile{% endif %} - Micu's Market{% endblock %}
+{% block twitter_description %}{% if search_query %}Anunțuri găsite pentru {{ search_query }} pe Micu's Market.{% elif current_category %}Anunțuri active din categoria {{ current_category.name }}.{% else %}Toate anunțurile active disponibile pe Micu's Market.{% endif %}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/listings.css' %}">
