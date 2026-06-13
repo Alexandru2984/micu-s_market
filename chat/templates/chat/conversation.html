@@ -75,7 +75,7 @@
                                                 {% if attachment.file_type == 'image' %}
                                                     <img src="{{ attachment.download_url }}" alt="{{ attachment.filename }}" class="attachment-image" loading="lazy" decoding="async">
                                                 {% else %}
-                                                    <a href="{{ attachment.download_url }}" target="_blank" class="attachment-file">
+                                                    <a href="{{ attachment.download_url }}" target="_blank" rel="noopener noreferrer" class="attachment-file">
                                                         <i class="fas fa-file"></i>
                                                         {{ attachment.filename }}
                                                     </a>

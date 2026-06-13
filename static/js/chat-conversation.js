@@ -498,7 +498,7 @@ function addMessageToUI(message) {
                         const attachmentName = escapeHTML(att.filename || 'attachment');
                         return att.file_type === 'image'
                             ? `<div class="message-attachments"><img src="${attachmentUrl}" alt="${attachmentName}" class="attachment-image"></div>`
-                            : `<div class="message-attachments"><a href="${attachmentUrl}" target="_blank" class="attachment-file"><i class="fas fa-file"></i> ${attachmentName}</a></div>`;
+                            : `<div class="message-attachments"><a href="${attachmentUrl}" target="_blank" rel="noopener noreferrer" class="attachment-file"><i class="fas fa-file"></i> ${attachmentName}</a></div>`;
                     }).join('')}
                 </div>
                 <div class="message-time">

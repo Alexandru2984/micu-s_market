@@ -71,7 +71,7 @@
                                                 {% if attachment.file_type == 'image' %}
                                                     <img src="{{ attachment.download_url }}" alt="{{ attachment.filename }}" class="attachment-image" loading="lazy" decoding="async">
                                                 {% else %}
-                                                    <a href="{{ attachment.download_url }}" target="_blank" class="attachment-file">
+                                                    <a href="{{ attachment.download_url }}" target="_blank" rel="noopener noreferrer" class="attachment-file">
                                                         <i class="fas fa-file"></i>
                                                         {{ attachment.filename }}
                                                     </a>
@@ -258,7 +258,7 @@ function addMessageToUI(message) {
                         const attachmentName = escapeHTML(att.filename || 'attachment');
                         return att.file_type === 'image'
                             ? `<div class="message-attachments"><img src="${attachmentUrl}" alt="${attachmentName}" class="attachment-image" loading="lazy" decoding="async"></div>`
-                            : `<div class="message-attachments"><a href="${attachmentUrl}" target="_blank" class="attachment-file"><i class="fas fa-file"></i> ${attachmentName}</a></div>`;
+                            : `<div class="message-attachments"><a href="${attachmentUrl}" target="_blank" rel="noopener noreferrer" class="attachment-file"><i class="fas fa-file"></i> ${attachmentName}</a></div>`;
                     }).join('')}
                 </div>
                 <div class="message-time">
