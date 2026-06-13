@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.db.models import Q, Count
 from django.http import FileResponse, JsonResponse
 from django.core.paginator import Paginator
+from django.conf import settings
 from django.views.decorators.http import require_POST
 from django_ratelimit.decorators import ratelimit
 import logging
@@ -142,6 +143,8 @@ def send_message_view(request, conversation_pk):
     content = request.POST.get('content', '').strip()
     if not content:
         return JsonResponse({'error': 'Mesajul nu poate fi gol.'}, status=400)
+    if len(content) > settings.CHAT_MESSAGE_MAX_LENGTH:
+        return JsonResponse({'error': 'Mesajul este prea lung.'}, status=400)
     
     # Determină destinatarul
     receiver = conversation.get_other_participant(request.user)

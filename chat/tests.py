@@ -130,6 +130,22 @@ class ChatConversationTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
+    @override_settings(CHAT_MESSAGE_MAX_LENGTH=20)
+    def test_send_too_long_message_rejected(self):
+        """Mesajele peste limita server-side sunt respinse."""
+        conv = Conversation.objects.create(listing=self.listing)
+        conv.participants.add(self.buyer, self.seller)
+
+        self.client.login(username='buyer', password='BuyerPass123!')
+        response = self.client.post(
+            reverse('chat:send_message', kwargs={'conversation_pk': conv.pk}),
+            {'content': 'x' * 21},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Message.objects.count(), 0)
+
     def test_send_message_creates_receiver_notification(self):
         """Un mesaj nou creează notificare pentru destinatar."""
         conv = Conversation.objects.create(listing=self.listing)

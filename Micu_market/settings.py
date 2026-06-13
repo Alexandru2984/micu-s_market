@@ -188,6 +188,7 @@ LISTING_RISK_TERMS = _split_env(
     "LISTING_RISK_TERMS",
     "whatsapp,telegram,avans,western union,crypto,bitcoin,revolut only,livrare doar cu plata in avans",
 )
+CHAT_MESSAGE_MAX_LENGTH = int(os.getenv("CHAT_MESSAGE_MAX_LENGTH", "5000"))
 
 # Security settings pentru producție
 if not DEBUG:
