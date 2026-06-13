@@ -13,6 +13,7 @@ urlpatterns = [
     
     # Acțiuni AJAX
     path('send/<int:conversation_pk>/', views.send_message_view, name='send_message'),
+    path('attachments/<int:pk>/download/', views.attachment_download_view, name='attachment_download'),
     path('mark-read/<int:pk>/', views.mark_conversation_read, name='mark_read'),
     path('unread-count/', views.get_unread_count, name='unread_count'),
     path('search-users/', views.search_users_view, name='search_users'),

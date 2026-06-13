@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.text import get_valid_filename
+from pathlib import PurePath
 
 User = get_user_model()
 
@@ -70,7 +72,7 @@ class Message(models.Model):
 class MessageAttachment(models.Model):
     """Atașamente pentru mesaje (imagini, documente)"""
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='attachments', verbose_name="Mesaj")
-    file = models.FileField(upload_to='chat/attachments/', verbose_name="Fișier")
+    file = models.FileField(upload_to='chat/private/attachments/', verbose_name="Fișier")
     filename = models.CharField(max_length=255, verbose_name="Nume fișier")
     file_type = models.CharField(max_length=50, verbose_name="Tip fișier")
     file_size = models.IntegerField(verbose_name="Dimensiune fișier")
@@ -82,15 +84,19 @@ class MessageAttachment(models.Model):
     
     def __str__(self):
         return f"Atașament: {self.filename}"
+
+    @property
+    def download_url(self):
+        return reverse('chat:attachment_download', kwargs={'pk': self.pk})
     
     def save(self, *args, **kwargs):
         if self.file:
-            self.filename = self.file.name
+            self.filename = get_valid_filename(PurePath(self.file.name).name)
             self.file_size = self.file.size
             # Determină tipul fișierului
             if self.file.name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
                 self.file_type = 'image'
-            elif self.file.name.lower().endswith(('.pdf', '.doc', '.docx', '.txt')):
+            elif self.file.name.lower().endswith(('.pdf', '.doc', '.docx', '.txt', '.xls', '.xlsx')):
                 self.file_type = 'document'
             else:
                 self.file_type = 'other'

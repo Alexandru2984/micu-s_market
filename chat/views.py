@@ -3,12 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.db.models import Q, Count
-from django.http import JsonResponse
+from django.http import FileResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 from django_ratelimit.decorators import ratelimit
-import json
 import logging
+import mimetypes
 
 from .models import Conversation, Message, MessageAttachment
 from listings.models import Listing
@@ -197,7 +197,8 @@ def send_message_view(request, conversation_pk):
                 'created_at': message.created_at.strftime('%H:%M'),
                 'attachments': [
                     {
-                        'url': att.file.url,
+                        'url': att.download_url,
+                        'download_url': att.download_url,
                         'filename': att.filename,
                         'file_type': att.file_type
                     } for att in message.attachments.all()
@@ -241,6 +242,24 @@ def get_unread_count(request):
     ).count()
     
     return JsonResponse({'unread_count': count})
+
+@login_required
+def attachment_download_view(request, pk):
+    """Servește atașamentele doar participanților conversației."""
+    attachment = get_object_or_404(
+        MessageAttachment.objects.select_related('message__conversation'),
+        pk=pk,
+        message__conversation__participants=request.user,
+    )
+    content_type, _ = mimetypes.guess_type(attachment.filename)
+    response = FileResponse(
+        attachment.file.open('rb'),
+        as_attachment=attachment.file_type != 'image',
+        filename=attachment.filename,
+        content_type=content_type or 'application/octet-stream',
+    )
+    response['X-Content-Type-Options'] = 'nosniff'
+    return response
 
 @login_required
 @require_POST

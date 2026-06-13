@@ -1,11 +1,14 @@
 """
 Teste pentru sistemul de chat — conversații și mesaje
 """
-from django.test import TestCase, Client
+import tempfile
+
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from .models import Conversation, Message
+from .models import Conversation, Message, MessageAttachment
 from listings.models import Listing
 from categories.models import Category
 
@@ -125,3 +128,50 @@ class ChatConversationTestCase(TestCase):
             HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
         self.assertEqual(response.status_code, 400)
+
+    def test_attachment_download_allowed_for_participant(self):
+        """Participanții conversației pot descărca atașamentele."""
+        with tempfile.TemporaryDirectory() as media_root:
+            with override_settings(MEDIA_ROOT=media_root):
+                conv = Conversation.objects.create(listing=self.listing)
+                conv.participants.add(self.buyer, self.seller)
+                message = Message.objects.create(
+                    conversation=conv,
+                    sender=self.buyer,
+                    receiver=self.seller,
+                    content='cu atasament',
+                )
+                attachment = MessageAttachment.objects.create(
+                    message=message,
+                    file=SimpleUploadedFile('secret.txt', b'secret', content_type='text/plain'),
+                )
+
+                self.client.login(username='buyer', password='BuyerPass123!')
+                response = self.client.get(
+                    reverse('chat:attachment_download', kwargs={'pk': attachment.pk})
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response['X-Content-Type-Options'], 'nosniff')
+
+    def test_attachment_download_denied_for_non_participant(self):
+        """Utilizatorii din afara conversației nu pot descărca atașamentele."""
+        with tempfile.TemporaryDirectory() as media_root:
+            with override_settings(MEDIA_ROOT=media_root):
+                conv = Conversation.objects.create(listing=self.listing)
+                conv.participants.add(self.buyer, self.seller)
+                message = Message.objects.create(
+                    conversation=conv,
+                    sender=self.buyer,
+                    receiver=self.seller,
+                    content='cu atasament',
+                )
+                attachment = MessageAttachment.objects.create(
+                    message=message,
+                    file=SimpleUploadedFile('secret.txt', b'secret', content_type='text/plain'),
+                )
+
+                self.client.login(username='third', password='ThirdPass123!')
+                response = self.client.get(
+                    reverse('chat:attachment_download', kwargs={'pk': attachment.pk})
+                )
+                self.assertEqual(response.status_code, 404)

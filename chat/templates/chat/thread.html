@@ -69,9 +69,9 @@
                                         {% for attachment in message.attachments.all %}
                                             <div class="attachment">
                                                 {% if attachment.file_type == 'image' %}
-                                                    <img src="{{ attachment.file.url }}" alt="{{ attachment.filename }}" class="attachment-image">
+                                                    <img src="{{ attachment.download_url }}" alt="{{ attachment.filename }}" class="attachment-image">
                                                 {% else %}
-                                                    <a href="{{ attachment.file.url }}" target="_blank" class="attachment-file">
+                                                    <a href="{{ attachment.download_url }}" target="_blank" class="attachment-file">
                                                         <i class="fas fa-file"></i>
                                                         {{ attachment.filename }}
                                                     </a>
@@ -107,7 +107,7 @@
                         <label for="fileInput" class="attachment-btn">
                             <i class="fas fa-paperclip"></i>
                         </label>
-                        <input type="file" id="fileInput" name="attachments" multiple accept="image/*,.pdf,.doc,.docx" style="display: none;">
+                        <input type="file" id="fileInput" name="attachments" multiple accept="image/*,.pdf,.doc,.docx,.txt,.xls,.xlsx" style="display: none;">
                         
                         <button type="submit" class="send-btn">
                             <i class="fas fa-paper-plane"></i>
