@@ -4,6 +4,7 @@ Teste pentru sistemul de autentificare și profiluri
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from .forms import CustomUserCreationForm, UserProfileForm
 from .models import UserReport
 
 User = get_user_model()
@@ -60,6 +61,21 @@ class AuthViewsTestCase(TestCase):
         response = self.client.get(reverse('accounts:register'))
         self.assertIn(response.status_code, [200, 301, 302])
 
+    def test_register_form_rejects_duplicate_email(self):
+        form = CustomUserCreationForm(
+            data={
+                'username': 'newuser',
+                'first_name': 'New',
+                'last_name': 'User',
+                'email': 'TEST@example.com',
+                'password1': 'StrongPass123!',
+                'password2': 'StrongPass123!',
+            }
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('email', form.errors)
+
     def test_profile_view_requires_login(self):
         """Profile view necesită autentificare"""
         response = self.client.get(reverse('accounts:profile'))
@@ -71,6 +87,30 @@ class AuthViewsTestCase(TestCase):
         self.client.login(username='testuser', password='SecurePass123!')
         response = self.client.get(reverse('accounts:profile'))
         self.assertEqual(response.status_code, 200)
+
+    def test_profile_form_rejects_another_users_email(self):
+        other = User.objects.create_user(
+            username='otheruser',
+            email='other@example.com',
+            password='OtherPass123!',
+        )
+        form = UserProfileForm(
+            data={
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'email': 'OTHER@example.com',
+                'bio': '',
+                'phone': '',
+                'city': '',
+                'county': '',
+                'date_of_birth': '',
+            },
+            instance=self.user.profile,
+            user=self.user,
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('email', form.errors)
 
     def test_request_verification_requires_login(self):
         """Cererea de verificare necesită autentificare."""

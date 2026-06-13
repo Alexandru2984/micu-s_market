@@ -49,6 +49,12 @@ class CustomUserCreationForm(UserCreationForm):
             user.save()
         return user
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '').strip().lower()
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('Există deja un cont cu această adresă de email.')
+        return email
+
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
@@ -175,6 +181,15 @@ class UserProfileForm(forms.ModelForm):
                 raise forms.ValidationError('Fişierul nu este o imagine validă.')
         
         return avatar
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '').strip().lower()
+        queryset = User.objects.filter(email__iexact=email)
+        if self.user:
+            queryset = queryset.exclude(pk=self.user.pk)
+        if queryset.exists():
+            raise forms.ValidationError('Există deja un cont cu această adresă de email.')
+        return email
 
 
 class UserReportForm(forms.ModelForm):
