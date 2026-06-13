@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Comandă promovare - Micu's Market{% endblock %}
+
+{% block content %}
+<section class="container" style="padding: 2rem 0;">
+    <h1>Comandă promovare</h1>
+    <p><strong>Anunț:</strong> {{ order.listing.title }}</p>
+    <p><strong>Plan:</strong> {{ order.plan.name }}</p>
+    <p><strong>Total:</strong> {{ order.amount }} {{ order.currency }}</p>
+    <p><strong>Status:</strong> {{ order.get_status_display }}</p>
+    <p style="color: #64748b;">Gateway-ul de plată se poate conecta peste această comandă. Momentan plata se marchează din admin.</p>
+</section>
+{% endblock %}

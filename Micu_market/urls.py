@@ -25,6 +25,7 @@ urlpatterns = [
     path("notifications/", include(("notifications.urls", "notifications"), namespace="notifications")),
     path("dashboard/", include(("dashboard.urls", "dashboard"), namespace="dashboard")),
     path("api/", include(("api.urls", "api"), namespace="api")),
+    path("billing/", include(("billing.urls", "billing"), namespace="billing")),
 ]
 
 if settings.DEBUG:

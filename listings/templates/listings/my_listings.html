@@ -163,6 +163,9 @@
                                 <a href="{% url 'listings:upload_images' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="Gestionează imagini">
                                     <i class="fas fa-images"></i>
                                 </a>
+                                <a href="{% url 'billing:promote_listing' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Promovează">
+                                    <i class="fas fa-bolt"></i>
+                                </a>
                                 <a href="{% url 'listings:delete' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Șterge">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>

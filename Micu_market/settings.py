@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     "dashboard",
     "api",
     "audit.apps.AuditConfig",
+    "billing.apps.BillingConfig",
     # "ws",  # doar dacă ai app ws
 ]
 
