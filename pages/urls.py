@@ -9,9 +9,9 @@ from .views import home_view
 urlpatterns = [
 
 	path("healthz", healthcheck_view, name="healthcheck"),
-	path("home", home_view),
-	path("about", about_view),
-	path("contact", contact_view),
-	path("terms", terms_view),
-	path("privacy", privacy_view),
+	path("home", home_view, name="home"),
+	path("about", about_view, name="about"),
+	path("contact", contact_view, name="contact"),
+	path("terms", terms_view, name="terms"),
+	path("privacy", privacy_view, name="privacy"),
 ]

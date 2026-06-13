@@ -53,6 +53,20 @@ class ProjectUrlSecurityTests(TestCase):
         self.assertContains(response, '<link rel="manifest" href="/manifest.webmanifest">')
         self.assertContains(response, '/static/js/pwa.js')
 
+    def test_home_includes_cookie_consent(self):
+        response = self.client.get(reverse('listings:home'))
+
+        self.assertContains(response, 'id="cookieConsent"')
+        self.assertContains(response, reverse('pages:privacy'))
+        self.assertContains(response, '/static/js/cookie-consent.js')
+
+    def test_privacy_page_documents_cookie_policy(self):
+        response = self.client.get(reverse('pages:privacy'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Politica de confidențialitate')
+        self.assertContains(response, 'Cookie-uri')
+
 
 class DoctorCommandTests(TestCase):
     def test_doctor_checks_core_services(self):

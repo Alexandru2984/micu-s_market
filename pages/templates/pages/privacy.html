@@ -1,11 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pages/privacy</title>
-</head>
-<body>
-    <h1>pages/privacy</h1>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Politica de confidențialitate - Micu's Market{% endblock %}
+{% block meta_description %}Politica de confidențialitate Micu's Market: date colectate, cookie-uri, securitate, notificări și drepturile utilizatorilor.{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="content-page">
+        <h1>Politica de confidențialitate</h1>
+        <p>Micu's Market colectează doar datele necesare pentru cont, publicarea anunțurilor, mesagerie, favorite, notificări și siguranța platformei.</p>
+
+        <h2>Date folosite</h2>
+        <p>Putem procesa nume, email, telefon, locație, avatar, conținutul anunțurilor, mesajele trimise prin platformă, rapoarte de siguranță și date tehnice precum adresa IP, user agent și jurnale de securitate.</p>
+
+        <h2>Cookie-uri</h2>
+        <p>Folosim cookie-uri esențiale pentru autentificare, sesiuni, protecție CSRF și preferințe. Acceptul pentru banner este salvat local în browser. Nu activăm cookie-uri de marketing fără o integrare dedicată și o bază legală clară.</p>
+
+        <h2>Emailuri și notificări</h2>
+        <p>Trimitem emailuri operaționale pentru confirmarea contului, resetarea parolei și notificări importante despre mesaje, recenzii, rapoarte sau actualizări ale anunțurilor.</p>
+
+        <h2>Securitate</h2>
+        <p>Aplicăm controale precum hashing puternic al parolelor, anteturi de securitate, audit pentru acțiuni sensibile, limitări de rată și verificări operaționale pentru serviciile critice.</p>
+
+        <h2>Drepturile tale</h2>
+        <p>Poți cere acces, corectare sau ștergere pentru datele tale, în limita obligațiilor legale și a nevoilor de siguranță ale platformei.</p>
+    </section>
+</div>
+{% endblock %}

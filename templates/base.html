@@ -55,12 +55,21 @@
     </main>
     
     {% include "partials/footer.html" %}
+
+    <div class="cookie-consent" id="cookieConsent" hidden>
+        <div class="cookie-consent__text">
+            Folosim cookie-uri esențiale pentru autentificare, securitate și preferințe. Detalii în
+            <a href="{% url 'pages:privacy' %}">politica de confidențialitate</a>.
+        </div>
+        <button type="button" class="cookie-consent__button" id="cookieConsentAccept">Accept</button>
+    </div>
     
     <!-- JavaScript -->
     <script src="{% static 'js/image-compression.js' %}"></script>
     <script src="{% static 'js/detail.js' %}"></script>
     <script src="{% static 'js/modals.js' %}"></script>
     <script src="{% static 'js/pwa.js' %}" defer></script>
+    <script src="{% static 'js/cookie-consent.js' %}" defer></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
