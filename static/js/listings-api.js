@@ -98,6 +98,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const img = document.createElement('img');
             img.src = listing.main_image;
             img.alt = listing.title;
+            img.loading = 'lazy';
+            img.decoding = 'async';
             imageWrap.appendChild(img);
         } else {
             const noImage = document.createElement('div');

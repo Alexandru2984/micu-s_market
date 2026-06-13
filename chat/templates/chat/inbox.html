@@ -22,7 +22,7 @@
                                 <!-- Avatar celuilalt participant -->
                                 <div class="participant-avatar">
                                     {% if conversation.other_participant.profile.avatar %}
-                                        <img src="{{ conversation.other_participant.profile.avatar.url }}" alt="{{ conversation.other_participant.username }}">
+                                        <img src="{{ conversation.other_participant.profile.avatar.url }}" alt="{{ conversation.other_participant.username }}" loading="lazy" decoding="async">
                                     {% else %}
                                         <div class="default-avatar">
                                             <i class="fas fa-user"></i>

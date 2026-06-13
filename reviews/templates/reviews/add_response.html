@@ -18,7 +18,7 @@
                     <div class="reviewer-info">
                         <div class="reviewer-avatar">
                             {% if review.reviewer.profile.avatar %}
-                                <img src="{{ review.reviewer.profile.avatar.url }}" alt="{{ review.reviewer.username }}">
+                                <img src="{{ review.reviewer.profile.avatar.url }}" alt="{{ review.reviewer.username }}" loading="lazy" decoding="async">
                             {% else %}
                                 <div class="small-avatar">
                                     <i class="fas fa-user"></i>

@@ -409,7 +409,7 @@
                             <a href="{% url 'listings:detail' listing.slug %}" class="listing-card">
                                 <div class="listing-image">
                                     {% if listing.images.first %}
-                                        <img src="{{ listing.images.first.image.url }}" alt="{{ listing.title }}">
+                                        <img src="{{ listing.images.first.image.url }}" alt="{{ listing.title }}" loading="lazy" decoding="async">
                                     {% else %}
                                         <div class="no-image">
                                             <i class="fas fa-image"></i>

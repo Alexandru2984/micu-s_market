@@ -31,7 +31,7 @@
             <div class="flex items-center space-x-4">
                 <div class="flex-shrink-0">
                     {% if listing.main_image %}
-                        <img src="{{ listing.main_image.image.url }}" alt="{{ listing.title }}" class="w-16 h-16 object-cover rounded-lg border">
+                        <img src="{{ listing.main_image.image.url }}" alt="{{ listing.title }}" class="w-16 h-16 object-cover rounded-lg border" loading="lazy" decoding="async">
                     {% else %}
                         <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
                             <i class="fas fa-image text-gray-400"></i>
@@ -56,7 +56,7 @@
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {% for image in listing.images.all %}
                         <div class="relative group">
-                            <img src="{{ image.image.url }}" alt="{{ image.alt_text }}" class="w-full h-32 object-cover rounded-lg border">
+                            <img src="{{ image.image.url }}" alt="{{ image.alt_text }}" class="w-full h-32 object-cover rounded-lg border" loading="lazy" decoding="async">
                             <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center">
                                 <div class="opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button onclick="deleteImage({{ image.id }})" class="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">

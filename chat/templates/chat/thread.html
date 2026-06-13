@@ -18,7 +18,7 @@
                 <div class="conversation-info">
                     <div class="participant-avatar">
                         {% if other_participant.profile.avatar %}
-                            <img src="{{ other_participant.profile.avatar.url }}" alt="{{ other_participant.username }}">
+                            <img src="{{ other_participant.profile.avatar.url }}" alt="{{ other_participant.username }}" loading="lazy" decoding="async">
                         {% else %}
                             <div class="default-avatar">
                                 <i class="fas fa-user"></i>
@@ -51,7 +51,7 @@
                     <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
                         <div class="message-avatar">
                             {% if message.sender.profile.avatar %}
-                                <img src="{{ message.sender.profile.avatar.url }}" alt="{{ message.sender.username }}">
+                                <img src="{{ message.sender.profile.avatar.url }}" alt="{{ message.sender.username }}" loading="lazy" decoding="async">
                             {% else %}
                                 <div class="small-avatar">
                                     <i class="fas fa-user"></i>
@@ -69,7 +69,7 @@
                                         {% for attachment in message.attachments.all %}
                                             <div class="attachment">
                                                 {% if attachment.file_type == 'image' %}
-                                                    <img src="{{ attachment.download_url }}" alt="{{ attachment.filename }}" class="attachment-image">
+                                                    <img src="{{ attachment.download_url }}" alt="{{ attachment.filename }}" class="attachment-image" loading="lazy" decoding="async">
                                                 {% else %}
                                                     <a href="{{ attachment.download_url }}" target="_blank" class="attachment-file">
                                                         <i class="fas fa-file"></i>
@@ -257,7 +257,7 @@ function addMessageToUI(message) {
                         const attachmentUrl = escapeHTML(att.download_url || att.url || '#');
                         const attachmentName = escapeHTML(att.filename || 'attachment');
                         return att.file_type === 'image'
-                            ? `<div class="message-attachments"><img src="${attachmentUrl}" alt="${attachmentName}" class="attachment-image"></div>`
+                            ? `<div class="message-attachments"><img src="${attachmentUrl}" alt="${attachmentName}" class="attachment-image" loading="lazy" decoding="async"></div>`
                             : `<div class="message-attachments"><a href="${attachmentUrl}" target="_blank" class="attachment-file"><i class="fas fa-file"></i> ${attachmentName}</a></div>`;
                     }).join('')}
                 </div>

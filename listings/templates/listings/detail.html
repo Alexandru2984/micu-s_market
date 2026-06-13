@@ -16,7 +16,7 @@
             <div class="image-gallery">
                 {% if listing.images.all %}
                     <div class="main-image">
-                        <img id="mainImage" src="{{ listing.main_image.url }}" alt="{{ listing.title }}">
+                        <img id="mainImage" src="{{ listing.main_image.url }}" alt="{{ listing.title }}" loading="eager" decoding="async" fetchpriority="high">
                         {% if listing.is_promoted %}
                             <div class="featured-badge">
                                 <i class="fas fa-star"></i> Recomandat
@@ -29,6 +29,8 @@
                         {% for image in listing.images.all %}
                         <img src="{{ image.image.url }}" 
                              alt="{{ image.alt_text }}" 
+                             loading="lazy"
+                             decoding="async"
                              class="thumbnail {% if forloop.first %}active{% endif %}"
                              onclick="changeMainImage('{{ image.image.url }}', this)">
                         {% endfor %}
@@ -162,7 +164,7 @@
             <div class="seller-info">
                 <div class="seller-avatar">
                     {% if listing.owner.userprofile.avatar %}
-                        <img src="{{ listing.owner.userprofile.avatar.url }}" alt="{{ listing.owner.get_full_name }}">
+                        <img src="{{ listing.owner.userprofile.avatar.url }}" alt="{{ listing.owner.get_full_name }}" loading="lazy" decoding="async">
                     {% else %}
                         <div class="default-avatar">
                             <i class="fas fa-user"></i>
@@ -205,7 +207,7 @@
             <a href="{% url 'listings:detail' similar.slug %}" class="listing-card">
                 <div class="listing-image">
                     {% if similar.images.first %}
-                        <img src="{{ similar.images.first.image.url }}" alt="{{ similar.title }}">
+                        <img src="{{ similar.images.first.image.url }}" alt="{{ similar.title }}" loading="lazy" decoding="async">
                     {% else %}
                         <div class="no-image">
                             <i class="fas fa-image"></i>

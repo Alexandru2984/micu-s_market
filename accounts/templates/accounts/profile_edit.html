@@ -33,7 +33,7 @@
                     
                     <div class="avatar-upload-section">
                         {% if profile.avatar %}
-                            <img src="{{ profile.avatar.url }}" alt="Avatar actual" class="current-avatar">
+                            <img src="{{ profile.avatar.url }}" alt="Avatar actual" class="current-avatar" loading="lazy" decoding="async">
                         {% else %}
                             <div class="default-avatar-large">
                                 <i class="fas fa-user"></i>

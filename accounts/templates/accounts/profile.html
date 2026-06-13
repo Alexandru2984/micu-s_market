@@ -15,7 +15,7 @@
                 <div class="d-flex align-items-center">
                     <div class="avatar-container">
                         {% if profile.avatar %}
-                            <img src="{{ profile.avatar.url }}" alt="Avatar" class="profile-avatar">
+                            <img src="{{ profile.avatar.url }}" alt="Avatar" class="profile-avatar" loading="lazy" decoding="async">
                         {% else %}
                             <div class="default-avatar">
                                 <i class="fas fa-user"></i>

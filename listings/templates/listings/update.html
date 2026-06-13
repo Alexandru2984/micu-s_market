@@ -229,7 +229,7 @@
                                 <!-- Current Image Display -->
                                 {% if form.instance.image %}
                                     <div class="current-image-display">
-                                        <img src="{{ form.instance.image.url }}" alt="{{ form.instance.alt_text }}">
+                                        <img src="{{ form.instance.image.url }}" alt="{{ form.instance.alt_text }}" loading="lazy" decoding="async">
                                         <div class="current-image-label">
                                             <i class="fas fa-image"></i>
                                             Imagine curentă

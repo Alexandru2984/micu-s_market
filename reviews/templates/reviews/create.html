@@ -17,7 +17,7 @@
                 <div class="user-info">
                     <div class="user-avatar">
                         {% if reviewed_user.profile.avatar %}
-                            <img src="{{ reviewed_user.profile.avatar.url }}" alt="{{ reviewed_user.username }}">
+                            <img src="{{ reviewed_user.profile.avatar.url }}" alt="{{ reviewed_user.username }}" loading="lazy" decoding="async">
                         {% else %}
                             <div class="default-avatar">
                                 <i class="fas fa-user"></i>
