@@ -29,6 +29,8 @@ class ProjectUrlSecurityTests(TestCase):
         self.assertEqual(response['Permissions-Policy'], 'geolocation=(), microphone=(), camera=()')
         self.assertEqual(response['X-Permitted-Cross-Domain-Policies'], 'none')
         self.assertEqual(response['Cross-Origin-Resource-Policy'], 'same-site')
+        self.assertEqual(response['Cross-Origin-Opener-Policy'], 'same-origin')
+        self.assertEqual(response['X-Download-Options'], 'noopen')
 
     def test_manifest_endpoint_returns_pwa_metadata(self):
         response = self.client.get(reverse('manifest'))

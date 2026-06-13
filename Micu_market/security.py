@@ -10,6 +10,8 @@ class SecurityHeadersMiddleware:
         response.setdefault("Permissions-Policy", getattr(settings, "PERMISSIONS_POLICY", "geolocation=(), microphone=(), camera=()"))
         response.setdefault("X-Permitted-Cross-Domain-Policies", "none")
         response.setdefault("Cross-Origin-Resource-Policy", getattr(settings, "CROSS_ORIGIN_RESOURCE_POLICY", "same-site"))
+        response.setdefault("Cross-Origin-Opener-Policy", getattr(settings, "CROSS_ORIGIN_OPENER_POLICY", "same-origin"))
+        response.setdefault("X-Download-Options", "noopen")
 
         csp_report_only = getattr(settings, "CONTENT_SECURITY_POLICY_REPORT_ONLY", "")
         if csp_report_only:

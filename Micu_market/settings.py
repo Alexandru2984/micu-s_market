@@ -212,6 +212,7 @@ SESSION_COOKIE_SAMESITE = os.getenv("SESSION_COOKIE_SAMESITE", "Lax")
 CSRF_COOKIE_SAMESITE = os.getenv("CSRF_COOKIE_SAMESITE", "Lax")
 PERMISSIONS_POLICY = os.getenv("PERMISSIONS_POLICY", "geolocation=(), microphone=(), camera=()")
 CROSS_ORIGIN_RESOURCE_POLICY = os.getenv("CROSS_ORIGIN_RESOURCE_POLICY", "same-site")
+CROSS_ORIGIN_OPENER_POLICY = os.getenv("CROSS_ORIGIN_OPENER_POLICY", "same-origin")
 CONTENT_SECURITY_POLICY_REPORT_ONLY = os.getenv("CONTENT_SECURITY_POLICY_REPORT_ONLY", "")
 
 # Setări HTTPS active doar când nu suntem în dev local
