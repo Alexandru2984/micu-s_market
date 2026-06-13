@@ -74,6 +74,7 @@ sudo install -d -o www-data -g adm -m 750 /var/log/micu_market
 ```bash
 cd /home/micu/Micu_market
 git pull --ff-only
+RUN_DOCTOR=0 scripts/preflight_release.sh
 APP_BASE_URL=https://market.micutu.com scripts/deploy_release.sh
 ```
 
@@ -102,6 +103,14 @@ To verify SMTP delivery explicitly, pass a real inbox:
 ```bash
 venv/bin/python manage.py doctor --settings=Micu_market.settings_production --send-test-email you@example.com
 ```
+
+Rollback to a previous ref:
+
+```bash
+ROLLBACK_CONFIRM=1 APP_BASE_URL=https://market.micutu.com scripts/rollback_release.sh <commit-or-tag>
+```
+
+By default rollback creates a PostgreSQL backup, skips migrations, restarts the service, and runs smoke checks. Set `RUN_MIGRATE=1` only after checking that the target code and database migrations are compatible.
 
 ## systemd service
 
