@@ -7,16 +7,20 @@ ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,market.mi
 
 # HTTPS settings
 SECURE_SSL_REDIRECT = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+if os.getenv('DJANGO_USE_X_FORWARDED_PROTO', 'False') == 'True':
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_BROWSER_XSS_FILTER = True
 
 # Static files cu WhiteNoise
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STORAGES = {
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 # Database production (din environment variables)
 DATABASES = {
@@ -31,19 +35,27 @@ DATABASES = {
 }
 
 # Logging
+LOG_DIR = os.getenv('DJANGO_LOG_DIR', '/var/log/micu_market')
+LOG_FILE = os.path.join(LOG_DIR, 'django.log')
+LOG_TO_FILE = os.getenv('DJANGO_LOG_TO_FILE', 'False') == 'True'
+LOG_HANDLER = {
+    'level': 'ERROR',
+    'class': 'logging.FileHandler',
+    'filename': LOG_FILE,
+} if LOG_TO_FILE else {
+    'level': 'ERROR',
+    'class': 'logging.StreamHandler',
+}
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': '/var/log/micu_market/django.log',
-        },
+        'default': LOG_HANDLER,
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['default'],
             'level': 'ERROR',
             'propagate': True,
         },
