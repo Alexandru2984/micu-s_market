@@ -1,0 +1,140 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Django tests / Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.13"
+          - "3.14"
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: micu_market
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d micu_market"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DJANGO_SETTINGS_MODULE: Micu_market.settings
+      DJANGO_SECRET_KEY: ci-secret-key-for-micu-market-tests-change-in-prod-2026
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: 127.0.0.1,localhost,testserver
+      CSRF_TRUSTED_ORIGINS: https://market.micutu.com
+      EMAIL_BACKEND: django.core.mail.backends.locmem.EmailBackend
+      DB_NAME: micu_market
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_HOST: 127.0.0.1
+      DB_PORT: "5432"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pip-audit
+
+      - name: Django system check
+        run: python manage.py check --settings=Micu_market.settings
+
+      - name: Check migrations are committed
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Run tests
+        run: python manage.py test --settings=Micu_market.settings
+
+      - name: Audit Python dependencies
+        run: pip-audit -r requirements.txt
+
+  deploy-check:
+    name: Django deploy checks
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: micu_market
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d micu_market"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DJANGO_SETTINGS_MODULE: Micu_market.settings_production
+      DJANGO_SECRET_KEY: ci-production-check-secret-key-for-micu-market-2026
+      DJANGO_DEBUG: "0"
+      DJANGO_ALLOWED_HOSTS: market.micutu.com
+      CSRF_TRUSTED_ORIGINS: https://market.micutu.com
+      DJANGO_ADMIN_URL: portal-secret-micu/
+      DJANGO_USE_X_FORWARDED_PROTO: "True"
+      DJANGO_TRUSTED_PROXY_CHAIN_CONFIGURED: "True"
+      DJANGO_LOG_TO_FILE: "False"
+      EMAIL_BACKEND: django.core.mail.backends.locmem.EmailBackend
+      DB_NAME: micu_market
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_HOST: 127.0.0.1
+      DB_PORT: "5432"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run deploy checks
+        run: python manage.py check --deploy --settings=Micu_market.settings_production
