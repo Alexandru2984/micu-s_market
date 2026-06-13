@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Listing, ListingImage
+from .models import Listing, ListingImage, ListingReport
 from categories.models import Category
 
 
@@ -146,3 +146,27 @@ ListingImageFormSet = modelformset_factory(
     validate_min=False,  # Nu cere imagini obligatorii
     min_num=0  # Minim 0 imagini
 )
+
+
+class ListingReportForm(forms.ModelForm):
+    class Meta:
+        model = ListingReport
+        fields = ["reason", "details"]
+        widgets = {
+            "reason": forms.Select(attrs={"class": "form-control"}),
+            "details": forms.Textarea(attrs={
+                "class": "form-control",
+                "rows": 4,
+                "placeholder": "Adaugă detalii utile pentru moderare (opțional)",
+            }),
+        }
+        labels = {
+            "reason": "Motiv",
+            "details": "Detalii",
+        }
+
+    def clean_details(self):
+        details = self.cleaned_data.get("details", "").strip()
+        if len(details) > 1000:
+            raise ValidationError("Detaliile nu pot depăși 1000 de caractere.")
+        return details

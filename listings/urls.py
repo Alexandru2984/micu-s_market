@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.home_view, name='home'),
     path('anunturi/', views.listing_list_view, name='list'),
     path('anunt/<slug:slug>/', views.listing_detail_view, name='detail'),
+    path('anunt/<slug:slug>/raporteaza/', views.report_listing_view, name='report'),
     path('adauga/', views.listing_create_view, name='create'),
     path('anunt/<slug:slug>/editeaza/', views.listing_update_view, name='update'),
     path('anunt/<slug:slug>/sterge/', views.listing_delete_view, name='delete'),

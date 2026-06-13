@@ -3,10 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
+from django.views.decorators.http import require_POST
 from django_ratelimit.decorators import ratelimit
 import logging
-from .models import Listing, ListingImage
-from .forms import ListingForm, ListingImageFormSet
+from .models import Listing, ListingImage, ListingReport
+from .forms import ListingForm, ListingImageFormSet, ListingReportForm
 from categories.models import Category
 from favorites.models import Favorite
 
@@ -160,8 +161,41 @@ def listing_detail_view(request, slug):
         'listing': listing,
         'similar_listings': similar_listings,
         'is_favorited': is_favorited,
+        'report_form': ListingReportForm(),
     }
     return render(request, 'listings/detail.html', context)
+
+
+@login_required
+@require_POST
+def report_listing_view(request, slug):
+    """Creează un raport de moderare pentru un anunț."""
+    listing = get_object_or_404(Listing, slug=slug, status='active')
+
+    if listing.owner == request.user:
+        messages.error(request, "Nu poți raporta propriul anunț.")
+        return redirect('listings:detail', slug=listing.slug)
+
+    active_report_exists = ListingReport.objects.filter(
+        listing=listing,
+        reporter=request.user,
+        status__in=["pending", "reviewed"],
+    ).exists()
+    if active_report_exists:
+        messages.info(request, "Ai deja un raport activ pentru acest anunț.")
+        return redirect('listings:detail', slug=listing.slug)
+
+    form = ListingReportForm(request.POST)
+    if form.is_valid():
+        report = form.save(commit=False)
+        report.listing = listing
+        report.reporter = request.user
+        report.save()
+        messages.success(request, "Raportul a fost trimis către moderare.")
+    else:
+        messages.error(request, "Raportul nu a putut fi trimis. Verifică motivul selectat.")
+
+    return redirect('listings:detail', slug=listing.slug)
 
 def process_images(request, listing):
     """Procesează și salvează imaginile pentru un anunț (maxim 10)"""

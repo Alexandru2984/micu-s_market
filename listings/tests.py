@@ -8,7 +8,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from io import BytesIO
 from PIL import Image as PilImage
 
-from .models import Listing
+from .models import Listing, ListingReport
 from categories.models import Category
 
 User = get_user_model()
@@ -119,6 +119,53 @@ class ListingCRUDTestCase(TestCase):
         # Anunțul inactiv nu trebuie să apară în response
         if response.status_code == 200:
             self.assertNotIn(b'Anun\xc8\x9b inactiv', response.content)
+
+    def test_report_listing_requires_login(self):
+        """Raportarea unui anunț necesită autentificare."""
+        response = self.client.post(
+            reverse('listings:report', kwargs={'slug': self.listing.slug}),
+            {'reason': 'scam', 'details': 'suspect'},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(ListingReport.objects.exists())
+
+    def test_owner_cannot_report_own_listing(self):
+        """Proprietarul nu își poate raporta propriul anunț."""
+        self.client.login(username='seller', password='SellerPass123!')
+        response = self.client.post(
+            reverse('listings:report', kwargs={'slug': self.listing.slug}),
+            {'reason': 'scam', 'details': 'suspect'},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(ListingReport.objects.exists())
+
+    def test_authenticated_user_can_report_listing(self):
+        """Un utilizator autentificat poate raporta un anunț străin."""
+        self.client.login(username='other', password='OtherPass123!')
+        response = self.client.post(
+            reverse('listings:report', kwargs={'slug': self.listing.slug}),
+            {'reason': 'misleading', 'details': 'Prețul pare fals.'},
+        )
+        self.assertEqual(response.status_code, 302)
+        report = ListingReport.objects.get()
+        self.assertEqual(report.listing, self.listing)
+        self.assertEqual(report.reporter, self.other_user)
+        self.assertEqual(report.reason, 'misleading')
+
+    def test_duplicate_active_report_is_prevented(self):
+        """Utilizatorul nu poate crea două rapoarte active pentru același anunț."""
+        ListingReport.objects.create(
+            listing=self.listing,
+            reporter=self.other_user,
+            reason='scam',
+        )
+        self.client.login(username='other', password='OtherPass123!')
+        response = self.client.post(
+            reverse('listings:report', kwargs={'slug': self.listing.slug}),
+            {'reason': 'duplicate', 'details': ''},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(ListingReport.objects.count(), 1)
 
 
 class ListingImageValidationTestCase(TestCase):

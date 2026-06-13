@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Listing, ListingImage
+from .models import Listing, ListingImage, ListingReport
 
 class ListingImageInline(admin.TabularInline):
     model = ListingImage
@@ -57,6 +57,53 @@ class ListingAdmin(admin.ModelAdmin):
     def data_creare(self, obj):
         return obj.created_at.strftime('%d.%m.%Y %H:%M')
     data_creare.short_description = 'Creat la'
+
+
+@admin.register(ListingReport)
+class ListingReportAdmin(admin.ModelAdmin):
+    list_display = (
+        "listing",
+        "reporter",
+        "reason",
+        "status",
+        "created_at",
+    )
+    list_filter = ("status", "reason", "created_at")
+    search_fields = (
+        "listing__title",
+        "reporter__username",
+        "reporter__email",
+        "details",
+        "moderator_note",
+    )
+    readonly_fields = ("listing", "reporter", "reason", "details", "created_at", "updated_at")
+    actions = ("mark_reviewed", "mark_dismissed", "mark_action_taken")
+    autocomplete_fields = ("listing", "reporter")
+
+    fieldsets = (
+        ("Raport", {
+            "fields": ("listing", "reporter", "reason", "details"),
+        }),
+        ("Moderare", {
+            "fields": ("status", "moderator_note"),
+        }),
+        ("Sistem", {
+            "fields": ("created_at", "updated_at"),
+            "classes": ("collapse",),
+        }),
+    )
+
+    @admin.action(description="Marchează ca verificat")
+    def mark_reviewed(self, request, queryset):
+        queryset.update(status="reviewed")
+
+    @admin.action(description="Respinge raportul")
+    def mark_dismissed(self, request, queryset):
+        queryset.update(status="dismissed")
+
+    @admin.action(description="Marchează cu acțiune aplicată")
+    def mark_action_taken(self, request, queryset):
+        queryset.update(status="action_taken")
 
 @admin.register(ListingImage)
 class ListingImageAdmin(admin.ModelAdmin):

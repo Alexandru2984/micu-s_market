@@ -123,6 +123,28 @@
                         <i class="fas fa-share-alt"></i> Partajează
                     </button>
                 </div>
+
+                <div class="report-panel">
+                    {% if user.is_authenticated and user != listing.owner %}
+                        <details>
+                            <summary><i class="fas fa-flag"></i> Raportează anunțul</summary>
+                            <form method="post" action="{% url 'listings:report' listing.slug %}" class="report-form">
+                                {% csrf_token %}
+                                {{ report_form.reason.label_tag }}
+                                {{ report_form.reason }}
+                                {{ report_form.details.label_tag }}
+                                {{ report_form.details }}
+                                <button type="submit" class="btn btn-outline">
+                                    <i class="fas fa-paper-plane"></i> Trimite raport
+                                </button>
+                            </form>
+                        </details>
+                    {% elif not user.is_authenticated %}
+                        <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="report-login">
+                            <i class="fas fa-flag"></i> Autentifică-te pentru a raporta anunțul
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
         
@@ -253,6 +275,41 @@
 
 #favorite-detail-btn span {
     font-weight: 500;
+}
+
+.report-panel {
+    margin-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 1rem;
+}
+
+.report-panel summary,
+.report-login {
+    color: #64748b;
+    cursor: pointer;
+    font-size: 0.95rem;
+    text-decoration: none;
+}
+
+.report-panel summary:hover,
+.report-login:hover {
+    color: #dc2626;
+}
+
+.report-form {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.report-form label {
+    color: #334155;
+    font-weight: 600;
+}
+
+.report-form textarea,
+.report-form select {
+    width: 100%;
 }
 </style>
 {% endblock %}

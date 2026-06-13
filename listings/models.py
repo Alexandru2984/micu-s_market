@@ -113,3 +113,62 @@ class ListingImage(models.Model):
                 if img.height > 800 or img.width > 800:
                     img.thumbnail((800, 800), Image.Resampling.LANCZOS)
                     img.save(img_path, optimize=True, quality=85)
+
+
+class ListingReport(models.Model):
+    REASON_CHOICES = [
+        ("scam", "Înșelătorie"),
+        ("prohibited", "Produs interzis"),
+        ("misleading", "Informații false"),
+        ("offensive", "Conținut ofensator"),
+        ("duplicate", "Anunț duplicat"),
+        ("other", "Alt motiv"),
+    ]
+
+    STATUS_CHOICES = [
+        ("pending", "În așteptare"),
+        ("reviewed", "Verificat"),
+        ("dismissed", "Respins"),
+        ("action_taken", "Acțiune aplicată"),
+    ]
+
+    listing = models.ForeignKey(
+        Listing,
+        on_delete=models.CASCADE,
+        related_name="reports",
+        verbose_name="Anunț",
+    )
+    reporter = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="listing_reports",
+        verbose_name="Raportat de",
+    )
+    reason = models.CharField(max_length=30, choices=REASON_CHOICES, verbose_name="Motiv")
+    details = models.TextField(blank=True, verbose_name="Detalii")
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending",
+        verbose_name="Status",
+    )
+    moderator_note = models.TextField(blank=True, verbose_name="Notă moderator")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creat la")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Actualizat la")
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Raport anunț"
+        verbose_name_plural = "Rapoarte anunțuri"
+        indexes = [
+            models.Index(fields=["status", "-created_at"]),
+            models.Index(fields=["listing", "status"]),
+            models.Index(fields=["reporter", "-created_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.get_reason_display()} - {self.listing.title}"
+
+    @property
+    def is_active(self):
+        return self.status in {"pending", "reviewed"}
