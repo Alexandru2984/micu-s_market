@@ -16,3 +16,9 @@ class ProjectUrlSecurityTests(TestCase):
         response = self.client.get(reverse('healthcheck'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['status'], 'ok')
+
+    def test_security_headers_are_present(self):
+        response = self.client.get(reverse('healthcheck'))
+        self.assertEqual(response['Permissions-Policy'], 'geolocation=(), microphone=(), camera=()')
+        self.assertEqual(response['X-Permitted-Cross-Domain-Policies'], 'none')
+        self.assertEqual(response['Cross-Origin-Resource-Policy'], 'same-site')
