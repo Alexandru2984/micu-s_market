@@ -61,6 +61,7 @@ def create_review_view(request, username, listing_slug=None):
     reviewed_user = get_object_or_404(User, username=username)
     listing = None
     
+    listing_slug = listing_slug or request.GET.get('listing')
     if listing_slug:
         listing = get_object_or_404(Listing, slug=listing_slug)
     
@@ -102,7 +103,7 @@ def create_review_view(request, username, listing_slug=None):
         'reviewed_user': reviewed_user,
         'listing': listing,
     }
-    return render(request, 'reviews/create_review.html', context)
+    return render(request, 'reviews/create.html', context)
 
 @login_required
 def add_response_view(request, review_id):
@@ -151,7 +152,7 @@ def edit_review_view(request, review_id):
         'review': review,
         'is_edit': True,
     }
-    return render(request, 'reviews/create_review.html', context)
+    return render(request, 'reviews/create.html', context)
 
 @login_required
 @require_POST

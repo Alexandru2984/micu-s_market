@@ -115,7 +115,7 @@ class ListingCRUDTestCase(TestCase):
             city='Cluj',
             status='inactive'
         )
-        response = self.client.get(reverse('home'))  # pages:home
+        response = self.client.get(reverse('listings:home'))  # listings:home
         # Anunțul inactiv nu trebuie să apară în response
         if response.status_code == 200:
             self.assertNotIn(b'Anun\xc8\x9b inactiv', response.content)

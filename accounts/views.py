@@ -27,7 +27,7 @@ def register_view(request):
     else:
         form = CustomUserCreationForm()
     
-    return render(request, 'accounts/register.html', {'form': form})
+    return render(request, 'account/signup.html', {'form': form})
 
 def login_view(request):
     """Autentificare utilizator"""

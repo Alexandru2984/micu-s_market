@@ -64,7 +64,8 @@ class ReviewSecurityTestCase(TestCase):
             reviewed_user=self.reviewed,
             listing=self.listing,
             title='Primul review',
-            content='Bun',
+            comment='Bun',
+            transaction_type='purchase',
             rating=4
         )
         self.client.login(username='reviewer', password='ReviewPass123!')
@@ -104,7 +105,8 @@ class ReviewSecurityTestCase(TestCase):
             reviewed_user=self.reviewed,
             listing=self.listing,
             title='Test review',
-            content='Test',
+            comment='Test',
+            transaction_type='purchase',
             rating=3
         )
         # Alt user încearcă să șteargă
