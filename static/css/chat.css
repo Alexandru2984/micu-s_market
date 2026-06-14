@@ -199,17 +199,43 @@
 .empty-state p { margin: 0 0 var(--space-5); }
 
 /* ---------- Conversație (real-time) ---------- */
+/* App-shell: pagina de conversație umple exact viewport-ul (header natural +
+   chat care ocupă restul), fără offset-uri magice și fără scroll de pagină.
+   Doar lista de mesaje derulează; compozitorul rămâne deasupra tastaturii. */
+body.chat-page {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+}
+body.chat-page .main-header {
+    position: static;
+    flex: 0 0 auto;
+}
+body.chat-page .main-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+}
+body.chat-page .main-footer,
+body.chat-page .cookie-consent { display: none; }
+/* Pe mobil, header-ul nu se mai desface pe coloană (ocupa prea mult) */
+@media (max-width: 768px) {
+    body.chat-page .header-content { flex-direction: row; flex-wrap: wrap; gap: 0.5rem; }
+}
+
 .chat-conversation {
     display: flex;
     flex-direction: column;
-    height: calc(100dvh - 150px);
-    min-height: 460px;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
     max-width: 900px;
-    margin: var(--space-5) auto;
     background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
     overflow: hidden;
 }
 
@@ -286,7 +312,10 @@
 
 .chat-conversation__messages {
     flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
     padding: var(--space-4);
     display: flex;
     flex-direction: column;
@@ -430,7 +459,8 @@
     background: var(--surface-2);
     color: var(--text);
     font-family: inherit;
-    font-size: var(--text-sm);
+    /* 16px: previne zoom-ul automat pe iOS/Android la focus în input */
+    font-size: 16px;
     line-height: 1.4;
     transition: border-color var(--transition), background var(--transition);
 }
@@ -502,14 +532,14 @@
 /* Responsive */
 @media (max-width: 640px) {
     .chat-conversation {
-        height: calc(100dvh - 110px);
-        margin: 0;
-        border-radius: 0;
+        max-width: none;
         border-left: 0;
         border-right: 0;
-        max-width: none;
     }
     .chat-msg { max-width: 85%; }
     .chat-conversation__view span { display: none; }
+    .chat-conversation__header { padding: var(--space-2) var(--space-3); }
+    .chat-conversation__messages { padding: var(--space-3); }
+    .chat-conversation__composer { padding: var(--space-2) var(--space-3); }
     .chat-container { margin: var(--space-4) auto; }
 }
