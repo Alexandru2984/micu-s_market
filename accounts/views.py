@@ -16,6 +16,7 @@ from audit.utils import audit_log
 
 User = get_user_model()
 
+@ratelimit(key='ip', rate=settings.AUTH_REGISTER_RATE, method='POST', block=True)
 def register_view(request):
     """Înregistrare utilizator nou"""
     if request.user.is_authenticated:
@@ -33,6 +34,8 @@ def register_view(request):
     
     return render(request, 'account/signup.html', {'form': form})
 
+@ratelimit(key='ip', rate=settings.AUTH_LOGIN_IP_RATE, method='POST', block=True)
+@ratelimit(key='post:username', rate=settings.AUTH_LOGIN_USER_RATE, method='POST', block=True)
 def login_view(request):
     """Autentificare utilizator"""
     if request.user.is_authenticated:
