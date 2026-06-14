@@ -129,11 +129,33 @@ class DeploymentCheckTests(TestCase):
             }
         },
     )
-    @patch.dict('os.environ', {}, clear=True)
+    @patch.dict('os.environ', {'DJANGO_ADMIN_URL': 'private-admin-path/'}, clear=True)
     def test_deploy_check_requires_explicit_allowed_hosts_env(self):
         issues = production_environment_checks(None)
 
         self.assertIn('micu.E005', {issue.id for issue in issues})
+
+    @override_settings(
+        DEBUG=False,
+        ALLOWED_HOSTS=['market.micutu.com'],
+        DEFAULT_FROM_EMAIL='noreply@micutu.com',
+        SITE_URL='https://market.micutu.com',
+        DATABASES={
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': 'micu_market',
+                'USER': 'micu',
+                'PASSWORD': 'secret',
+                'HOST': '127.0.0.1',
+                'PORT': '5432',
+            }
+        },
+    )
+    @patch.dict('os.environ', {'DJANGO_ALLOWED_HOSTS': 'market.micutu.com'}, clear=True)
+    def test_deploy_check_requires_explicit_admin_url_env(self):
+        issues = production_environment_checks(None)
+
+        self.assertIn('micu.E008', {issue.id for issue in issues})
 
     @override_settings(
         DEBUG=False,

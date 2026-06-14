@@ -82,6 +82,15 @@ def production_environment_checks(app_configs, **kwargs):
             )
         )
 
+    if not os.getenv("DJANGO_ADMIN_URL"):
+        errors.append(
+            Error(
+                "DJANGO_ADMIN_URL trebuie setat explicit în producție.",
+                hint="Setează DJANGO_ADMIN_URL în .env la o rută privată, diferită de fallback-ul din cod.",
+                id="micu.E008",
+            )
+        )
+
     if not getattr(settings, "DEFAULT_FROM_EMAIL", "") or "example.com" in settings.DEFAULT_FROM_EMAIL:
         errors.append(
             Error(
