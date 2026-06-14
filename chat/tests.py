@@ -107,6 +107,18 @@ class ChatConversationTestCase(TestCase):
 
         self.assertEqual(response.status_code, 405)
 
+    def test_conversation_page_renders_for_participant(self):
+        """Pagina de conversație se randează corect pentru un participant."""
+        conv = Conversation.objects.create(listing=self.listing)
+        conv.participants.add(self.buyer, self.seller)
+        Message.objects.create(conversation=conv, sender=self.seller, receiver=self.buyer, content='Salut!')
+
+        self.client.login(username='buyer', password='BuyerPass123!')
+        response = self.client.get(reverse('chat:conversation', kwargs={'pk': conv.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'data-conversation-id')
+        self.assertContains(response, 'chat-conversation__messages')
+
     def test_third_user_cannot_access_conversation(self):
         """Un utilizator terț nu poate accesa conversația altora"""
         # Creează conversația între buyer și seller

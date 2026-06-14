@@ -5,125 +5,111 @@
     Conversație cu {{ other_participant.get_full_name|default:other_participant.username }} - Micu's Market
 {% endblock %}
 
+{% block meta_robots %}noindex,nofollow{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/chat.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="conversation-container">
-    <div class="container">
-        <!-- Header conversație -->
-        <div class="conversation-header">
-            <div class="header-left">
-                <a href="{% url 'chat:inbox' %}" class="back-btn">
-                    <i class="fas fa-arrow-left"></i> Înapoi la mesaje
-                </a>
-                
-                <div class="conversation-info">
-                    <div class="participant-avatar">
-                        {% if other_participant.profile.avatar %}
-                            <img src="{{ other_participant.profile.avatar.url }}" alt="{{ other_participant.username }}" loading="lazy" decoding="async">
-                        {% else %}
-                            <div class="default-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="participant-details">
-                        <h2>{{ other_participant.get_full_name|default:other_participant.username }}</h2>
-                        <div class="listing-info">
-                            <i class="fas fa-tag"></i>
-                            <a href="{% url 'listings:detail' listing.slug %}">{{ listing.title }}</a>
-                            <span class="listing-price">{{ listing.price }} RON</span>
-                        </div>
-                    </div>
-                </div>
+<div class="chat-conversation"
+     id="chatRoot"
+     data-conversation-id="{{ conversation.pk }}"
+     data-current-user="{{ request.user.username }}">
+
+    <div class="chat-conversation__header">
+        <a href="{% url 'chat:inbox' %}" class="chat-conversation__back" title="Înapoi la mesaje" aria-label="Înapoi la mesaje">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+
+        <div class="chat-conversation__peer">
+            <div class="participant-avatar">
+                {% if other_participant.profile.avatar %}
+                    <img src="{{ other_participant.profile.avatar.url }}" alt="{{ other_participant.username }}" loading="lazy" decoding="async">
+                {% else %}
+                    <div class="default-avatar"><i class="fas fa-user"></i></div>
+                {% endif %}
             </div>
-            
-            <div class="header-right">
-                <a href="{% url 'listings:detail' listing.slug %}" class="btn btn-outline">
-                    <i class="fas fa-eye"></i> Vezi anunțul
-                </a>
+            <div class="chat-conversation__peer-info">
+                <h2 class="chat-conversation__peer-name">{{ other_participant.get_full_name|default:other_participant.username }}</h2>
+                <div class="chat-conversation__listing">
+                    <i class="fas fa-tag"></i>
+                    <a href="{% url 'listings:detail' listing.slug %}">{{ listing.title }}</a>
+                    <span class="listing-price">{{ listing.price }} RON</span>
+                </div>
             </div>
         </div>
 
-        <!-- Mesaje -->
-        <div class="messages-container" id="messagesContainer">
-            <div class="messages-list" id="messagesList">
-                {% for message in page_obj reversed %}
-                    <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
-                        <div class="message-avatar">
-                            {% if message.sender.profile.avatar %}
-                                <img src="{{ message.sender.profile.avatar.url }}" alt="{{ message.sender.username }}" loading="lazy" decoding="async">
-                            {% else %}
-                                <div class="small-avatar">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="message-content">
-                            <div class="message-bubble">
-                                <p>{{ message.content|linebreaks }}</p>
-                                
-                                <!-- Atașamente -->
-                                {% if message.attachments.all %}
-                                    <div class="message-attachments">
-                                        {% for attachment in message.attachments.all %}
-                                            <div class="attachment">
-                                                {% if attachment.file_type == 'image' %}
-                                                    <img src="{{ attachment.download_url }}" alt="{{ attachment.filename }}" class="attachment-image" loading="lazy" decoding="async">
-                                                {% else %}
-                                                    <a href="{{ attachment.download_url }}" target="_blank" rel="noopener noreferrer" class="attachment-file">
-                                                        <i class="fas fa-file"></i>
-                                                        {{ attachment.filename }}
-                                                    </a>
-                                                {% endif %}
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="message-time">
-                                {{ message.created_at|date:"d.m.Y H:i" }}
-                                {% if message.sender == request.user and message.is_read %}
-                                    <i class="fas fa-check-double read"></i>
-                                {% elif message.sender == request.user %}
-                                    <i class="fas fa-check"></i>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
+        <a href="{% url 'listings:detail' listing.slug %}" class="chat-conversation__view">
+            <i class="fas fa-eye"></i> <span>Vezi anunțul</span>
+        </a>
+    </div>
 
-        <!-- Form pentru mesaj nou -->
-        <div class="message-form-container">
-            <form id="messageForm" method="post" action="{% url 'chat:send_message' conversation.pk %}" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="message-input-container">
-                    <textarea name="content" id="messageContent" placeholder="Scrie un mesaj..." rows="3" required></textarea>
-                    
-                    <div class="message-actions">
-                        <label for="fileInput" class="attachment-btn">
-                            <i class="fas fa-paperclip"></i>
-                        </label>
-                        <input type="file" id="fileInput" name="attachments" multiple accept="image/*,.pdf,.doc,.docx,.txt,.xls,.xlsx" style="display: none;">
-                        
-                        <button type="submit" class="send-btn">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
+    <div class="chat-conversation__messages" id="chatMessages">
+        {% if not page_obj %}
+            <div class="chat-conversation__empty">
+                <i class="fas fa-comments"></i>
+                <p>Începe conversația trimițând primul mesaj.</p>
+            </div>
+        {% endif %}
+        {% for message in page_obj reversed %}
+            <div class="chat-msg chat-msg--{% if message.sender == request.user %}sent{% else %}received{% endif %}" data-message-id="{{ message.id }}">
+                <div class="chat-msg__bubble">
+                    <div class="chat-msg__text">{{ message.content|linebreaks }}</div>
+                    {% if message.attachments.all %}
+                        <div class="chat-msg__attachments">
+                            {% for attachment in message.attachments.all %}
+                                {% if attachment.file_type == 'image' %}
+                                    <a href="{{ attachment.download_url }}" target="_blank" rel="noopener noreferrer">
+                                        <img class="chat-att-img" src="{{ attachment.download_url }}" alt="{{ attachment.filename }}" loading="lazy" decoding="async">
+                                    </a>
+                                {% else %}
+                                    <a class="chat-att-file" href="{{ attachment.download_url }}" target="_blank" rel="noopener noreferrer">
+                                        <i class="fas fa-file"></i> {{ attachment.filename }}
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
-                
-                <div id="attachmentPreview" class="attachment-preview" style="display: none;"></div>
-            </form>
+                <div class="chat-msg__meta">
+                    <span class="chat-msg__time">{{ message.created_at|date:"H:i" }}</span>
+                    {% if message.sender == request.user %}
+                        <span class="chat-msg__status">
+                            {% if message.is_read %}<i class="fas fa-check-double read"></i>{% else %}<i class="fas fa-check"></i>{% endif %}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="chat-typing" id="chatTyping" hidden>
+            <span class="chat-typing__dots"><span></span><span></span><span></span></span>
+            scrie…
         </div>
     </div>
+
+    <form id="chatForm" class="chat-conversation__composer" method="post"
+          action="{% url 'chat:send_message' conversation.pk %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="chat-conn-status" id="chatConnStatus" hidden>
+            <i class="fas fa-rotate"></i> Reconectare…
+        </div>
+        <div class="chat-composer__preview" id="chatPreview"></div>
+        <div class="chat-composer__row">
+            <label class="chat-composer__attach" for="chatFile" title="Atașează un fișier">
+                <i class="fas fa-paperclip"></i>
+            </label>
+            <input type="file" id="chatFile" name="attachments" multiple
+                   accept="image/*,.pdf,.doc,.docx,.txt,.xls,.xlsx" hidden>
+            <textarea class="chat-composer__input" id="chatInput" name="content"
+                      placeholder="Scrie un mesaj…" rows="1" maxlength="5000"></textarea>
+            <button type="submit" class="chat-composer__send" id="chatSend" title="Trimite" aria-label="Trimite">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </form>
 </div>
 
-<script src="{% static 'js/chat-conversation.js' %}"></script>
+<script src="{% static 'js/chat-conversation.js' %}" defer></script>
 {% endblock %}

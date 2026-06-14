@@ -1,548 +1,204 @@
-// Chat Conversation JavaScript - Dynamic Height Version
-function escapeHTML(value) {
-    return String(value ?? '').replace(/[&<>"']/g, function(char) {
-        return {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;'
-        }[char];
-    });
-}
+// Chat în timp real prin WebSocket (Django Channels), cu fallback AJAX pentru
+// atașamente / când WS-ul e indisponibil. Mesajele proprii se randează la ecoul
+// serverului (au id real); deduplicare după id ca să nu apară dublate.
+(function () {
+    const root = document.getElementById('chatRoot');
+    if (!root) return;
 
-document.addEventListener('DOMContentLoaded', function() {
-    const messagesContainer = document.getElementById('messagesList');
-    const messageForm = document.getElementById('messageForm');
-    const messageContent = document.getElementById('messageContent');
-    const fileInput = document.getElementById('fileInput');
-    const attachmentPreview = document.getElementById('attachmentPreview');
-    const sendBtn = document.querySelector('.send-btn');
-    const conversationContainer = document.querySelector('.conversation-container');
-    
-    // Initialize chat features
-    initializeChatFeatures();
-    
-    function initializeChatFeatures() {
-        // Setup dynamic height management
-        setupDynamicHeight();
-        
-        // Scroll to bottom with smooth animation
-        setTimeout(scrollToBottomSmooth, 100);
-        
-        // Add typing indicators
-        setupTypingIndicator();
-        
-        // Add message animations
-        animateExistingMessages();
-        
-        // Add better file upload UX
-        enhanceFileUpload();
-        
-        // Add message status indicators
-        updateMessageStatuses();
-        
-        // Setup window resize handler
-        window.addEventListener('resize', debounce(setupDynamicHeight, 250));
+    const convId = root.dataset.conversationId;
+    const currentUser = root.dataset.currentUser;
+    const messagesEl = document.getElementById('chatMessages');
+    const typingEl = document.getElementById('chatTyping');
+    const form = document.getElementById('chatForm');
+    const input = document.getElementById('chatInput');
+    const fileInput = document.getElementById('chatFile');
+    const preview = document.getElementById('chatPreview');
+    const connStatus = document.getElementById('chatConnStatus');
+    const csrf = form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    const seen = new Set(
+        Array.from(messagesEl.querySelectorAll('[data-message-id]')).map((el) => el.dataset.messageId)
+    );
+
+    let socket = null;
+    let reconnectDelay = 1000;
+    let typingTimer = null;
+    let lastTypingSent = 0;
+
+    function escapeHTML(value) {
+        return String(value ?? '').replace(/[&<>"']/g, (c) => (
+            { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+        ));
     }
-    
-    // Dynamic height management
-    function setupDynamicHeight() {
-        if (!conversationContainer) return;
-        
-        const header = document.querySelector('header');
-        const footer = document.querySelector('footer');
-        const conversationHeader = document.querySelector('.conversation-header');
-        const messageFormContainer = document.querySelector('.message-form-container');
-        
-        let availableHeight = window.innerHeight;
-        
-        // Subtract header height
-        if (header) {
-            availableHeight -= header.offsetHeight;
-        }
-        
-        // Subtract footer height with some margin
-        if (footer) {
-            availableHeight -= footer.offsetHeight + 20; // 20px margin
-        }
-        
-        // Subtract conversation header height
-        if (conversationHeader) {
-            availableHeight -= conversationHeader.offsetHeight;
-        }
-        
-        // Subtract message form height
-        if (messageFormContainer) {
-            availableHeight -= messageFormContainer.offsetHeight;
-        }
-        
-        // Set conversation container height
-        conversationContainer.style.height = Math.max(availableHeight, 300) + 'px';
-        
-        // Ensure messages container takes remaining space
-        if (messagesContainer) {
-            const containerPadding = 32; // 2rem padding
-            messagesContainer.style.height = (availableHeight - containerPadding) + 'px';
-            messagesContainer.style.maxHeight = (availableHeight - containerPadding) + 'px';
-        }
-        
-        // Scroll to bottom after height adjustment
-        setTimeout(scrollToBottomSmooth, 50);
+
+    function scrollToBottom() {
+        messagesEl.scrollTop = messagesEl.scrollHeight;
     }
-    
-    // Debounce function for performance
-    function debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
+
+    function attachmentHTML(att) {
+        if (att.file_type === 'image') {
+            return `<a href="${escapeHTML(att.download_url)}" target="_blank" rel="noopener noreferrer">`
+                + `<img class="chat-att-img" src="${escapeHTML(att.download_url)}" alt="${escapeHTML(att.filename)}" loading="lazy"></a>`;
+        }
+        return `<a class="chat-att-file" href="${escapeHTML(att.download_url)}" target="_blank" rel="noopener noreferrer">`
+            + `<i class="fas fa-file"></i> ${escapeHTML(att.filename)}</a>`;
+    }
+
+    function renderMessage(msg) {
+        const id = String(msg.id);
+        if (seen.has(id)) return;
+        seen.add(id);
+
+        const mine = msg.sender === currentUser;
+        const wrap = document.createElement('div');
+        wrap.className = 'chat-msg ' + (mine ? 'chat-msg--sent' : 'chat-msg--received');
+        wrap.dataset.messageId = id;
+
+        const atts = (msg.attachments || []).map(attachmentHTML).join('');
+        const status = mine ? '<span class="chat-msg__status"><i class="fas fa-check"></i></span>' : '';
+
+        wrap.innerHTML =
+            '<div class="chat-msg__bubble">' +
+                '<div class="chat-msg__text">' + escapeHTML(msg.content || '').replace(/\n/g, '<br>') + '</div>' +
+                (atts ? '<div class="chat-msg__attachments">' + atts + '</div>' : '') +
+            '</div>' +
+            '<div class="chat-msg__meta"><span class="chat-msg__time">' + escapeHTML(msg.created_at || '') + '</span>' + status + '</div>';
+
+        messagesEl.insertBefore(wrap, typingEl);
+        scrollToBottom();
+    }
+
+    function markOwnAsRead() {
+        messagesEl.querySelectorAll('.chat-msg--sent .chat-msg__status').forEach((el) => {
+            el.innerHTML = '<i class="fas fa-check-double read"></i>';
+        });
+    }
+
+    function showTyping() {
+        typingEl.hidden = false;
+        scrollToBottom();
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => { typingEl.hidden = true; }, 3000);
+    }
+
+    // ---- WebSocket ----
+    function connect() {
+        const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+        socket = new WebSocket(`${proto}://${location.host}/ws/chat/${convId}/`);
+
+        socket.onopen = function () {
+            reconnectDelay = 1000;
+            connStatus.hidden = true;
+            send({ type: 'read' });
+        };
+
+        socket.onmessage = function (event) {
+            let data;
+            try { data = JSON.parse(event.data); } catch (e) { return; }
+            if (data.type === 'message') {
+                renderMessage(data.message);
+                if (document.hasFocus()) send({ type: 'read' });
+            } else if (data.type === 'typing') {
+                showTyping();
+            } else if (data.type === 'read') {
+                markOwnAsRead();
+            }
+        };
+
+        socket.onclose = function () {
+            connStatus.hidden = false;
+            setTimeout(connect, reconnectDelay);
+            reconnectDelay = Math.min(reconnectDelay * 2, 15000);
         };
     }
-    
-    // Enhanced scroll to bottom with smooth animation
-    function scrollToBottomSmooth() {
-        if (messagesContainer) {
-            messagesContainer.scrollTo({
-                top: messagesContainer.scrollHeight,
-                behavior: 'smooth'
-            });
+
+    function send(obj) {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify(obj));
+            return true;
         }
+        return false;
     }
-    
-    // Setup typing indicator
-    function setupTypingIndicator() {
-        let typingTimer;
-        const typingIndicator = createTypingIndicator();
-        
-        if (messageContent) {
-            messageContent.addEventListener('input', function() {
-                clearTimeout(typingTimer);
-                showTypingIndicator(typingIndicator);
-                
-                typingTimer = setTimeout(() => {
-                    hideTypingIndicator(typingIndicator);
-                }, 1000);
-            });
-            
-            messageContent.addEventListener('blur', function() {
-                clearTimeout(typingTimer);
-                hideTypingIndicator(typingIndicator);
-            });
+
+    // ---- Trimitere mesaj ----
+    async function submit() {
+        const content = input.value.trim();
+        const hasFiles = fileInput.files && fileInput.files.length > 0;
+        if (!content && !hasFiles) return;
+
+        // Cu atașamente sau fără WS → POST multipart (fallback). Altfel, prin WS.
+        if (hasFiles || !send({ type: 'message', content: content })) {
+            await postFallback(content, hasFiles);
         }
+
+        input.value = '';
+        autoGrow();
+        fileInput.value = '';
+        preview.innerHTML = '';
+        input.focus();
     }
-    
-    function createTypingIndicator() {
-        const indicator = document.createElement('div');
-        indicator.className = 'typing-indicator';
-        indicator.innerHTML = `
-            <div class="typing-avatar">
-                <div class="small-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-            </div>
-            <div class="typing-bubble">
-                <div class="typing-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        `;
-        indicator.style.display = 'none';
-        return indicator;
-    }
-    
-    function showTypingIndicator(indicator) {
-        if (messagesContainer && !messagesContainer.contains(indicator)) {
-            messagesContainer.appendChild(indicator);
+
+    async function postFallback(content, hasFiles) {
+        const fd = new FormData();
+        fd.append('content', content || ' ');
+        fd.append('csrfmiddlewaretoken', csrf);
+        if (hasFiles) {
+            for (const f of fileInput.files) fd.append('attachments', f);
         }
-        indicator.style.display = 'flex';
-        scrollToBottomSmooth();
-    }
-    
-    function hideTypingIndicator(indicator) {
-        if (indicator && indicator.parentNode) {
-            indicator.style.display = 'none';
-        }
-    }
-    
-    // Animate existing messages on load
-    function animateExistingMessages() {
-        const messages = document.querySelectorAll('.message');
-        messages.forEach((message, index) => {
-            message.style.opacity = '0';
-            message.style.transform = 'translateY(20px)';
-            
-            setTimeout(() => {
-                message.style.transition = 'all 0.3s ease';
-                message.style.opacity = '1';
-                message.style.transform = 'translateY(0)';
-            }, index * 30); // Faster animation
-        });
-    }
-    
-    // Enhance file upload with better UX
-    function enhanceFileUpload() {
-        if (fileInput && attachmentPreview) {
-            // Add drag and drop
-            setupDragAndDrop();
-            
-            // Enhanced file preview
-            fileInput.addEventListener('change', function() {
-                handleFileUpload(this.files);
-            });
-        }
-    }
-    
-    function setupDragAndDrop() {
-        const dropZone = messageForm;
-        if (!dropZone) return;
-        
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, preventDefaults, false);
-        });
-        
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, highlight, false);
-        });
-        
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, unhighlight, false);
-        });
-        
-        dropZone.addEventListener('drop', handleDrop, false);
-        
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        
-        function highlight() {
-            dropZone.classList.add('drag-over');
-        }
-        
-        function unhighlight() {
-            dropZone.classList.remove('drag-over');
-        }
-        
-        function handleDrop(e) {
-            const files = e.dataTransfer.files;
-            handleFileUpload(files);
-        }
-    }
-    
-    function handleFileUpload(files) {
-        if (!attachmentPreview) return;
-        
-        attachmentPreview.innerHTML = '';
-        
-        if (files.length > 0) {
-            attachmentPreview.style.display = 'block';
-            
-            Array.from(files).forEach((file, index) => {
-                const item = createFilePreviewItem(file, index);
-                attachmentPreview.appendChild(item);
-            });
-        } else {
-            attachmentPreview.style.display = 'none';
-        }
-    }
-    
-    function createFilePreviewItem(file, index) {
-        const item = document.createElement('div');
-        item.className = 'attachment-item';
-        
-        const fileIcon = file.type.startsWith('image/') ? 'image' : 'file';
-        const fileSize = formatFileSize(file.size);
-        
-        item.innerHTML = `
-            <div class="file-info">
-                <i class="fas fa-${fileIcon}"></i>
-                <div class="file-details">
-                    <span class="file-name">${escapeHTML(file.name)}</span>
-                    <span class="file-size">${escapeHTML(fileSize)}</span>
-                </div>
-            </div>
-            <button type="button" class="remove-attachment" onclick="removeAttachment(${index})">
-                <i class="fas fa-times"></i>
-            </button>
-        `;
-        
-        // Add image preview for images
-        if (file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const preview = document.createElement('img');
-                preview.src = e.target.result;
-                preview.className = 'file-preview-image';
-                item.insertBefore(preview, item.firstChild);
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        return item;
-    }
-    
-    function formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-    
-    // Update message statuses with animations
-    function updateMessageStatuses() {
-        const sentMessages = document.querySelectorAll('.message.sent');
-        sentMessages.forEach(message => {
-            const timeElement = message.querySelector('.message-time');
-            if (timeElement && !timeElement.querySelector('.status-icon')) {
-                const statusIcon = document.createElement('i');
-                statusIcon.className = 'fas fa-check status-icon';
-                timeElement.appendChild(statusIcon);
-                
-                // Animate icon appearance
-                setTimeout(() => {
-                    statusIcon.style.opacity = '1';
-                    statusIcon.style.transform = 'scale(1)';
-                }, 300);
-            }
-        });
-    }
-    
-    // Enhanced form submission with better UX
-    if (messageForm) {
-        messageForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const content = messageContent ? messageContent.value.trim() : '';
-            
-            if (!content && (!fileInput || fileInput.files.length === 0)) {
-                // Shake animation for empty message
-                shakeElement(messageContent);
-                return;
-            }
-            
-            // Disable form with loading state
-            setFormLoadingState(true);
-            
-            // Add sending message to UI immediately
-            const tempMessage = addTemporaryMessage(content);
-            
-            fetch(this.action, {
+        try {
+            const resp = await fetch(form.action, {
                 method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Remove temporary message and add real one
-                    if (tempMessage) tempMessage.remove();
-                    addMessageToUI(data.message);
-                    
-                    // Clear form
-                    clearForm();
-                    
-                    // Scroll to bottom
-                    scrollToBottomSmooth();
-                    
-                    // Show success feedback
-                    showSuccessFeedback();
-                } else {
-                    // Remove temporary message
-                    if (tempMessage) tempMessage.remove();
-                    showErrorMessage('Eroare la trimiterea mesajului: ' + (data.error || 'Eroare necunoscută'));
-                }
-            })
-            .catch(error => {
-                // Remove temporary message
-                if (tempMessage) tempMessage.remove();
-                console.error('Error:', error);
-                showErrorMessage('Eroare la trimiterea mesajului');
-            })
-            .finally(() => {
-                setFormLoadingState(false);
+                body: fd,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
             });
-        });
-    }
-    
-    function addTemporaryMessage(content) {
-        if (!messagesContainer || !content) return null;
-        
-        const tempMessage = document.createElement('div');
-        tempMessage.className = 'message sent temporary';
-        tempMessage.innerHTML = `
-            <div class="message-avatar">
-                <div class="small-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-            </div>
-            <div class="message-content">
-                <div class="message-bubble">
-                    <p>${escapeHTML(content).replace(/\n/g, '<br>')}</p>
-                </div>
-                <div class="message-time">
-                    Trimite...
-                    <i class="fas fa-clock sending-icon"></i>
-                </div>
-            </div>
-        `;
-        
-        messagesContainer.appendChild(tempMessage);
-        scrollToBottomSmooth();
-        
-        return tempMessage;
-    }
-    
-    function setFormLoadingState(loading) {
-        if (sendBtn) {
-            sendBtn.disabled = loading;
-            sendBtn.innerHTML = loading 
-                ? '<i class="fas fa-spinner fa-spin"></i>' 
-                : '<i class="fas fa-paper-plane"></i>';
-        }
-        
-        if (messageContent) {
-            messageContent.disabled = loading;
-        }
-    }
-    
-    function clearForm() {
-        if (messageContent) messageContent.value = '';
-        if (fileInput) fileInput.value = '';
-        if (attachmentPreview) {
-            attachmentPreview.innerHTML = '';
-            attachmentPreview.style.display = 'none';
-        }
-        
-        // Reset textarea height
-        if (messageContent) {
-            messageContent.style.height = 'auto';
-        }
-    }
-    
-    function shakeElement(element) {
-        if (!element) return;
-        element.classList.add('shake');
-        setTimeout(() => element.classList.remove('shake'), 500);
-    }
-    
-    function showSuccessFeedback() {
-        // Brief success animation on send button
-        if (sendBtn) {
-            sendBtn.classList.add('success');
-            setTimeout(() => sendBtn.classList.remove('success'), 200);
-        }
-    }
-    
-    function showErrorMessage(message) {
-        // Simple console log instead of toast to avoid positioning issues
-        console.error(message);
-        
-        // Optional: Add error class to form for visual feedback
-        if (messageForm) {
-            messageForm.classList.add('error');
-            setTimeout(() => messageForm.classList.remove('error'), 2000);
-        }
-    }
-    
-    // Handle Enter key with better UX
-    if (messageContent) {
-        messageContent.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                if (messageForm) {
-                    messageForm.dispatchEvent(new Event('submit'));
-                }
+            if (resp.ok) {
+                const data = await resp.json();
+                if (data && data.message) renderMessage(data.message);
             }
-        });
-        
-        // Auto-resize textarea with smooth animation
-        messageContent.addEventListener('input', function() {
-            this.style.height = 'auto';
-            const newHeight = Math.min(this.scrollHeight, 120);
-            this.style.height = newHeight + 'px';
-            
-            // Recalculate container height when textarea changes
-            setTimeout(setupDynamicHeight, 10);
-        });
+        } catch (e) { /* nimic — utilizatorul poate reîncerca */ }
     }
-});
 
-function addMessageToUI(message) {
-    const messagesContainer = document.getElementById('messagesList');
-    if (!messagesContainer) return;
-    const attachments = message.attachments || [];
-    
-    const messageHTML = `
-        <div class="message sent new-message">
-            <div class="message-avatar">
-                <div class="small-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-            </div>
-            <div class="message-content">
-                <div class="message-bubble">
-                    <p>${escapeHTML(message.content).replace(/\n/g, '<br>')}</p>
-                    ${attachments.map(att => {
-                        const attachmentUrl = escapeHTML(att.download_url || att.url || '#');
-                        const attachmentName = escapeHTML(att.filename || 'attachment');
-                        return att.file_type === 'image'
-                            ? `<div class="message-attachments"><img src="${attachmentUrl}" alt="${attachmentName}" class="attachment-image"></div>`
-                            : `<div class="message-attachments"><a href="${attachmentUrl}" target="_blank" rel="noopener noreferrer" class="attachment-file"><i class="fas fa-file"></i> ${attachmentName}</a></div>`;
-                    }).join('')}
-                </div>
-                <div class="message-time">
-                    ${escapeHTML(message.created_at)}
-                    <i class="fas fa-check status-icon"></i>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
-    
-    // Animate new message
-    const newMessage = messagesContainer.lastElementChild;
-    newMessage.style.opacity = '0';
-    newMessage.style.transform = 'translateY(20px)';
-    
-    setTimeout(() => {
-        newMessage.style.transition = 'all 0.3s ease';
-        newMessage.style.opacity = '1';
-        newMessage.style.transform = 'translateY(0)';
-    }, 50);
-    
-    // Scroll to bottom
-    setTimeout(() => {
-        messagesContainer.scrollTo({
-            top: messagesContainer.scrollHeight,
-            behavior: 'smooth'
-        });
-    }, 100);
-}
+    // ---- UI composer ----
+    function autoGrow() {
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 140) + 'px';
+    }
 
-function removeAttachment(index) {
-    const fileInput = document.getElementById('fileInput');
-    if (!fileInput) return;
-    
-    const dt = new DataTransfer();
-    
-    Array.from(fileInput.files).forEach((file, i) => {
-        if (i !== index) {
-            dt.items.add(file);
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        submit();
+    });
+
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            submit();
         }
     });
-    
-    fileInput.files = dt.files;
-    fileInput.dispatchEvent(new Event('change'));
-}
+
+    input.addEventListener('input', function () {
+        autoGrow();
+        const now = Date.now();
+        if (now - lastTypingSent > 2000) {
+            lastTypingSent = now;
+            send({ type: 'typing' });
+        }
+    });
+
+    fileInput.addEventListener('change', function () {
+        preview.innerHTML = '';
+        for (const f of fileInput.files) {
+            const chip = document.createElement('span');
+            chip.className = 'chat-preview-chip';
+            chip.innerHTML = '<i class="fas fa-paperclip"></i><span>' + escapeHTML(f.name) + '</span>';
+            preview.appendChild(chip);
+        }
+    });
+
+    window.addEventListener('focus', function () { send({ type: 'read' }); });
+
+    // ---- Init ----
+    scrollToBottom();
+    autoGrow();
+    connect();
+})();
