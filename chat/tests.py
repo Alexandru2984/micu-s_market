@@ -1,19 +1,26 @@
 """
 Teste pentru sistemul de chat — conversații și mesaje
 """
+import json
 import tempfile
 
+from asgiref.sync import async_to_sync
+from asgiref.testing import ApplicationCommunicator
+from django.contrib.auth.models import AnonymousUser
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, Client, override_settings
+from django.test import TestCase, TransactionTestCase, Client, override_settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
+from .consumers import ChatConsumer
 from .models import Conversation, Message, MessageAttachment
 from listings.models import Listing
 from categories.models import Category
 from notifications.models import Notification
 
 User = get_user_model()
+
+INMEMORY_LAYER = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
 
 class ChatConversationTestCase(TestCase):
@@ -297,3 +304,82 @@ class ChatConversationTestCase(TestCase):
                     reverse('chat:attachment_download', kwargs={'pk': attachment.pk})
                 )
                 self.assertEqual(response.status_code, 404)
+
+
+@override_settings(CHANNEL_LAYERS=INMEMORY_LAYER)
+class ChatConsumerTestCase(TransactionTestCase):
+    """Teste pentru WebSocket consumer (chat real-time)."""
+
+    def setUp(self):
+        self.buyer = User.objects.create_user(username='ws_buyer', email='wsb@example.com', password='WsBuyer123!')
+        self.seller = User.objects.create_user(username='ws_seller', email='wss@example.com', password='WsSeller123!')
+        self.outsider = User.objects.create_user(username='ws_out', email='wso@example.com', password='WsOut123!')
+        self.category = Category.objects.create(name='WS Cat', slug='ws-cat', is_active=True)
+        self.listing = Listing.objects.create(
+            title='Produs WS', description='Test', price=100.00,
+            owner=self.seller, category=self.category, city='Cluj', status='active',
+        )
+        self.conv = Conversation.objects.create(listing=self.listing)
+        self.conv.participants.add(self.buyer, self.seller)
+
+    def _communicator(self, user):
+        scope = {
+            "type": "websocket",
+            "path": f"/ws/chat/{self.conv.pk}/",
+            "headers": [],
+            "subprotocols": [],
+            "query_string": b"",
+            "user": user,
+            "url_route": {"kwargs": {"pk": self.conv.pk}},
+        }
+        return ApplicationCommunicator(ChatConsumer.as_asgi(), scope)
+
+    @staticmethod
+    async def _connect(comm):
+        await comm.send_input({"type": "websocket.connect"})
+        out = await comm.receive_output(timeout=5)
+        return out["type"] == "websocket.accept"
+
+    @staticmethod
+    async def _close(comm):
+        await comm.send_input({"type": "websocket.disconnect", "code": 1000})
+
+    def test_non_participant_is_rejected(self):
+        async def run():
+            comm = self._communicator(self.outsider)
+            return await self._connect(comm)
+        self.assertFalse(async_to_sync(run)())
+
+    def test_anonymous_is_rejected(self):
+        async def run():
+            comm = self._communicator(AnonymousUser())
+            return await self._connect(comm)
+        self.assertFalse(async_to_sync(run)())
+
+    def test_message_delivered_live_to_other_participant(self):
+        async def run():
+            buyer_comm = self._communicator(self.buyer)
+            seller_comm = self._communicator(self.seller)
+            self.assertTrue(await self._connect(buyer_comm))
+            self.assertTrue(await self._connect(seller_comm))
+            await buyer_comm.send_input(
+                {"type": "websocket.receive", "text": json.dumps({"type": "message", "content": "salut prin websocket"})}
+            )
+            # Seller (cealaltă parte) primește mesajul live, fără reload.
+            received = None
+            for _ in range(5):
+                out = await seller_comm.receive_output(timeout=5)
+                payload = json.loads(out.get("text", "{}")) if out.get("type") == "websocket.send" else {}
+                if payload.get("type") == "message":
+                    received = payload
+                    break
+            await self._close(buyer_comm)
+            await self._close(seller_comm)
+            return received
+        received = async_to_sync(run)()
+        self.assertIsNotNone(received)
+        self.assertEqual(received["message"]["content"], "salut prin websocket")
+        self.assertEqual(received["message"]["sender"], "ws_buyer")
+        # Persistat în DB + notificare pentru destinatar.
+        self.assertTrue(Message.objects.filter(conversation=self.conv, content="salut prin websocket").exists())
+        self.assertTrue(Notification.objects.filter(recipient=self.seller, notification_type="new_message").exists())
