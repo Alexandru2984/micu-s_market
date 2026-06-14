@@ -104,6 +104,8 @@ def _filter_decimal(queryset, field_name, raw_value, lookup):
         value = Decimal(str(raw_value))
     except (InvalidOperation, ValueError):
         return queryset
+    if value < 0:
+        return queryset
     return queryset.filter(**{f'{field_name}__{lookup}': value})
 
 

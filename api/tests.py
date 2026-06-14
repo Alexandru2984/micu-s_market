@@ -92,6 +92,16 @@ class ListingApiTests(TestCase):
         self.assertIn(self.listing.slug, slugs)
         self.assertIn(self.child_listing.slug, slugs)
 
+    def test_listing_list_ignores_invalid_price_filters(self):
+        response = self.client.get(
+            reverse('api:listing_list'),
+            {'min_price': 'invalid', 'max_price': '-10'},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        slugs = [item['slug'] for item in response.json()['results']]
+        self.assertIn(self.listing.slug, slugs)
+
     def test_search_orders_results_by_relevance(self):
         relevant = Listing.objects.create(
             title='Laptop gaming Asus ROG',
