@@ -77,6 +77,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "Micu_market.observability.RequestIdMiddleware",
+    "Micu_market.security.ClientIPMiddleware",
     "Micu_market.security.SecurityHeadersMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
