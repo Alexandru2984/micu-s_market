@@ -8,6 +8,7 @@ from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 from django.db.models import Count
 from django.conf import settings
+from django.views.decorators.debug import sensitive_post_parameters
 from django_ratelimit.decorators import ratelimit
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfileForm, UserReportForm
 from .models import UserProfile, UserReport
@@ -17,6 +18,7 @@ from audit.utils import audit_log
 User = get_user_model()
 
 @ratelimit(key='ip', rate=settings.AUTH_REGISTER_RATE, method='POST', block=True)
+@sensitive_post_parameters('password1', 'password2')
 def register_view(request):
     """Înregistrare utilizator nou"""
     if request.user.is_authenticated:
@@ -36,6 +38,7 @@ def register_view(request):
 
 @ratelimit(key='ip', rate=settings.AUTH_LOGIN_IP_RATE, method='POST', block=True)
 @ratelimit(key='post:username', rate=settings.AUTH_LOGIN_USER_RATE, method='POST', block=True)
+@sensitive_post_parameters('password')
 def login_view(request):
     """Autentificare utilizator"""
     if request.user.is_authenticated:
