@@ -502,7 +502,7 @@ function addMessageToUI(message) {
                     }).join('')}
                 </div>
                 <div class="message-time">
-                    ${message.created_at}
+                    ${escapeHTML(message.created_at)}
                     <i class="fas fa-check status-icon"></i>
                 </div>
             </div>
