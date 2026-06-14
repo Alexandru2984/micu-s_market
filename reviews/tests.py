@@ -179,3 +179,22 @@ class ReviewSecurityTestCase(TestCase):
 
         self.reviewed.profile.refresh_from_db()
         self.assertEqual(self.reviewed.profile.average_rating, 0)
+
+    def test_bulk_delete_review_recalculates_profile_rating(self):
+        """Ștergerile bulk din admin/queryset actualizează ratingul profilului."""
+        Review.objects.create(
+            reviewer=self.reviewer,
+            reviewed_user=self.reviewed,
+            listing=self.listing,
+            title='Test review',
+            comment='Test',
+            transaction_type='purchase',
+            rating=5,
+        )
+        self.reviewed.profile.refresh_from_db()
+        self.assertEqual(self.reviewed.profile.average_rating, 5)
+
+        Review.objects.filter(reviewed_user=self.reviewed).delete()
+
+        self.reviewed.profile.refresh_from_db()
+        self.assertEqual(self.reviewed.profile.average_rating, 0)

@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 User = get_user_model()
 
@@ -45,13 +47,6 @@ class Review(models.Model):
         if hasattr(self.reviewed_user, 'profile'):
             self.reviewed_user.profile.update_statistics()
 
-    def delete(self, *args, **kwargs):
-        reviewed_user = self.reviewed_user
-        result = super().delete(*args, **kwargs)
-        if hasattr(reviewed_user, 'profile'):
-            reviewed_user.profile.update_statistics()
-        return result
-
 
 class ReviewResponse(models.Model):
     """Răspunsul utilizatorului la un review primit"""
@@ -66,3 +61,9 @@ class ReviewResponse(models.Model):
     
     def __str__(self):
         return f"Răspuns la review-ul {self.review.id}"
+
+
+@receiver(post_delete, sender=Review)
+def update_reviewed_user_rating_after_delete(sender, instance, **kwargs):
+    if hasattr(instance.reviewed_user, 'profile'):
+        instance.reviewed_user.profile.update_statistics()
