@@ -1,6 +1,7 @@
 import os
 import random
 import urllib.request
+from urllib.parse import urlparse
 from io import BytesIO
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
@@ -96,11 +97,14 @@ def get_image_keyword_for_listing(title, category_name):
 
 def download_real_image_bytes(keyword):
     url = f"https://loremflickr.com/800/600/{keyword}"
+    parsed_url = urlparse(url)
+    if parsed_url.scheme != "https" or parsed_url.netloc != "loremflickr.com":
+        raise ValueError("Sursa imaginii demo nu este permisă.")
     req = urllib.request.Request(
         url,
         headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
     )
-    with urllib.request.urlopen(req, timeout=15) as response:
+    with urllib.request.urlopen(req, timeout=15) as response:  # nosec B310
         return response.read()
 
 
@@ -114,8 +118,8 @@ def get_font(size=72):
     for p in paths:
         try:
             return ImageFont.truetype(p, size)
-        except Exception:
-            pass
+        except OSError:
+            continue
     return ImageFont.load_default()
 
 
@@ -814,7 +818,7 @@ class Command(BaseCommand):
                 county=item['county'],
                 contact_phone=item['contact_phone'],
                 status='active',
-                views_count=random.randint(10, 250),
+                views_count=random.randint(10, 250),  # nosec B311
             )
 
             # Descărcare imagine reală sau fallback pe text placeholder
