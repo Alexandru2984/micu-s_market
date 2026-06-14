@@ -41,6 +41,20 @@ class ReviewSecurityTestCase(TestCase):
             city='Iași',
             status='active'
         )
+        self.other_listing_owner = User.objects.create_user(
+            username='other-owner',
+            email='other-owner@example.com',
+            password='OtherPass123!'
+        )
+        self.other_listing = Listing.objects.create(
+            title='Alt produs',
+            description='Test',
+            price=75.00,
+            owner=self.other_listing_owner,
+            category=self.category,
+            city='Cluj',
+            status='active',
+        )
 
     def test_cannot_review_yourself(self):
         """Utilizatorul nu poate lăsa o recenzie pentru sine însuși"""
@@ -84,6 +98,29 @@ class ReviewSecurityTestCase(TestCase):
         self.assertEqual(
             Review.objects.filter(reviewer=self.reviewer, reviewed_user=self.reviewed).count(),
             1
+        )
+
+    def test_review_listing_must_belong_to_reviewed_user(self):
+        """Review-ul nu poate fi atașat la anunțul altui utilizator."""
+        self.client.login(username='reviewer', password='ReviewPass123!')
+        response = self.client.post(
+            reverse('reviews:create_review', kwargs={'username': self.reviewed.username}) +
+            f'?listing={self.other_listing.slug}',
+            {
+                'title': 'Review greșit',
+                'comment': 'Atașare invalidă',
+                'transaction_type': 'purchase',
+                'rating': 5,
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(
+            Review.objects.filter(
+                reviewer=self.reviewer,
+                reviewed_user=self.reviewed,
+                listing=self.other_listing,
+            ).exists()
         )
 
     def test_create_review_requires_login(self):

@@ -65,6 +65,9 @@ def create_review_view(request, username, listing_slug=None):
     listing_slug = listing_slug or request.GET.get('listing')
     if listing_slug:
         listing = get_object_or_404(Listing, slug=listing_slug)
+        if listing.owner_id != reviewed_user.id:
+            messages.error(request, "Review-ul nu poate fi atașat la un anunț care aparține altui utilizator.")
+            return redirect('accounts:public_profile', username=username)
     
     # Nu poți lăsa review pentru tine însuți
     if reviewed_user == request.user:
