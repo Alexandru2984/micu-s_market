@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.core import mail
 from django.core.management import call_command
 from django.test import TestCase, override_settings
+from django.urls import reverse
 
 from .models import Notification
 
@@ -71,3 +72,29 @@ class NotificationEmailTestCase(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("https://market.example/", mail.outbox[0].body)
         self.assertNotIn("evil.example", mail.outbox[0].body)
+
+
+class NotificationViewTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="notify-view",
+            email="notify-view@example.com",
+            password="NotifyPass123!",
+        )
+
+    def test_notification_list_counts_unread_before_limit(self):
+        for index in range(55):
+            Notification.objects.create(
+                recipient=self.user,
+                notification_type="system",
+                title=f"Notificare {index}",
+                message="Mesaj",
+                is_read=index < 5,
+            )
+
+        self.client.login(username="notify-view", password="NotifyPass123!")
+        response = self.client.get(reverse("notifications:list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["notifications"]), 50)
+        self.assertEqual(response.context["unread_count"], 50)

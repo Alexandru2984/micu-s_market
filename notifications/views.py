@@ -11,13 +11,13 @@ from .models import Notification
 
 @login_required
 def notifications_list_view(request):
-    notifications = Notification.objects.filter(
+    notifications_qs = Notification.objects.filter(
         recipient=request.user
-    ).order_by('-created_at')[:50]
+    )
 
     context = {
-        'notifications': notifications,
-        'unread_count': notifications.filter(is_read=False).count(),
+        'notifications': notifications_qs.order_by('-created_at')[:50],
+        'unread_count': notifications_qs.filter(is_read=False).count(),
     }
     return render(request, 'notifications/list.html', context)
 
