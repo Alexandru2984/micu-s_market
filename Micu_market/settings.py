@@ -235,15 +235,20 @@ CSRF_COOKIE_SAMESITE = os.getenv("CSRF_COOKIE_SAMESITE", "Lax")
 PERMISSIONS_POLICY = os.getenv("PERMISSIONS_POLICY", "geolocation=(), microphone=(), camera=()")
 CROSS_ORIGIN_RESOURCE_POLICY = os.getenv("CROSS_ORIGIN_RESOURCE_POLICY", "same-site")
 CROSS_ORIGIN_OPENER_POLICY = os.getenv("CROSS_ORIGIN_OPENER_POLICY", "same-origin")
+# CSP enforced este servit de nginx (snippets/security-headers.conf) ca sursă
+# unică pentru market. Aici definim doar o variantă strictă (script-src fără
+# 'unsafe-inline', plus object-src/base-uri/form-action) rulată în report-only,
+# ca să raporteze ce ar trebui curățat (handlerele onclick) înainte de lockdown.
 DEFAULT_CONTENT_SECURITY_POLICY_REPORT_ONLY = (
     "default-src 'self'; "
-    "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
-    "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
-    "img-src 'self' data: https:; "
-    "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
+    "script-src 'self'; "
+    "style-src 'self' 'unsafe-inline'; "
+    "img-src 'self' data: blob: https:;"
+    "font-src 'self'; "
     "connect-src 'self'; "
     "base-uri 'self'; "
     "form-action 'self'; "
+    "object-src 'none'; "
     "frame-ancestors 'none'"
 )
 CONTENT_SECURITY_POLICY_REPORT_ONLY = os.getenv(
