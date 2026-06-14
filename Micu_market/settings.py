@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     # third-party
     "corsheaders",
     "storages",
+    "channels",
 
     # allauth
     "allauth",
@@ -178,6 +179,20 @@ CACHES = {
     }
 }
 RATELIMIT_USE_CACHE = os.getenv("RATELIMIT_USE_CACHE", "default")
+
+# Channels (WebSocket) — layer Redis ca group_send să treacă între workerii uvicorn.
+# DB Redis dedicat (/2) ca să nu se ciocnească cu cache/ratelimit. Pentru dev fără
+# Redis se poate forța layerul in-memory cu CHANNELS_IN_MEMORY=1.
+CHANNELS_REDIS_URL = os.getenv("CHANNELS_REDIS_URL", os.getenv("REDIS_URL", "redis://127.0.0.1:6379/2"))
+if os.getenv("CHANNELS_IN_MEMORY") == "1":
+    CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {"hosts": [CHANNELS_REDIS_URL]},
+        }
+    }
 API_READ_RATE = os.getenv("API_READ_RATE", "120/m")
 API_WRITE_RATE = os.getenv("API_WRITE_RATE", "30/m")
 AJAX_WRITE_RATE = os.getenv("AJAX_WRITE_RATE", "120/m")

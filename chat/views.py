@@ -12,6 +12,7 @@ import logging
 import mimetypes
 
 from .models import Conversation, Message, MessageAttachment
+from .broadcast import broadcast_message
 from .validators import MAX_ATTACHMENTS_PER_MESSAGE, is_allowed_chat_attachment
 from listings.models import Listing
 from notifications.models import Notification
@@ -173,7 +174,11 @@ def send_message_view(request, conversation_pk):
         for file in uploaded_files:
             if is_allowed_chat_attachment(file):
                 MessageAttachment.objects.create(message=message, file=file)
-    
+
+    # Publică live celuilalt participant (conectat pe WebSocket). Clientul propriu
+    # deduplică după id, ca să nu apară dublat față de răspunsul AJAX.
+    broadcast_message(message)
+
     # Returnează răspunsul JSON pentru AJAX
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return JsonResponse({

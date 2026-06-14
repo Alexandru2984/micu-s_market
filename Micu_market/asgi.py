@@ -1,10 +1,7 @@
 """
-ASGI config for Micu_market project.
+ASGI config for Micu_market.
 
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/5.2/howto/deployment/asgi/
+Routează HTTP prin aplicația Django standard și WebSocket prin Django Channels.
 """
 
 import os
@@ -13,4 +10,18 @@ from django.core.asgi import get_asgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Micu_market.settings')
 
-application = get_asgi_application()
+# Inițializează Django (încarcă app registry) ÎNAINTE de a importa consumers/routing.
+django_asgi_app = get_asgi_application()
+
+from channels.auth import AuthMiddlewareStack  # noqa: E402
+from channels.routing import ProtocolTypeRouter, URLRouter  # noqa: E402
+from channels.security.websocket import AllowedHostsOriginValidator  # noqa: E402
+
+import chat.routing  # noqa: E402
+
+application = ProtocolTypeRouter({
+    "http": django_asgi_app,
+    "websocket": AllowedHostsOriginValidator(
+        AuthMiddlewareStack(URLRouter(chat.routing.websocket_urlpatterns))
+    ),
+})
