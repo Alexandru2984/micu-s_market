@@ -57,6 +57,19 @@ class PromotionOrderTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertFalse(PromotionOrder.objects.exists())
 
+    def test_owner_cannot_promote_inactive_listing(self):
+        self.listing.status = "inactive"
+        self.listing.save(update_fields=["status", "updated_at"])
+
+        self.client.login(username="owner", password="OwnerPass123!")
+        response = self.client.post(
+            reverse("billing:promote_listing", kwargs={"slug": self.listing.slug}),
+            {"plan": self.plan.pk},
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(PromotionOrder.objects.exists())
+
     def test_pending_order_cannot_apply_promotion(self):
         order = PromotionOrder.objects.create(
             listing=self.listing,

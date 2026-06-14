@@ -1,7 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
+from django_ratelimit.decorators import ratelimit
 
 from listings.models import Listing
 
@@ -10,8 +12,9 @@ from .models import PromotionOrder, PromotionPlan
 
 @login_required
 @require_http_methods(["GET", "POST"])
+@ratelimit(key="user", rate=settings.BILLING_ORDER_RATE, method="POST", block=True)
 def promote_listing_view(request, slug):
-    listing = get_object_or_404(Listing, slug=slug, owner=request.user)
+    listing = get_object_or_404(Listing, slug=slug, owner=request.user, status="active")
     plans = PromotionPlan.objects.filter(is_active=True)
 
     if request.method == "POST":
