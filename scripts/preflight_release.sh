@@ -10,6 +10,7 @@ RUN_DOCTOR="${RUN_DOCTOR:-1}"
 cd "$ROOT_DIR"
 source scripts/lib_security.sh
 check_env_file_permissions .env
+check_sensitive_file_permissions
 
 if [[ -f .env ]]; then
   set -a
