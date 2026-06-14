@@ -142,6 +142,32 @@ class ListingCRUDTestCase(TestCase):
         self.assertIsNotNone(self.listing.slug)
         self.assertIn('anunt', self.listing.slug.lower())
 
+    def test_listing_create_rejects_invalid_uploaded_image(self):
+        """Uploadul custom de la creare folosește validarea server-side a imaginilor."""
+        with tempfile.TemporaryDirectory() as media_root:
+            with override_settings(MEDIA_ROOT=media_root):
+                self.client.login(username='seller', password='SellerPass123!')
+                response = self.client.post(
+                    reverse('listings:create'),
+                    {
+                        'title': 'Anunț cu imagine falsă',
+                        'description': 'Descriere suficientă',
+                        'category': self.category.pk,
+                        'price': '100.00',
+                        'city': 'Iași',
+                        'county': 'Iași',
+                        'images': SimpleUploadedFile(
+                            'malware.jpg',
+                            b'MZ not really an image',
+                            content_type='image/jpeg',
+                        ),
+                    },
+                )
+
+                self.assertEqual(response.status_code, 302)
+                listing = Listing.objects.get(title='Anunț cu imagine falsă')
+                self.assertFalse(listing.images.exists())
+
     def test_pages_home_view_filters_active(self):
         """pages/home_view returnează doar anunțuri active"""
         # Creează un anunț inactiv

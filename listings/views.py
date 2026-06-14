@@ -12,7 +12,7 @@ import logging
 import hashlib
 from decimal import Decimal, InvalidOperation
 from .models import Listing, ListingImage, ListingReport
-from .forms import ListingForm, ListingImageFormSet, ListingReportForm
+from .forms import ListingForm, ListingImageForm, ListingImageFormSet, ListingReportForm
 from .search import apply_listing_search, order_search_results
 from .moderation import apply_listing_risk_review
 from categories.models import Category
@@ -267,12 +267,16 @@ def process_images(request, listing):
         images = images[:10]
     for image in images:
         if image:
+            image_form = ListingImageForm(files={'image': image})
+            if not image_form.is_valid():
+                messages.warning(request, 'Nu am putut încărca o imagine. Verifică formatul şi dimensiunea.')
+                continue
+
             try:
-                ListingImage.objects.create(
-                    listing=listing,
-                    image=image,
-                    alt_text=f"Imagine pentru {listing.title}"
-                )
+                listing_image = image_form.save(commit=False)
+                listing_image.listing = listing
+                listing_image.alt_text = f"Imagine pentru {listing.title}"
+                listing_image.save()
             except Exception:
                 logger.exception("Eroare la încărcarea imaginii pentru anunțul %s", listing.pk)
                 messages.warning(request, 'Nu am putut încărca o imagine. Verifică formatul şi dimensiunea.')
