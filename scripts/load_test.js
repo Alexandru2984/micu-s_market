@@ -36,8 +36,8 @@ export const options = {
 export function browse() {
   const responses = http.batch([
     ["GET", `${baseUrl}/`, null, { tags: { surface: "page", route: "home" } }],
-    ["GET", `${baseUrl}/listings/`, null, { tags: { surface: "page", route: "listings" } }],
-    ["GET", `${baseUrl}/listings/?search=${encodeURIComponent(searchTerm)}`, null, { tags: { surface: "page", route: "search" } }],
+    ["GET", `${baseUrl}/anunturi/`, null, { tags: { surface: "page", route: "listings" } }],
+    ["GET", `${baseUrl}/anunturi/?search=${encodeURIComponent(searchTerm)}`, null, { tags: { surface: "page", route: "search" } }],
   ]);
 
   for (const response of responses) {
@@ -48,7 +48,7 @@ export function browse() {
   }
 
   if (listingSlug) {
-    const detail = http.get(`${baseUrl}/listing/${listingSlug}/`, {
+    const detail = http.get(`${baseUrl}/anunt/${listingSlug}/`, {
       tags: { surface: "page", route: "listing-detail" },
     });
     check(detail, {
