@@ -40,7 +40,7 @@ services:
       && python manage.py collectstatic --noinput
       && gunicorn -c gunicorn.conf.py Micu_market.asgi:application"
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     volumes:
       - media_data:/app/media
       - static_data:/app/staticfiles
