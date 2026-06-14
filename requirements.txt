@@ -14,3 +14,8 @@ sentry-sdk==2.62.0
 django-storages==1.14.6
 boto3==1.43.29
 redis==6.4.0
+
+# Transitive dependency floors pinned for known CVE fixes (pip-audit).
+PyJWT>=2.13.0
+sqlparse>=0.5.4
+Pygments>=2.20.0
