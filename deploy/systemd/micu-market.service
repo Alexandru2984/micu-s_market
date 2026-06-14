@@ -6,6 +6,7 @@ After=network.target postgresql.service redis-server.service
 Type=simple
 User=micu
 Group=www-data
+UMask=0007
 WorkingDirectory=/home/micu/Micu_market
 EnvironmentFile=/home/micu/Micu_market/.env
 Environment=DJANGO_SETTINGS_MODULE=Micu_market.settings_production

@@ -5,6 +5,7 @@ Description=Micu Market notification email dispatcher
 Type=oneshot
 User=micu
 Group=www-data
+UMask=0007
 WorkingDirectory=/home/micu/Micu_market
 EnvironmentFile=/home/micu/Micu_market/.env
 Environment=DJANGO_SETTINGS_MODULE=Micu_market.settings_production

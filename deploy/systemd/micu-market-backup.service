@@ -5,6 +5,7 @@ Description=Micu Market PostgreSQL backup
 Type=oneshot
 User=micu
 Group=micu
+UMask=0077
 WorkingDirectory=/home/micu/Micu_market
 EnvironmentFile=/home/micu/Micu_market/.env
 Environment=BACKUP_DIR=/var/backups/micu_market
