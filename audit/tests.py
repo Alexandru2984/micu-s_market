@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.admin.sites import AdminSite
-from django.test import RequestFactory
-from django.test import Client, TestCase
+from django.test import Client, RequestFactory, TestCase, override_settings
 from django.urls import reverse
 
 from .models import AuditEvent
@@ -68,3 +67,29 @@ class ObservabilityTestCase(TestCase):
         self.assertEqual(event.object_type, "Listing")
         self.assertEqual(event.object_id, str(listing.pk))
         self.assertEqual(event.request_id, "admin-action-request")
+
+    @override_settings(TRUSTED_PROXY_CHAIN_CONFIGURED=False)
+    def test_audit_log_ignores_forwarded_for_without_trusted_proxy(self):
+        response = self.client.post(
+            reverse("accounts:login"),
+            {"username": "audit-user", "password": "AuditPass123!"},
+            REMOTE_ADDR="198.51.100.10",
+            HTTP_X_FORWARDED_FOR="203.0.113.99",
+        )
+
+        self.assertEqual(response.status_code, 302)
+        event = AuditEvent.objects.get(event_type="auth.login")
+        self.assertEqual(str(event.ip_address), "198.51.100.10")
+
+    @override_settings(TRUSTED_PROXY_CHAIN_CONFIGURED=True)
+    def test_audit_log_uses_forwarded_for_with_trusted_proxy(self):
+        response = self.client.post(
+            reverse("accounts:login"),
+            {"username": "audit-user", "password": "AuditPass123!"},
+            REMOTE_ADDR="198.51.100.10",
+            HTTP_X_FORWARDED_FOR="203.0.113.99",
+        )
+
+        self.assertEqual(response.status_code, 302)
+        event = AuditEvent.objects.get(event_type="auth.login")
+        self.assertEqual(str(event.ip_address), "203.0.113.99")

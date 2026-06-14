@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from .models import AuditEvent
@@ -10,7 +11,7 @@ User = get_user_model()
 
 def get_client_ip(request):
     forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-    if forwarded_for:
+    if forwarded_for and getattr(settings, "TRUSTED_PROXY_CHAIN_CONFIGURED", False):
         return forwarded_for.split(",", 1)[0].strip()
     return request.META.get("REMOTE_ADDR")
 
