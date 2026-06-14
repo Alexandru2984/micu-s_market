@@ -160,9 +160,15 @@ class Command(BaseCommand):
             action="store_true",
             help="Șterge toate anunțurile și utilizatorii fictivi existenți înainte de populare.",
         )
+        parser.add_argument(
+            "--user-password",
+            default=os.getenv("POPULATE_DB_USER_PASSWORD"),
+            help="Parola pentru utilizatorii fictivi. Dacă lipsește, conturile primesc parolă inutilizabilă.",
+        )
 
     def handle(self, *args, **options):
         clear_existing = options["clear"]
+        seed_user_password = options["user_password"]
 
         if clear_existing:
             self.stdout.write(self.style.WARNING("🗑️  Ștergem datele existente..."))
@@ -402,7 +408,10 @@ class Command(BaseCommand):
                 }
             )
             if created:
-                user.set_password('Micu2000!')
+                if seed_user_password:
+                    user.set_password(seed_user_password)
+                else:
+                    user.set_unusable_password()
                 user.save()
                 self.stdout.write(f"   + Creat utilizatorul {user.username}")
             else:
