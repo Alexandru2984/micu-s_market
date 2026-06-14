@@ -2,13 +2,14 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Count, Q
+from django.db.models import Count, F, Q
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.conf import settings
 from django.core.cache import cache
 from django_ratelimit.decorators import ratelimit
 import logging
+import hashlib
 from .models import Listing, ListingImage, ListingReport
 from .forms import ListingForm, ListingImageFormSet, ListingReportForm
 from .search import apply_listing_search, order_search_results
@@ -19,6 +20,17 @@ from audit.utils import audit_log
 from notifications.models import Notification
 
 logger = logging.getLogger(__name__)
+
+
+def _listing_view_cache_key(request, listing_id):
+    if request.user.is_authenticated:
+        actor = f"user:{request.user.pk}"
+    else:
+        remote_addr = request.META.get("REMOTE_ADDR", "")
+        user_agent = request.META.get("HTTP_USER_AGENT", "")
+        actor_hash = hashlib.sha256(f"{remote_addr}:{user_agent}".encode("utf-8")).hexdigest()
+        actor = f"anon:{actor_hash}"
+    return f"listing:{listing_id}:viewed:{actor}"
 
 def home_view(request):
     """Homepage cu anunțuri recente și categorii"""
@@ -156,9 +168,10 @@ def listing_detail_view(request, slug):
     """Detaliile unui anunț"""
     listing = get_object_or_404(Listing, slug=slug, status='active')
     
-    # Crește numărul de vizualizări
-    listing.views_count += 1
-    listing.save(update_fields=['views_count'])
+    view_cache_key = _listing_view_cache_key(request, listing.pk)
+    if cache.add(view_cache_key, True, settings.LISTING_VIEW_COOLDOWN_SECONDS):
+        Listing.objects.filter(pk=listing.pk).update(views_count=F('views_count') + 1)
+        listing.views_count += 1
     
     # Verifică dacă anunțul este în favorite pentru utilizatorul autentificat
     is_favorited = False

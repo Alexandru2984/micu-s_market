@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
+from django.core.cache import cache
 from django.utils import timezone
 from io import BytesIO
 from pathlib import Path
@@ -77,6 +78,17 @@ class ListingCRUDTestCase(TestCase):
             reverse('listings:detail', kwargs={'slug': self.listing.slug})
         )
         self.assertEqual(response.status_code, 200)
+
+    def test_listing_detail_view_count_has_cooldown(self):
+        """Refreshurile repetate de la același client nu scriu view-uri nelimitat."""
+        cache.clear()
+        url = reverse('listings:detail', kwargs={'slug': self.listing.slug})
+
+        self.client.get(url, HTTP_USER_AGENT='test-agent', REMOTE_ADDR='127.0.0.1')
+        self.client.get(url, HTTP_USER_AGENT='test-agent', REMOTE_ADDR='127.0.0.1')
+
+        self.listing.refresh_from_db()
+        self.assertEqual(self.listing.views_count, 1)
 
     def test_listing_detail_has_seo_metadata(self):
         """Pagina de anunț expune meta tags și structured data pentru indexare/share."""
