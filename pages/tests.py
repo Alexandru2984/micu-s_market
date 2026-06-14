@@ -47,6 +47,7 @@ class ProjectUrlSecurityTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('application/javascript', response['Content-Type'])
         self.assertContains(response, 'self.addEventListener("fetch"', status_code=200)
+        self.assertContains(response, 'response.ok && response.type === "basic"', status_code=200)
 
     def test_offline_page_is_noindex(self):
         response = self.client.get(reverse('offline'))

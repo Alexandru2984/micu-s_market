@@ -37,8 +37,10 @@ self.addEventListener("fetch", (event) => {
   if (url.pathname.startsWith("/static/")) {
     event.respondWith(
       caches.match(request).then((cached) => cached || fetch(request).then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        if (response.ok && response.type === "basic") {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        }
         return response;
       }))
     );
