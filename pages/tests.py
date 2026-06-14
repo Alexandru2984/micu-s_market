@@ -31,6 +31,8 @@ class ProjectUrlSecurityTests(TestCase):
         self.assertEqual(response['Cross-Origin-Resource-Policy'], 'same-site')
         self.assertEqual(response['Cross-Origin-Opener-Policy'], 'same-origin')
         self.assertEqual(response['X-Download-Options'], 'noopen')
+        self.assertIn("default-src 'self'", response['Content-Security-Policy-Report-Only'])
+        self.assertIn("frame-ancestors 'none'", response['Content-Security-Policy-Report-Only'])
 
     def test_manifest_endpoint_returns_pwa_metadata(self):
         response = self.client.get(reverse('manifest'))

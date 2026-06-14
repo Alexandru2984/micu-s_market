@@ -216,7 +216,21 @@ CSRF_COOKIE_SAMESITE = os.getenv("CSRF_COOKIE_SAMESITE", "Lax")
 PERMISSIONS_POLICY = os.getenv("PERMISSIONS_POLICY", "geolocation=(), microphone=(), camera=()")
 CROSS_ORIGIN_RESOURCE_POLICY = os.getenv("CROSS_ORIGIN_RESOURCE_POLICY", "same-site")
 CROSS_ORIGIN_OPENER_POLICY = os.getenv("CROSS_ORIGIN_OPENER_POLICY", "same-origin")
-CONTENT_SECURITY_POLICY_REPORT_ONLY = os.getenv("CONTENT_SECURITY_POLICY_REPORT_ONLY", "")
+DEFAULT_CONTENT_SECURITY_POLICY_REPORT_ONLY = (
+    "default-src 'self'; "
+    "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
+    "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
+    "img-src 'self' data: https:; "
+    "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
+    "connect-src 'self'; "
+    "base-uri 'self'; "
+    "form-action 'self'; "
+    "frame-ancestors 'none'"
+)
+CONTENT_SECURITY_POLICY_REPORT_ONLY = os.getenv(
+    "CONTENT_SECURITY_POLICY_REPORT_ONLY",
+    DEFAULT_CONTENT_SECURITY_POLICY_REPORT_ONLY,
+)
 
 # Setări HTTPS active doar când nu suntem în dev local
 if not DEBUG:
