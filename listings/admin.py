@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.utils import timezone
 from datetime import timedelta
 from .models import Listing, ListingImage, ListingReport
+from audit.utils import audit_log
 
 class ListingImageInline(admin.TabularInline):
     model = ListingImage
@@ -71,23 +72,35 @@ class ListingAdmin(admin.ModelAdmin):
 
     @admin.action(description="Promovează 7 zile")
     def promote_7_days(self, request, queryset):
-        queryset.update(is_featured=True, featured_until=timezone.now() + timedelta(days=7))
+        featured_until = timezone.now() + timedelta(days=7)
+        queryset.update(is_featured=True, featured_until=featured_until)
+        for listing in queryset:
+            audit_log("listing.promotion_started", request=request, obj=listing, metadata={"days": 7})
 
     @admin.action(description="Promovează 30 zile")
     def promote_30_days(self, request, queryset):
-        queryset.update(is_featured=True, featured_until=timezone.now() + timedelta(days=30))
+        featured_until = timezone.now() + timedelta(days=30)
+        queryset.update(is_featured=True, featured_until=featured_until)
+        for listing in queryset:
+            audit_log("listing.promotion_started", request=request, obj=listing, metadata={"days": 30})
 
     @admin.action(description="Oprește promovarea")
     def stop_promotion(self, request, queryset):
         queryset.update(is_featured=False, featured_until=None)
+        for listing in queryset:
+            audit_log("listing.promotion_stopped", request=request, obj=listing)
 
     @admin.action(description="Aprobă moderarea și activează")
     def approve_moderation(self, request, queryset):
         queryset.update(needs_moderation_review=False, risk_score=0, moderation_note="", status="active")
+        for listing in queryset:
+            audit_log("listing.moderation_approved", request=request, obj=listing)
 
     @admin.action(description="Trimite la moderare")
     def send_to_moderation(self, request, queryset):
         queryset.update(needs_moderation_review=True, status="inactive")
+        for listing in queryset:
+            audit_log("listing.moderation_requested", request=request, obj=listing)
 
 
 @admin.register(ListingReport)
