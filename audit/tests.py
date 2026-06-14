@@ -26,6 +26,13 @@ class ObservabilityTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["X-Request-ID"], "test-request-id")
 
+    def test_invalid_request_id_header_is_replaced(self):
+        response = self.client.get(reverse("healthcheck"), HTTP_X_REQUEST_ID="bad id with spaces")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(response["X-Request-ID"], "bad id with spaces")
+        self.assertEqual(len(response["X-Request-ID"]), 32)
+
     def test_login_creates_audit_event(self):
         response = self.client.post(
             reverse("accounts:login"),
