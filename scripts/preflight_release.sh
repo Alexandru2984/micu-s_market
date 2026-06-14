@@ -36,6 +36,12 @@ if [[ "$RUN_AUDIT" == "1" ]]; then
   else
     echo "pip-audit is not installed in venv; skipping dependency audit." >&2
   fi
+
+  if [[ -x venv/bin/bandit ]]; then
+    venv/bin/bandit -q -r Micu_market accounts api audit billing categories chat dashboard favorites jobs listings notifications pages reviews search ws -x "*/tests.py,*/migrations/*"
+  else
+    echo "bandit is not installed in venv; skipping static security scan." >&2
+  fi
 fi
 
 echo "Preflight checks passed."
