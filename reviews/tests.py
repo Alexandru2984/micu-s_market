@@ -160,3 +160,22 @@ class ReviewSecurityTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 404)
         self.assertTrue(Review.objects.filter(pk=review.pk).exists())
+
+    def test_delete_review_recalculates_profile_rating(self):
+        """Ștergerea unei recenzii actualizează ratingul public al profilului."""
+        review = Review.objects.create(
+            reviewer=self.reviewer,
+            reviewed_user=self.reviewed,
+            listing=self.listing,
+            title='Test review',
+            comment='Test',
+            transaction_type='purchase',
+            rating=5,
+        )
+        self.reviewed.profile.refresh_from_db()
+        self.assertEqual(self.reviewed.profile.average_rating, 5)
+
+        review.delete()
+
+        self.reviewed.profile.refresh_from_db()
+        self.assertEqual(self.reviewed.profile.average_rating, 0)

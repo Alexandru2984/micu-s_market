@@ -45,6 +45,13 @@ class Review(models.Model):
         if hasattr(self.reviewed_user, 'profile'):
             self.reviewed_user.profile.update_statistics()
 
+    def delete(self, *args, **kwargs):
+        reviewed_user = self.reviewed_user
+        result = super().delete(*args, **kwargs)
+        if hasattr(reviewed_user, 'profile'):
+            reviewed_user.profile.update_statistics()
+        return result
+
 
 class ReviewResponse(models.Model):
     """Răspunsul utilizatorului la un review primit"""
