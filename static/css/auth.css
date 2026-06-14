@@ -6,11 +6,11 @@
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent) 100%);
 }
 
 .auth-card {
-    background: white;
+    background: var(--surface);
     border-radius: 12px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     max-width: 400px;
@@ -21,11 +21,11 @@
 .auth-header {
     text-align: center;
     padding: 2rem 2rem 1rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    background: linear-gradient(135deg, var(--surface-2) 0%, var(--border) 100%);
 }
 
 .auth-header h1 {
-    color: #1a202c;
+    color: var(--text);
     margin-bottom: 0.8rem;
     font-size: 2.2rem;
     font-weight: 800;
@@ -34,12 +34,12 @@
 }
 
 .auth-header h1 i {
-    color: #667eea;
+    color: var(--accent);
     margin-right: 0.5rem;
 }
 
 .auth-header p {
-    color: #4a5568;
+    color: var(--text-muted);
     margin: 0;
     font-size: 1.1rem;
     font-weight: 500;
@@ -58,7 +58,7 @@
     display: block;
     margin-bottom: 0.7rem;
     font-weight: 700;
-    color: #2d3748;
+    color: var(--text);
     font-size: 0.95rem;
     letter-spacing: 0.025em;
 }
@@ -66,30 +66,30 @@
 .form-control {
     width: 100%;
     padding: 1rem 1.2rem;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--border);
     border-radius: 10px;
     font-size: 1.05rem;
     transition: all 0.3s ease;
-    background: #f8fafc;
+    background: var(--surface-2);
     font-weight: 500;
-    color: #2d3748;
+    color: var(--text);
 }
 
 .form-control:focus {
     outline: none;
-    border-color: #667eea;
-    background: white;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: var(--accent);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
 }
 
 .form-control.is-invalid {
-    border-color: #ef4444;
-    background: #fef2f2;
+    border-color: var(--danger);
+    background: var(--danger-soft);
 }
 
 .invalid-feedback {
     display: block;
-    color: #ef4444;
+    color: var(--danger);
     font-size: 0.875rem;
     margin-top: 0.5rem;
 }
@@ -97,7 +97,7 @@
 .btn-auth {
     width: 100%;
     padding: 1rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent) 100%);
     color: white;
     border: none;
     border-radius: 10px;
@@ -107,12 +107,12 @@
     transition: all 0.3s ease;
     text-transform: none;
     letter-spacing: 0.025em;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
 }
 
 .btn-auth:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 10px 20px rgba(20, 184, 166, 0.3);
 }
 
 .btn-auth:active {
@@ -122,35 +122,35 @@
 .auth-links {
     text-align: center;
     padding: 1.5rem 2rem;
-    background: #f8fafc;
-    border-top: 1px solid #e5e7eb;
+    background: var(--surface-2);
+    border-top: 1px solid var(--border);
 }
 
 .auth-links a {
-    color: #667eea;
+    color: var(--accent);
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s ease;
 }
 
 .auth-links a:hover {
-    color: #764ba2;
+    color: var(--accent);
     text-decoration: underline;
 }
 
 .social-auth {
     margin-bottom: 1.5rem;
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--border);
 }
 
 .btn-social {
     width: 100%;
     padding: 0.75rem;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--border);
     border-radius: 8px;
-    background: white;
-    color: #374151;
+    background: var(--surface);
+    color: var(--text);
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -162,8 +162,8 @@
 }
 
 .btn-social:hover {
-    border-color: #667eea;
-    color: #667eea;
+    border-color: var(--accent);
+    color: var(--accent);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     text-decoration: none;
@@ -178,7 +178,7 @@
     text-align: center;
     position: relative;
     margin: 1.5rem 0;
-    color: #9ca3af;
+    color: var(--text-subtle);
     font-size: 0.875rem;
 }
 
@@ -189,11 +189,11 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: #e5e7eb;
+    background: var(--border);
 }
 
 .divider span {
-    background: white;
+    background: var(--surface);
     padding: 0 1rem;
     position: relative;
 }
@@ -222,7 +222,7 @@
 }
 
 .forgot-password a {
-    color: #667eea;
+    color: var(--accent);
     text-decoration: none;
     font-size: 0.875rem;
 }
@@ -239,13 +239,13 @@
 }
 
 .errorlist li {
-    background: #fed7d7;
-    color: #c53030;
+    background: var(--danger-soft);
+    color: var(--danger);
     padding: 0.5rem;
     border-radius: 4px;
     margin-bottom: 0.25rem;
     font-size: 0.875rem;
-    border-left: 3px solid #e53e3e;
+    border-left: 3px solid var(--danger);
 }
 
 .field-errors {
@@ -254,22 +254,22 @@
 
 .field-errors span {
     display: block;
-    color: #e53e3e;
+    color: var(--danger);
     font-size: 0.85rem;
     margin-bottom: 0.25rem;
-    background: #fed7d7;
+    background: var(--danger-soft);
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
 }
 
 /* Form validation states */
 .form-control.is-invalid {
-    border-color: #e53e3e;
+    border-color: var(--danger);
     box-shadow: 0 0 0 2px rgba(229, 62, 62, 0.2);
 }
 
 .form-control.is-valid {
-    border-color: #48bb78;
+    border-color: var(--success);
     box-shadow: 0 0 0 2px rgba(72, 187, 120, 0.2);
 }
 
@@ -306,12 +306,12 @@
 /* Success messages */
 .success-message {
     text-align: center;
-    color: #2f855a;
+    color: var(--success);
 }
 
 .success-message i {
     font-size: 3rem;
-    color: #48bb78;
+    color: var(--success);
     margin-bottom: 1rem;
 }
 
@@ -319,7 +319,7 @@
 .password-strength {
     margin-top: 0.5rem;
     height: 4px;
-    background: #e2e8f0;
+    background: var(--border);
     border-radius: 2px;
     overflow: hidden;
 }
@@ -330,10 +330,10 @@
     border-radius: 2px;
 }
 
-.password-strength-weak { background: #e53e3e; width: 25%; }
-.password-strength-fair { background: #ed8936; width: 50%; }
-.password-strength-good { background: #ecc94b; width: 75%; }
-.password-strength-strong { background: #48bb78; width: 100%; }
+.password-strength-weak { background: var(--danger); width: 25%; }
+.password-strength-fair { background: var(--warning); width: 50%; }
+.password-strength-good { background: var(--warning); width: 75%; }
+.password-strength-strong { background: var(--success); width: 100%; }
 
 /* Interactive animations */
 .auth-card {
@@ -386,23 +386,23 @@
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
     .auth-card {
-        background: #2d3748;
-        color: #e2e8f0;
+        background: var(--text);
+        color: var(--border);
     }
     
     .auth-header {
-        background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+        background: linear-gradient(135deg, var(--text-muted) 0%, var(--text) 100%);
     }
     
     .form-control {
-        background: #4a5568;
-        border-color: #718096;
-        color: #e2e8f0;
+        background: var(--text-muted);
+        border-color: var(--text-muted);
+        color: var(--border);
     }
     
     .form-control:focus {
-        border-color: #667eea;
-        background: #2d3748;
+        border-color: var(--accent);
+        background: var(--text);
     }
 }
 
@@ -410,7 +410,7 @@
 .btn-primary, .btn.btn-primary {
     width: 100%;
     padding: 1.2rem 1.5rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent) 100%);
     color: white;
     border: none;
     border-radius: 12px;
@@ -420,14 +420,14 @@
     transition: all 0.3s ease;
     text-transform: none;
     letter-spacing: 0.5px;
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 6px 20px rgba(20, 184, 166, 0.4);
     margin-bottom: 1rem;
 }
 
 .btn-primary:hover, .btn.btn-primary:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
-    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    box-shadow: 0 12px 30px rgba(20, 184, 166, 0.5);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent) 100%);
 }
 
 /* Checkbox styling îmbunătățit */
@@ -447,7 +447,7 @@ input[type="checkbox"] {
 }
 
 .form-check label {
-    color: #2d3748;
+    color: var(--text);
     font-size: 1.1rem;
     font-weight: 600;
     cursor: pointer;
@@ -458,7 +458,7 @@ input[type="checkbox"] {
 /* Link styling pentru paginile de autentificare */
 .auth-footer a,
 .auth-form a {
-    color: #667eea;
+    color: var(--accent);
     text-decoration: none;
     font-weight: 700;
     font-size: 1.1rem;
@@ -469,14 +469,14 @@ input[type="checkbox"] {
 
 .auth-footer a:hover,
 .auth-form a:hover {
-    color: #5a67d8;
+    color: var(--accent);
     text-decoration: underline;
     transform: translateY(-2px);
 }
 
 .auth-footer p,
 .auth-form p {
-    color: #2d3748;
+    color: var(--text);
     font-weight: 600;
     font-size: 1.1rem;
     line-height: 1.6;
@@ -488,17 +488,17 @@ input[type="checkbox"] {
 .auth-footer {
     text-align: center;
     padding: 1.5rem 2rem 2rem;
-    background: #f8fafc;
-    border-top: 1px solid #e2e8f0;
+    background: var(--surface-2);
+    border-top: 1px solid var(--border);
 }
 
 /* Butoane secundare */
 .btn-secondary {
     width: 100%;
     padding: 1rem 1.5rem;
-    background: #e2e8f0;
-    color: #2d3748;
-    border: 2px solid #cbd5e0;
+    background: var(--border);
+    color: var(--text);
+    border: 2px solid var(--border-strong);
     border-radius: 12px;
     font-size: 1.1rem;
     font-weight: 700;
@@ -511,9 +511,9 @@ input[type="checkbox"] {
 }
 
 .btn-secondary:hover {
-    background: #cbd5e0;
+    background: var(--border-strong);
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(0,0,0,0.1);
     text-decoration: none;
-    color: #1a202c;
+    color: var(--text);
 }

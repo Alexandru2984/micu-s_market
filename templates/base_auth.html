@@ -9,12 +9,25 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
     <link rel="shortcut icon" href="{% static 'images/favicon.svg' %}">
-    
+
+    <!-- Aplică tema salvată înainte de paint (anti-FOUC) -->
+    <script>
+        (function () {
+            try {
+                var t = localStorage.getItem('mm-theme');
+                if (!t) { t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+                document.documentElement.setAttribute('data-theme', t);
+            } catch (e) {}
+        })();
+    </script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
     <link rel="stylesheet" href="{% static 'css/base_auth.css' %}">
     {% block extra_css %}{% endblock %}
     {% block extra_js %}{% endblock%}
     <script src="{% static 'js/password-toggle.js' %}"></script>
+    <script src="{% static 'js/theme.js' %}" defer></script>
 </head>
 <body>
     <!-- Simple Header for Auth Pages -->

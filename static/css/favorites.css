@@ -2,7 +2,7 @@
 
 /* Page Header */
 .page-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent) 100%);
     color: white;
     padding: 3rem 0;
     margin-bottom: 2rem;
@@ -20,7 +20,7 @@
 }
 
 .header-content h1 i {
-    color: #ff6b6b;
+    color: var(--danger);
     margin-right: 0.5rem;
 }
 
@@ -47,12 +47,12 @@
 }
 
 .btn-primary {
-    background: #48bb78;
+    background: var(--success);
     color: white;
 }
 
 .btn-primary:hover {
-    background: #38a169;
+    background: var(--success);
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);
 }
@@ -70,12 +70,12 @@
 
 .listing-card {
     position: relative;
-    background: white;
+    background: var(--surface);
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     transition: all 0.3s;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
 }
 
 .listing-card:hover {
@@ -92,7 +92,7 @@
 .listing-image {
     position: relative;
     height: 220px;
-    background: #f7fafc;
+    background: var(--surface-2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -106,7 +106,7 @@
 }
 
 .no-image {
-    color: #a0aec0;
+    color: var(--text-subtle);
     font-size: 3rem;
 }
 
@@ -114,7 +114,7 @@
     position: absolute;
     top: 10px;
     left: 10px;
-    background: linear-gradient(45deg, #fbbf24, #f59e0b);
+    background: linear-gradient(45deg, var(--warning), var(--warning));
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
@@ -131,18 +131,18 @@
     margin: 0 0 0.5rem 0;
     font-size: 1.2rem;
     font-weight: 600;
-    color: #2d3748;
+    color: var(--text);
 }
 
 .price {
     font-size: 1.4rem;
     font-weight: 700;
-    color: #667eea;
+    color: var(--accent);
     margin: 0.5rem 0;
 }
 
 .description {
-    color: #718096;
+    color: var(--text-muted);
     margin: 0.75rem 0;
     line-height: 1.5;
     font-size: 0.95rem;
@@ -154,22 +154,22 @@
     align-items: center;
     margin: 1rem 0;
     padding-top: 1rem;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border);
     font-size: 0.9rem;
 }
 
 .location {
-    color: #718096;
+    color: var(--text-muted);
 }
 
 .location i {
     margin-right: 0.25rem;
-    color: #a0aec0;
+    color: var(--text-subtle);
 }
 
 .category {
-    background: #edf2f7;
-    color: #4a5568;
+    background: var(--surface-3);
+    color: var(--text-muted);
     padding: 0.25rem 0.75rem;
     border-radius: 15px;
     font-size: 0.8rem;
@@ -181,7 +181,7 @@
     justify-content: space-between;
     align-items: center;
     font-size: 0.85rem;
-    color: #a0aec0;
+    color: var(--text-subtle);
 }
 
 .date i,
@@ -215,12 +215,12 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s;
-    color: #e53e3e;
+    color: var(--danger);
 }
 
 .remove-favorite-btn:hover {
-    background: #fed7d7;
-    color: #c53030;
+    background: var(--danger-soft);
+    color: var(--danger);
     transform: scale(1.1);
 }
 
@@ -235,7 +235,7 @@
 }
 
 .page-btn {
-    background: #667eea;
+    background: var(--accent);
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 6px;
@@ -245,12 +245,12 @@
 }
 
 .page-btn:hover {
-    background: #5a67d8;
+    background: var(--accent);
     transform: translateY(-1px);
 }
 
 .page-info {
-    color: #718096;
+    color: var(--text-muted);
     font-weight: 500;
 }
 
@@ -267,18 +267,18 @@
 
 .no-favorites i {
     font-size: 4rem;
-    color: #fed7d7;
+    color: var(--danger-soft);
     margin-bottom: 1.5rem;
 }
 
 .no-favorites h3 {
-    color: #2d3748;
+    color: var(--text);
     margin-bottom: 1rem;
     font-size: 1.5rem;
 }
 
 .no-favorites p {
-    color: #718096;
+    color: var(--text-muted);
     margin-bottom: 2rem;
     line-height: 1.6;
 }
@@ -309,7 +309,7 @@
     position: fixed;
     top: 20px;
     right: 20px;
-    background: white;
+    background: var(--surface);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     padding: 1rem 1.5rem;
@@ -323,11 +323,11 @@
 }
 
 .toast.success {
-    border-left: 4px solid #48bb78;
+    border-left: 4px solid var(--success);
 }
 
 .toast.error {
-    border-left: 4px solid #e53e3e;
+    border-left: 4px solid var(--danger);
 }
 
 /* Responsive */

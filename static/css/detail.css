@@ -1,8 +1,8 @@
 
 .breadcrumb {
-    background: #f8fafc;
+    background: var(--surface-2);
     padding: 1rem 0;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border);
 }
 
 .breadcrumb ol {
@@ -22,21 +22,21 @@
 .breadcrumb li:not(:last-child)::after {
     content: '›';
     margin: 0 0.5rem;
-    color: #a0aec0;
+    color: var(--text-subtle);
 }
 
 .breadcrumb a {
-    color: #667eea;
+    color: var(--accent);
     text-decoration: none;
     transition: color 0.2s;
 }
 
 .breadcrumb a:hover {
-    color: #5a67d8;
+    color: var(--accent);
 }
 
 .breadcrumb .current {
-    color: #4a5568;
+    color: var(--text-muted);
     font-weight: 500;
 }
 
@@ -61,7 +61,7 @@
 
 .main-image {
     position: relative;
-    background: #f7fafc;
+    background: var(--surface-2);
     border-radius: 12px;
     overflow: hidden;
     margin-bottom: 1rem;
@@ -78,7 +78,7 @@
     position: absolute;
     top: 15px;
     left: 15px;
-    background: linear-gradient(45deg, #fbbf24, #f59e0b);
+    background: linear-gradient(45deg, var(--warning), var(--warning));
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 25px;
@@ -105,7 +105,7 @@
 
 .thumbnail:hover,
 .thumbnail.active {
-    border-color: #667eea;
+    border-color: var(--accent);
     transform: scale(1.05);
 }
 
@@ -115,8 +115,8 @@
     align-items: center;
     justify-content: center;
     height: 400px;
-    color: #a0aec0;
-    background: #f7fafc;
+    color: var(--text-subtle);
+    background: var(--surface-2);
     border-radius: 12px;
 }
 
@@ -128,7 +128,7 @@
 /* Listing Info */
 .listing-header h1 {
     font-size: 2rem;
-    color: #2d3748;
+    color: var(--text);
     margin-bottom: 1rem;
     font-weight: 700;
     line-height: 1.2;
@@ -144,11 +144,11 @@
 .price {
     font-size: 2.5rem;
     font-weight: 800;
-    color: #667eea;
+    color: var(--accent);
 }
 
 .negotiable {
-    background: #48bb78;
+    background: var(--success);
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
@@ -157,7 +157,7 @@
 }
 
 .listing-details {
-    background: #f8fafc;
+    background: var(--surface-2);
     padding: 1.5rem;
     border-radius: 12px;
     margin-bottom: 2rem;
@@ -168,7 +168,7 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem 0;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border);
 }
 
 .detail-item:last-child {
@@ -176,18 +176,18 @@
 }
 
 .detail-item i {
-    color: #667eea;
+    color: var(--accent);
     width: 20px;
     text-align: center;
 }
 
 .detail-item span {
-    color: #718096;
+    color: var(--text-muted);
     min-width: 100px;
 }
 
 .detail-item strong {
-    color: #2d3748;
+    color: var(--text);
     font-weight: 600;
 }
 
@@ -214,51 +214,51 @@
 }
 
 .btn-primary {
-    background: #667eea;
+    background: var(--accent);
     color: white;
 }
 
 .btn-primary:hover {
-    background: #5a67d8;
+    background: var(--accent);
     transform: translateY(-1px);
 }
 
 .btn-secondary {
-    background: #f7fafc;
-    color: #4a5568;
-    border: 1px solid #e2e8f0;
+    background: var(--surface-2);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-    background: #edf2f7;
-    border-color: #cbd5e0;
+    background: var(--surface-3);
+    border-color: var(--border-strong);
 }
 
 .btn-outline {
     background: transparent;
-    color: #667eea;
-    border: 1px solid #667eea;
+    color: var(--accent);
+    border: 1px solid var(--accent);
 }
 
 .btn-outline:hover {
-    background: #667eea;
+    background: var(--accent);
     color: white;
 }
 
 /* Description Section */
 .description-section,
 .seller-section {
-    background: white;
+    background: var(--surface);
     padding: 2rem;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     margin-bottom: 2rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
 }
 
 .description-section h2,
 .seller-section h2 {
-    color: #2d3748;
+    color: var(--text);
     margin-bottom: 1.5rem;
     font-size: 1.5rem;
     font-weight: 600;
@@ -269,11 +269,11 @@
 
 .description-section h2 i,
 .seller-section h2 i {
-    color: #667eea;
+    color: var(--accent);
 }
 
 .description-content {
-    color: #4a5568;
+    color: var(--text-muted);
     line-height: 1.6;
     font-size: 1.1rem;
 }
@@ -302,23 +302,23 @@
 .default-avatar {
     width: 100%;
     height: 100%;
-    background: #edf2f7;
+    background: var(--surface-3);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #a0aec0;
+    color: var(--text-subtle);
     font-size: 2rem;
 }
 
 .seller-details h3 {
-    color: #2d3748;
+    color: var(--text);
     margin-bottom: 0.25rem;
     font-size: 1.2rem;
     font-weight: 600;
 }
 
 .member-since {
-    color: #718096;
+    color: var(--text-muted);
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
 }
@@ -327,11 +327,11 @@
     display: flex;
     gap: 1rem;
     font-size: 0.9rem;
-    color: #4a5568;
+    color: var(--text-muted);
 }
 
 .seller-stats i {
-    color: #667eea;
+    color: var(--accent);
     margin-right: 0.25rem;
 }
 
@@ -343,13 +343,13 @@
 
 /* Similar Listings */
 .similar-listings {
-    background: #f8fafc;
+    background: var(--surface-2);
     padding: 3rem 0;
 }
 
 .similar-listings h2 {
     text-align: center;
-    color: #2d3748;
+    color: var(--text);
     margin-bottom: 2rem;
     font-size: 2rem;
     font-weight: 600;
@@ -360,7 +360,7 @@
 }
 
 .similar-listings h2 i {
-    color: #667eea;
+    color: var(--accent);
 }
 
 .listings-grid {
@@ -370,12 +370,12 @@
 }
 
 .listing-card {
-    background: white;
+    background: var(--surface);
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     transition: all 0.3s;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
     display: block;
     text-decoration: none;
     color: inherit;
@@ -390,7 +390,7 @@
 
 .listing-image {
     height: 180px;
-    background: #f7fafc;
+    background: var(--surface-2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -403,7 +403,7 @@
 }
 
 .no-image {
-    color: #a0aec0;
+    color: var(--text-subtle);
     font-size: 2rem;
 }
 
@@ -418,31 +418,31 @@
 }
 
 .listing-content h3 a {
-    color: #2d3748;
+    color: var(--text);
     text-decoration: none;
     transition: color 0.2s;
 }
 
 .listing-content h3 a:hover {
-    color: #667eea;
+    color: var(--accent);
 }
 
 .listing-content .price {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #667eea;
+    color: var(--accent);
     margin: 0.5rem 0;
 }
 
 .listing-content .location {
-    color: #718096;
+    color: var(--text-muted);
     font-size: 0.9rem;
     margin: 0;
 }
 
 .listing-content .location i {
     margin-right: 0.25rem;
-    color: #a0aec0;
+    color: var(--text-subtle);
 }
 
 /* Responsive */
