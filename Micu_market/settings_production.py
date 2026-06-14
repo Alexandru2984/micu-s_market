@@ -14,9 +14,17 @@ if SENTRY_DSN:
         release=os.getenv('SENTRY_RELEASE', ''),
     )
 
+def _required_csv_env(name):
+    value = os.getenv(name, "")
+    values = [item.strip() for item in value.split(",") if item.strip()]
+    if not values:
+        raise RuntimeError(f"{name} trebuie setat explicit pentru producție.")
+    return values
+
+
 # Security settings pentru producție
 DEBUG = False
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,market.micutu.com').split(',')
+ALLOWED_HOSTS = _required_csv_env('DJANGO_ALLOWED_HOSTS')
 
 # HTTPS settings
 SECURE_SSL_REDIRECT = True
