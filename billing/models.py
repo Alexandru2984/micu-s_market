@@ -60,7 +60,7 @@ class PromotionOrder(models.Model):
             self.save(update_fields=["status", "paid_at"])
 
     def apply_promotion(self):
-        if self.status not in {"paid", "pending"}:
+        if self.status != "paid":
             return False
         now = timezone.now()
         current_until = self.listing.featured_until if self.listing.is_promoted else now
@@ -68,8 +68,6 @@ class PromotionOrder(models.Model):
         self.listing.featured_until = max(current_until or now, now) + timedelta(days=self.plan.days)
         self.listing.save(update_fields=["is_featured", "featured_until", "updated_at"])
         self.status = "applied"
-        if self.paid_at is None:
-            self.paid_at = now
         self.applied_at = now
-        self.save(update_fields=["status", "paid_at", "applied_at"])
+        self.save(update_fields=["status", "applied_at"])
         return True

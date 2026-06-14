@@ -57,7 +57,7 @@ class PromotionOrderTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertFalse(PromotionOrder.objects.exists())
 
-    def test_apply_promotion_updates_listing(self):
+    def test_pending_order_cannot_apply_promotion(self):
         order = PromotionOrder.objects.create(
             listing=self.listing,
             user=self.owner,
@@ -66,8 +66,25 @@ class PromotionOrderTestCase(TestCase):
             currency=self.plan.currency,
         )
 
+        self.assertFalse(order.apply_promotion())
+        self.listing.refresh_from_db()
+        order.refresh_from_db()
+        self.assertFalse(self.listing.is_promoted)
+        self.assertEqual(order.status, "pending")
+
+    def test_apply_promotion_updates_paid_listing(self):
+        order = PromotionOrder.objects.create(
+            listing=self.listing,
+            user=self.owner,
+            plan=self.plan,
+            amount=self.plan.price,
+            currency=self.plan.currency,
+        )
+        order.mark_paid()
+
         self.assertTrue(order.apply_promotion())
         self.listing.refresh_from_db()
         order.refresh_from_db()
         self.assertTrue(self.listing.is_promoted)
         self.assertEqual(order.status, "applied")
+        self.assertIsNotNone(order.paid_at)
