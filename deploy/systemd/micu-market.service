@@ -20,7 +20,7 @@ KillSignal=SIGTERM
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=full
-ReadWritePaths=/home/micu/Micu_market/media /home/micu/Micu_market/staticfiles /home/micu/Micu_market/gunicorn.sock /var/log/micu_market
+ReadWritePaths=/home/micu/Micu_market/media /home/micu/Micu_market/staticfiles /var/log/micu_market
 
 [Install]
 WantedBy=multi-user.target
