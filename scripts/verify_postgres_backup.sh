@@ -10,6 +10,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DUMP_FILE="$1"
 
 cd "$ROOT_DIR"
+source scripts/lib_security.sh
 
 if [[ ! -f "$DUMP_FILE" ]]; then
   echo "Backup dump not found: $DUMP_FILE" >&2
@@ -20,6 +21,7 @@ if [[ ! -f .env ]]; then
   echo ".env is missing in $ROOT_DIR" >&2
   exit 1
 fi
+check_env_file_permissions .env
 
 set -a
 source .env
