@@ -10,6 +10,7 @@ from django.core.cache import cache
 from django_ratelimit.decorators import ratelimit
 import logging
 import hashlib
+from decimal import Decimal, InvalidOperation
 from .models import Listing, ListingImage, ListingReport
 from .forms import ListingForm, ListingImageFormSet, ListingReportForm
 from .search import apply_listing_search, order_search_results
@@ -31,6 +32,16 @@ def _listing_view_cache_key(request, listing_id):
         actor_hash = hashlib.sha256(f"{remote_addr}:{user_agent}".encode("utf-8")).hexdigest()
         actor = f"anon:{actor_hash}"
     return f"listing:{listing_id}:viewed:{actor}"
+
+
+def _parse_price_filter(raw_value):
+    if raw_value in (None, ""):
+        return None
+    try:
+        value = Decimal(str(raw_value))
+    except (InvalidOperation, ValueError):
+        return None
+    return value if value >= 0 else None
 
 def home_view(request):
     """Homepage cu anunțuri recente și categorii"""
@@ -109,8 +120,8 @@ def listing_list_view(request):
                 pass
     
     # Filtrare după preț
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
+    min_price = _parse_price_filter(request.GET.get('min_price'))
+    max_price = _parse_price_filter(request.GET.get('max_price'))
     if min_price:
         listings = listings.filter(price__gte=min_price)
     if max_price:

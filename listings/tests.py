@@ -101,6 +101,15 @@ class ListingCRUDTestCase(TestCase):
         self.assertContains(response, '"@type": "Product"')
         self.assertContains(response, f'<link rel="canonical" href="http://testserver{self.listing.get_absolute_url()}">')
 
+    def test_listing_list_ignores_invalid_price_filters(self):
+        response = self.client.get(
+            reverse('listings:list'),
+            {'min_price': 'not-a-number', 'max_price': '-10'},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.listing.title)
+
     def test_listing_edit_requires_owner(self):
         """Editarea anunțului este permisă doar proprietarului"""
         self.client.login(username='other', password='OtherPass123!')
