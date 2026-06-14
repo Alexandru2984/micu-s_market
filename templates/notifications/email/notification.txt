@@ -2,6 +2,6 @@
 
 {{ notification.message }}
 
-{% if notification.action_url %}Deschide: {{ notification.action_url }}{% endif %}
+{% if action_url %}Deschide: {{ action_url }}{% endif %}
 
 Micu's Market

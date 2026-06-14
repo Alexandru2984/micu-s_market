@@ -34,3 +34,40 @@ class NotificationEmailTestCase(TestCase):
         self.assertTrue(notification.is_emailed)
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("Emailuri notificări trimise: 1", output.getvalue())
+
+    @override_settings(
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+        SITE_URL="https://market.example",
+    )
+    def test_notification_email_uses_site_url_for_relative_action_url(self):
+        notification = Notification.objects.create(
+            recipient=self.user,
+            notification_type="new_message",
+            title="Mesaj nou",
+            message="Ai primit un mesaj.",
+            action_url="/chat/conversation/1/",
+        )
+
+        call_command("send_notification_emails")
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("https://market.example/chat/conversation/1/", mail.outbox[0].body)
+
+    @override_settings(
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+        SITE_URL="https://market.example",
+    )
+    def test_notification_email_rejects_external_action_url(self):
+        notification = Notification.objects.create(
+            recipient=self.user,
+            notification_type="new_message",
+            title="Mesaj nou",
+            message="Ai primit un mesaj.",
+            action_url="https://evil.example/phishing",
+        )
+
+        call_command("send_notification_emails")
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("https://market.example/", mail.outbox[0].body)
+        self.assertNotIn("evil.example", mail.outbox[0].body)

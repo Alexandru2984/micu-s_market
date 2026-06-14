@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urljoin, urlparse
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
@@ -28,11 +29,32 @@ def should_email(notification):
     return bool(preferences and getattr(preferences, preference_name, False))
 
 
+def safe_notification_action_url(action_url):
+    if not action_url:
+        return ""
+
+    site_url = settings.SITE_URL.rstrip("/")
+    site_host = urlparse(site_url).netloc
+    parsed = urlparse(action_url)
+
+    if not parsed.netloc and action_url.startswith("/") and not action_url.startswith("//"):
+        return urljoin(site_url, action_url)
+
+    if parsed.scheme in {"http", "https"} and parsed.netloc == site_host:
+        return action_url
+
+    return urljoin(site_url, "/")
+
+
 def send_notification_email(notification):
     if notification.is_emailed or not notification.recipient.email or not should_email(notification):
         return False
 
-    context = {"notification": notification, "site_name": "Micu's Market"}
+    context = {
+        "notification": notification,
+        "site_name": "Micu's Market",
+        "action_url": safe_notification_action_url(notification.action_url),
+    }
     subject = f"[Micu's Market] {notification.title}"
     text_body = render_to_string("notifications/email/notification.txt", context)
     html_body = render_to_string("notifications/email/notification.html", context)

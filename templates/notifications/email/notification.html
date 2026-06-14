@@ -3,9 +3,9 @@
 <body style="font-family: Arial, sans-serif; color: #1f2937; line-height: 1.5;">
   <h2 style="margin-bottom: 12px;">{{ notification.title }}</h2>
   <p>{{ notification.message }}</p>
-  {% if notification.action_url %}
+  {% if action_url %}
     <p>
-      <a href="{{ notification.action_url }}" style="background: #2563eb; color: #ffffff; padding: 10px 14px; text-decoration: none; border-radius: 6px;">Deschide în Micu's Market</a>
+      <a href="{{ action_url }}" style="background: #2563eb; color: #ffffff; padding: 10px 14px; text-decoration: none; border-radius: 6px;">Deschide în Micu's Market</a>
     </p>
   {% endif %}
   <p style="color: #64748b; font-size: 13px;">Micu's Market</p>
