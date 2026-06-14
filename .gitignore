@@ -12,6 +12,12 @@ env/
 backup_seed.json
 *.json.bak
 
+# Backup-uri baza de date (contin date reale)
+*.sql
+*.sql.gz
+*.dump
+backup_*
+
 # Python cache
 __pycache__/
 *.py[cod]
