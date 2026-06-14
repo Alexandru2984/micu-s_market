@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.checks import Error, Tags, Warning, register
@@ -87,6 +88,25 @@ def production_environment_checks(app_configs, **kwargs):
                 "DEFAULT_FROM_EMAIL nu este configurat pentru producție.",
                 hint="Setează DEFAULT_FROM_EMAIL la o adresă reală de pe domeniul aplicației.",
                 id="micu.E003",
+            )
+        )
+
+    site_url = getattr(settings, "SITE_URL", "")
+    parsed_site_url = urlparse(site_url)
+    if parsed_site_url.scheme != "https" or not parsed_site_url.netloc:
+        errors.append(
+            Error(
+                "SITE_URL trebuie să fie un URL HTTPS complet în producție.",
+                hint="Setează SITE_URL la domeniul public canonic, de exemplu https://market.micutu.com.",
+                id="micu.E006",
+            )
+        )
+    elif parsed_site_url.hostname not in settings.ALLOWED_HOSTS:
+        errors.append(
+            Error(
+                "SITE_URL nu este inclus în ALLOWED_HOSTS.",
+                hint="Adaugă hostul din SITE_URL în DJANGO_ALLOWED_HOSTS.",
+                id="micu.E007",
             )
         )
 

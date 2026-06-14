@@ -117,6 +117,7 @@ class DeploymentCheckTests(TestCase):
         DEBUG=False,
         ALLOWED_HOSTS=['market.micutu.com'],
         DEFAULT_FROM_EMAIL='noreply@micutu.com',
+        SITE_URL='https://market.micutu.com',
         DATABASES={
             'default': {
                 'ENGINE': 'django.db.backends.postgresql',
@@ -133,3 +134,47 @@ class DeploymentCheckTests(TestCase):
         issues = production_environment_checks(None)
 
         self.assertIn('micu.E005', {issue.id for issue in issues})
+
+    @override_settings(
+        DEBUG=False,
+        ALLOWED_HOSTS=['market.micutu.com'],
+        DEFAULT_FROM_EMAIL='noreply@micutu.com',
+        SITE_URL='http://market.micutu.com',
+        DATABASES={
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': 'micu_market',
+                'USER': 'micu',
+                'PASSWORD': 'secret',
+                'HOST': '127.0.0.1',
+                'PORT': '5432',
+            }
+        },
+    )
+    @patch.dict('os.environ', {'DJANGO_ALLOWED_HOSTS': 'market.micutu.com'})
+    def test_deploy_check_requires_https_site_url(self):
+        issues = production_environment_checks(None)
+
+        self.assertIn('micu.E006', {issue.id for issue in issues})
+
+    @override_settings(
+        DEBUG=False,
+        ALLOWED_HOSTS=['market.micutu.com'],
+        DEFAULT_FROM_EMAIL='noreply@micutu.com',
+        SITE_URL='https://evil.example',
+        DATABASES={
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': 'micu_market',
+                'USER': 'micu',
+                'PASSWORD': 'secret',
+                'HOST': '127.0.0.1',
+                'PORT': '5432',
+            }
+        },
+    )
+    @patch.dict('os.environ', {'DJANGO_ALLOWED_HOSTS': 'market.micutu.com'})
+    def test_deploy_check_requires_site_url_host_in_allowed_hosts(self):
+        issues = production_environment_checks(None)
+
+        self.assertIn('micu.E007', {issue.id for issue in issues})
