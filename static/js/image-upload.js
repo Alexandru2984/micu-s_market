@@ -102,16 +102,33 @@ function showImagePreview(file, compressedSize = null, originalSize = null) {
     
     const reader = new FileReader();
     reader.onload = function(e) {
-        previewDiv.innerHTML = `
-            <img src="${e.target.result}" alt="Preview" class="image-preview w-full h-32 object-cover rounded-lg border">
-            <p class="text-xs text-gray-500 mt-1 text-center">${escapeHTML(file.name)}</p>
-            ${compressedSize ? `
-                <div class="compression-info text-center">
-                    <i class="fas fa-check-circle"></i>
-                    Compresată: ${(originalSize / (1024 * 1024)).toFixed(2)}MB → ${(compressedSize / (1024 * 1024)).toFixed(2)}MB
-                </div>
-            ` : ''}
-        `;
+        previewDiv.textContent = '';
+
+        const image = document.createElement('img');
+        image.src = e.target.result;
+        image.alt = 'Preview';
+        image.className = 'image-preview w-full h-32 object-cover rounded-lg border';
+
+        const filename = document.createElement('p');
+        filename.className = 'text-xs text-gray-500 mt-1 text-center';
+        filename.textContent = file.name;
+
+        previewDiv.appendChild(image);
+        previewDiv.appendChild(filename);
+
+        if (compressedSize) {
+            const info = document.createElement('div');
+            info.className = 'compression-info text-center';
+
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-check-circle';
+
+            info.appendChild(icon);
+            info.appendChild(document.createTextNode(
+                ` Compresată: ${(originalSize / (1024 * 1024)).toFixed(2)}MB → ${(compressedSize / (1024 * 1024)).toFixed(2)}MB`
+            ));
+            previewDiv.appendChild(info);
+        }
     };
     reader.readAsDataURL(file);
     

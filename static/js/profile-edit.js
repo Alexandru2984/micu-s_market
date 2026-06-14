@@ -9,12 +9,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const preview = document.getElementById('avatar-preview');
-                    preview.innerHTML = `
-                        <div class="mt-3">
-                            <p class="mb-2"><strong>Preview:</strong></p>
-                            <img src="${e.target.result}" class="preview-image" alt="Preview">
-                        </div>
-                    `;
+                    preview.textContent = '';
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'mt-3';
+
+                    const label = document.createElement('p');
+                    label.className = 'mb-2';
+                    const strong = document.createElement('strong');
+                    strong.textContent = 'Preview:';
+                    label.appendChild(strong);
+
+                    const image = document.createElement('img');
+                    image.src = e.target.result;
+                    image.className = 'preview-image';
+                    image.alt = 'Preview';
+
+                    wrapper.appendChild(label);
+                    wrapper.appendChild(image);
+                    preview.appendChild(wrapper);
                 };
                 reader.readAsDataURL(file);
             }
