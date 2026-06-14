@@ -271,6 +271,8 @@ class ChatConversationTestCase(TestCase):
                     reverse('chat:attachment_download', kwargs={'pk': attachment.pk})
                 )
                 self.assertEqual(response.status_code, 200)
+                self.assertEqual(response['Cache-Control'], 'private, no-store')
+                self.assertEqual(response['Pragma'], 'no-cache')
                 self.assertEqual(response['X-Content-Type-Options'], 'nosniff')
 
     def test_attachment_download_denied_for_non_participant(self):

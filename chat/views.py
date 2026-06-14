@@ -251,6 +251,8 @@ def attachment_download_view(request, pk):
         filename=attachment.filename,
         content_type=content_type or 'application/octet-stream',
     )
+    response['Cache-Control'] = 'private, no-store'
+    response['Pragma'] = 'no-cache'
     response['X-Content-Type-Options'] = 'nosniff'
     return response
 
