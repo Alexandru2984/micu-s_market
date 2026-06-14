@@ -1,5 +1,7 @@
+import uuid
+
+from django.core.cache import cache
 from django.db import connections
-from django.db.utils import OperationalError
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.templatetags.static import static
@@ -17,15 +19,25 @@ def healthcheck_view(request):
     database_ok = True
     try:
         connections['default'].cursor().execute('SELECT 1')
-    except OperationalError:
+    except Exception:
         database_ok = False
 
+    cache_ok = True
+    try:
+        token = uuid.uuid4().hex
+        cache.set('healthcheck', token, 10)
+        cache_ok = cache.get('healthcheck') == token
+    except Exception:
+        cache_ok = False
+
+    healthy = database_ok and cache_ok
     return JsonResponse(
         {
-            'status': 'ok' if database_ok else 'unhealthy',
+            'status': 'ok' if healthy else 'unhealthy',
             'database': 'ok' if database_ok else 'unavailable',
+            'cache': 'ok' if cache_ok else 'unavailable',
         },
-        status=200 if database_ok else 503,
+        status=200 if healthy else 503,
     )
 
 
