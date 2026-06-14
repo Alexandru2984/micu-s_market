@@ -2,7 +2,7 @@ import uuid
 
 from django.core.cache import cache
 from django.db import connections
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.templatetags.static import static
 from django.views.decorators.cache import cache_control
@@ -39,6 +39,25 @@ def healthcheck_view(request):
         },
         status=200 if healthy else 503,
     )
+
+
+@require_GET
+@cache_control(public=True, max_age=86400)
+def robots_txt(request):
+    sitemap_url = request.build_absolute_uri('/sitemap.xml')
+    lines = [
+        "User-agent: *",
+        "Disallow: /accounts/",
+        "Disallow: /chat/",
+        "Disallow: /api/",
+        "Disallow: /dashboard/",
+        "Disallow: /notifications/",
+        "Disallow: /favorites/",
+        "Disallow: /billing/",
+        "Allow: /",
+        f"Sitemap: {sitemap_url}",
+    ]
+    return HttpResponse("\n".join(lines) + "\n", content_type="text/plain")
 
 
 def home_view(request):
