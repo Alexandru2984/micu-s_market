@@ -41,4 +41,10 @@ PGPASSWORD="$DB_PASS" pg_dump \
 chmod 600 "$out"
 find "$BACKUP_DIR" -type f -name 'micu_market_*.dump' -mtime +"$RETENTION_DAYS" -delete
 
+# Backup offsite la Cloudflare R2 (obligatoriu când R2_ENABLED=1: dacă upload-ul
+# eșuează, jobul iese cu eroare ca să fie vizibil/alertat).
+if [[ "${R2_ENABLED:-0}" == "1" ]]; then
+  "$ROOT_DIR/venv/bin/python" "$ROOT_DIR/scripts/r2_upload.py" "$out"
+fi
+
 echo "$out"
