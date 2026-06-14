@@ -142,6 +142,17 @@ class ListingApiTests(TestCase):
         )
         self.assertEqual(response.status_code, 401)
 
+    def test_listing_create_rejects_invalid_utf8_json(self):
+        self.client.login(username='api-buyer', password='BuyerPass123!')
+        response = self.client.post(
+            reverse('api:listing_create'),
+            data=b'\xff\xfe{',
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()['error'], 'Invalid JSON')
+
     def test_authenticated_user_can_create_listing(self):
         self.client.login(username='api-buyer', password='BuyerPass123!')
         response = self.client.post(

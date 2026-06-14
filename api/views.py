@@ -22,7 +22,7 @@ def _json_body(request):
     if request.content_type == 'application/json':
         try:
             return json.loads(request.body.decode('utf-8') or '{}')
-        except json.JSONDecodeError:
+        except (UnicodeDecodeError, json.JSONDecodeError):
             return None
     return request.POST
 
