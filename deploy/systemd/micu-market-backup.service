@@ -9,3 +9,8 @@ WorkingDirectory=/home/micu/Micu_market
 EnvironmentFile=/home/micu/Micu_market/.env
 Environment=BACKUP_DIR=/var/backups/micu_market
 ExecStart=/home/micu/Micu_market/scripts/backup_postgres.sh
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/var/backups/micu_market /var/log/micu_market

@@ -9,3 +9,8 @@ WorkingDirectory=/home/micu/Micu_market
 EnvironmentFile=/home/micu/Micu_market/.env
 Environment=DJANGO_SETTINGS_MODULE=Micu_market.settings_production
 ExecStart=/home/micu/Micu_market/venv/bin/python /home/micu/Micu_market/manage.py send_notification_emails --limit 200 --settings=Micu_market.settings_production
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/var/log/micu_market
