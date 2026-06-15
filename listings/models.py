@@ -31,11 +31,11 @@ class Listing(models.Model):
     negotiable = models.BooleanField(default=True, verbose_name="Negociabil")
     condition = models.CharField(max_length=20, choices=CONDITION_CHOICES, default='good', verbose_name="Stare")
     
-    # Relații
+    # Relations
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="listings", verbose_name="Proprietar", null=True, blank=True)
     category = models.ForeignKey('categories.Category', on_delete=models.SET_NULL, null=True, blank=True, related_name="listings", verbose_name="Categorie")
     
-    # Locație
+    # Location
     city = models.CharField(max_length=100, default="București", verbose_name="Oraș")
     county = models.CharField(max_length=100, default="București", verbose_name="Județ")
     location = models.CharField(max_length=200, blank=True, null=True, verbose_name="Adresă completă")
@@ -43,7 +43,7 @@ class Listing(models.Model):
     # Contact
     contact_phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Telefon contact")
     
-    # Status și date
+    # Status and dates
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active', verbose_name="Status")
     is_featured = models.BooleanField(default=False, verbose_name="Promovat")
     featured_until = models.DateTimeField(null=True, blank=True, verbose_name="Promovat până la")
@@ -76,7 +76,7 @@ class Listing(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
-            # Asigură unicitatea slug-ului, excluzând instanța curentă
+            # Ensure slug uniqueness, excluding the current instance
             original_slug = self.slug
             counter = 1
             while Listing.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
@@ -124,11 +124,11 @@ class ListingImage(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         
-        # Redimensionează imaginea pentru optimizare
+        # Resize the image for optimization
         if self.image:
             img_path = self.image.path
             with Image.open(img_path) as img:
-                # Păstrează raportul de aspect, dar nu mai mare de 800x800
+                # Keep the aspect ratio, but no larger than 800x800
                 if img.height > 800 or img.width > 800:
                     img.thumbnail((800, 800), Image.Resampling.LANCZOS)
                     img.save(img_path, optimize=True, quality=85)

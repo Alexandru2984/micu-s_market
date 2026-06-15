@@ -65,10 +65,10 @@ class ListingForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Toate categoriile active - temporar pentru debugging
+        # All active categories - temporary, for debugging
         self.fields['category'].queryset = Category.objects.filter(is_active=True).order_by('name')
         
-        # Doar câmpurile principale sunt obligatorii
+        # Only the main fields are required
         required_fields = ['title', 'description', 'category', 'price', 'city']
         for field_name, field in self.fields.items():
             if field_name in required_fields:
@@ -86,7 +86,7 @@ class ListingForm(forms.ModelForm):
 
     def clean_contact_phone(self):
         phone = self.cleaned_data.get('contact_phone')
-        # Fără validări - orice text este acceptat
+        # No validation - any text is accepted
         return phone
 
 
@@ -111,30 +111,30 @@ class ListingImageForm(forms.ModelForm):
     def clean_image(self):
         image = self.cleaned_data.get('image')
         if image:
-            # Verifică dimensiunea fişierului (max 5MB)
+            # Check the file size (max 5MB)
             if image.size > 5 * 1024 * 1024:
                 raise ValidationError('Imaginea nu poate fi mai mare de 5MB.')
             
-            # Verifică extensia fişierului
+            # Check the file extension
             valid_extensions = ['jpg', 'jpeg', 'png', 'webp']
             ext = image.name.rsplit('.', 1)[-1].lower() if '.' in image.name else ''
             if ext not in valid_extensions:
                 raise ValidationError('Doar fişierele JPG, PNG şi WebP sunt acceptate.')
             
-            # Verifică conținutul real al fişierului cu Pillow (previne rename malware.php -> malware.jpg)
+            # Check the real file content with Pillow (prevents rename malware.php -> malware.jpg)
             try:
                 from PIL import Image as PilImage
                 image.seek(0)
                 img = PilImage.open(image)
-                img.verify()  # verify() detectează fişiere corupte sau false
-                image.seek(0)  # resetăm cursorul după verify()
+                img.verify()  # verify() detects corrupt or fake files
+                image.seek(0)  # reset the cursor after verify()
             except Exception:
                 raise ValidationError('Fişierul nu este o imagine validă.')
         
         return image
 
 
-# Formset pentru multiple imagini
+# Formset for multiple images
 from django.forms import modelformset_factory
 
 ListingImageFormSet = modelformset_factory(

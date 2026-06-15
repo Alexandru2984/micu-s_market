@@ -44,7 +44,7 @@ def _parse_price_filter(raw_value):
     return value if value >= 0 else None
 
 def home_view(request):
-    """Homepage cu anunțuri recente și categorii"""
+    """Homepage with recent listings and categories"""
     recent_listings = Listing.objects.filter(status='active').select_related('category', 'owner').prefetch_related('images').order_by('-created_at')[:8]
     now = timezone.now()
     featured_listings = (
@@ -55,7 +55,7 @@ def home_view(request):
         .order_by('-created_at')[:4]
     )
     
-    # Adăugă starea de favorite pentru utilizatorul autentificat
+    # Add the favorite state for the authenticated user
     if request.user.is_authenticated:
         user_favorites = set(Favorite.objects.filter(user=request.user).values_list('listing_id', flat=True))
         
@@ -64,8 +64,8 @@ def home_view(request):
         for listing in featured_listings:
             listing.is_favorited = listing.id in user_favorites
     
-    # Categorii cu număr de anunțuri — un singur query agregat (fix N+1)
-    # Folosim annotate pentru a obține numărul de anunțuri active per categorie
+    # Categories with listing counts — a single aggregated query (N+1 fix)
+    # Use annotate to get the number of active listings per category
     top_categories = cache.get("home:top_categories")
     if top_categories is None:
         categories_with_counts = (
@@ -90,36 +90,36 @@ def home_view(request):
     return render(request, 'listings/home.html', context)
 
 def listing_list_view(request):
-    """Lista anunțurilor cu filtrare și sortare"""
+    """Listing list with filtering and sorting"""
     listings = Listing.objects.filter(status='active').select_related('category', 'owner').prefetch_related('images')
     
-    # Filtrare după vânzător
+    # Filter by seller
     seller = request.GET.get('seller')
     if seller:
         listings = listings.filter(owner__username=seller)
     
-    # Filtrare după categorie
+    # Filter by category
     category_param = request.GET.get('category')
     selected_category = None
     if category_param:
         try:
-            # Încearcă să găsească categoria după slug
+            # Try to find the category by slug
             selected_category = Category.objects.get(slug=category_param, is_active=True)
-            # Include categoria principală și toate subcategoriile
+            # Include the main category and all subcategories
             category_ids = [selected_category.id] + [sub.id for sub in selected_category.get_all_children]
             listings = listings.filter(category_id__in=category_ids)
         except Category.DoesNotExist:
-            # Dacă nu găsește după slug, încearcă după ID
+            # If not found by slug, try by ID
             try:
                 selected_category = Category.objects.get(id=category_param, is_active=True)
-                # Include categoria principală și toate subcategoriile
+                # Include the main category and all subcategories
                 category_ids = [selected_category.id] + [sub.id for sub in selected_category.get_all_children]
                 listings = listings.filter(category_id__in=category_ids)
             except (Category.DoesNotExist, ValueError):
-                # Dacă nu găsește nici după ID, ignoră filtrul
+                # If not found by ID either, ignore the filter
                 pass
     
-    # Filtrare după preț
+    # Filter by price
     min_price = _parse_price_filter(request.GET.get('min_price'))
     max_price = _parse_price_filter(request.GET.get('max_price'))
     if min_price:
@@ -127,16 +127,16 @@ def listing_list_view(request):
     if max_price:
         listings = listings.filter(price__lte=max_price)
     
-    # Filtrare după oraș
+    # Filter by city
     city = request.GET.get('city')
     if city:
         listings = listings.filter(city__icontains=city)
     
-    # Căutare
+    # Search
     search = request.GET.get('search')
     listings, search_applied = apply_listing_search(listings, search)
     
-    # Sortare
+    # Sorting
     sort_by = request.GET.get('sort', 'relevance' if search_applied else '-created_at')
     valid_sorts = ['relevance', '-created_at', 'created_at', 'price', '-price', 'title', '-title']
     if sort_by in valid_sorts:
@@ -146,19 +146,19 @@ def listing_list_view(request):
     else:
         listings = listings.order_by('-created_at')
     
-    # Paginare
+    # Pagination
     paginator = Paginator(listings, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    # Adăugă starea de favorite pentru utilizatorul autentificat
+    # Add the favorite state for the authenticated user
     if request.user.is_authenticated:
         user_favorites = set(Favorite.objects.filter(user=request.user).values_list('listing_id', flat=True))
         
         for listing in page_obj:
             listing.is_favorited = listing.id in user_favorites
     
-    # Context pentru template
+    # Context for the template
     categories = Category.objects.filter(is_active=True).order_by('name')
     
     context = {
@@ -176,7 +176,7 @@ def listing_list_view(request):
     return render(request, 'listings/list.html', context)
 
 def listing_detail_view(request, slug):
-    """Detaliile unui anunț"""
+    """Listing detail"""
     listing = get_object_or_404(Listing, slug=slug, status='active')
     
     view_cache_key = _listing_view_cache_key(request, listing.pk)
@@ -184,13 +184,13 @@ def listing_detail_view(request, slug):
         Listing.objects.filter(pk=listing.pk).update(views_count=F('views_count') + 1)
         listing.views_count += 1
     
-    # Verifică dacă anunțul este în favorite pentru utilizatorul autentificat
+    # Check if the listing is favorited by the authenticated user
     is_favorited = False
     if request.user.is_authenticated:
 
         is_favorited = Favorite.objects.filter(user=request.user, listing=listing).exists()
     
-    # Anunțuri similare
+    # Similar listings
     similar_listings = Listing.objects.filter(
         category=listing.category,
         status='active'
@@ -209,7 +209,7 @@ def listing_detail_view(request, slug):
 @require_POST
 @ratelimit(key='user', rate=settings.REPORT_WRITE_RATE, method='POST', block=True)
 def report_listing_view(request, slug):
-    """Creează un raport de moderare pentru un anunț."""
+    """Create a moderation report for a listing."""
     listing = get_object_or_404(Listing, slug=slug, status='active')
 
     if listing.owner == request.user:
@@ -259,10 +259,10 @@ def report_listing_view(request, slug):
     return redirect('listings:detail', slug=listing.slug)
 
 def process_images(request, listing):
-    """Procesează și salvează imaginile pentru un anunț (maxim 10)"""
+    """Process and save the images for a listing (max 10)"""
     images = request.FILES.getlist('images')
     
-    # Limită server-side (nu depăşete formset max_num=10)
+    # Server-side limit (don't exceed formset max_num=10)
     if len(images) > 10:
         images = images[:10]
     for image in images:
@@ -284,7 +284,7 @@ def process_images(request, listing):
 @login_required
 @ratelimit(key='user', rate='10/h', method='POST', block=True)
 def listing_create_view(request):
-    """Creează anunț nou"""
+    """Create a new listing"""
     if request.method == 'POST':
         form = ListingForm(request.POST)
         
@@ -294,7 +294,7 @@ def listing_create_view(request):
             listing.save()
             apply_listing_risk_review(listing, request.user, request=request)
             
-            # Folosește funcția auxiliară
+            # Use the helper function
             process_images(request, listing)
 
             if listing.needs_moderation_review:
@@ -314,7 +314,7 @@ def listing_create_view(request):
 
 @login_required
 def listing_update_view(request, slug):
-    """Editează un anunț"""
+    """Edit a listing"""
     listing = get_object_or_404(Listing, slug=slug, owner=request.user)
     
     if request.method == 'POST':
@@ -346,7 +346,7 @@ def listing_update_view(request, slug):
 
 @login_required
 def listing_delete_view(request, slug):
-    """Șterge un anunț"""
+    """Delete a listing"""
     listing = get_object_or_404(Listing, slug=slug, owner=request.user)
     
     if request.method == 'POST':
@@ -359,7 +359,7 @@ def listing_delete_view(request, slug):
 
 @login_required
 def my_listings_view(request):
-    """Anunțurile mele"""
+    """My listings"""
     listings = Listing.objects.filter(owner=request.user).order_by('-created_at')
     
     paginator = Paginator(listings, 10)
@@ -371,7 +371,7 @@ def my_listings_view(request):
 
 @login_required
 def upload_images_view(request, slug):
-    """Upload imagini pentru anunț"""
+    """Upload images for a listing"""
     listing = get_object_or_404(Listing, slug=slug, owner=request.user)
     
     if request.method == 'POST':
@@ -388,7 +388,7 @@ def upload_images_view(request, slug):
             messages.success(request, 'Imaginile au fost încărcate!')
             return redirect('listings:detail', slug=listing.slug)
     else:
-        # Formset cu imagini existente plus 3 forme goale
+        # Formset with existing images plus 3 empty forms
         formset = ListingImageFormSet(queryset=listing.images.all())
     
     context = {
