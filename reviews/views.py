@@ -17,16 +17,16 @@ from .forms import ReviewForm, ReviewResponseForm
 User = get_user_model()
 
 def user_reviews_view(request, username):
-    """Afișează toate review-urile pentru un utilizator"""
+    """Display all reviews for a user"""
     user = get_object_or_404(User, username=username)
-    
-    # Obține review-urile pentru utilizator
+
+    # Fetch the reviews for the user
     reviews = Review.objects.filter(
         reviewed_user=user,
         is_approved=True
     ).select_related('reviewer', 'listing').prefetch_related('response').order_by('-created_at')
     
-    # Statistici
+    # Statistics
     total_reviews = reviews.count()
     if total_reviews > 0:
         avg_rating = reviews.aggregate(avg=Avg('rating'))['avg']
@@ -41,7 +41,7 @@ def user_reviews_view(request, username):
         avg_rating = 0
         rating_distribution = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
     
-    # Paginare
+    # Pagination
     paginator = Paginator(reviews, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -58,7 +58,7 @@ def user_reviews_view(request, username):
 @login_required
 @ratelimit(key='user', rate='5/h', method='POST', block=True)
 def create_review_view(request, username, listing_slug=None):
-    """Creează un review pentru un utilizator"""
+    """Create a review for a user"""
     reviewed_user = get_object_or_404(User, username=username)
     listing = None
     
@@ -69,12 +69,12 @@ def create_review_view(request, username, listing_slug=None):
             messages.error(request, "Review-ul nu poate fi atașat la un anunț care aparține altui utilizator.")
             return redirect('accounts:public_profile', username=username)
     
-    # Nu poți lăsa review pentru tine însuți
+    # You cannot leave a review for yourself
     if reviewed_user == request.user:
         messages.error(request, "Nu poți lăsa un review pentru tine însuți.")
         return redirect('accounts:public_profile', username=username)
     
-    # Verifică dacă există deja un review pentru această combinație
+    # Check whether a review already exists for this combination
     existing_review = Review.objects.filter(
         reviewer=request.user,
         reviewed_user=reviewed_user,
@@ -111,10 +111,10 @@ def create_review_view(request, username, listing_slug=None):
 
 @login_required
 def add_response_view(request, review_id):
-    """Adaugă un răspuns la un review"""
+    """Add a response to a review"""
     review = get_object_or_404(Review, id=review_id, reviewed_user=request.user)
-    
-    # Verifică dacă există deja un răspuns
+
+    # Check whether a response already exists
     if hasattr(review, 'response'):
         messages.warning(request, "Ai răspuns deja la acest review.")
         return redirect('reviews:user_reviews', username=request.user.username)
@@ -139,7 +139,7 @@ def add_response_view(request, review_id):
 
 @login_required
 def edit_review_view(request, review_id):
-    """Editează un review"""
+    """Edit a review"""
     review = get_object_or_404(Review, id=review_id, reviewer=request.user)
     
     if request.method == 'POST':
@@ -161,7 +161,7 @@ def edit_review_view(request, review_id):
 @login_required
 @require_POST
 def delete_review_view(request, review_id):
-    """Șterge un review"""
+    """Delete a review"""
     review = get_object_or_404(Review, id=review_id, reviewer=request.user)
     username = review.reviewed_user.username
     review.delete()
@@ -172,7 +172,7 @@ def delete_review_view(request, review_id):
 @require_GET
 @ratelimit(key='ip', rate=settings.SENSITIVE_READ_RATE, method='GET', block=True)
 def reviews_stats_api(request, username):
-    """API pentru statistici review-uri"""
+    """API for review statistics"""
     user = get_object_or_404(User, username=username)
     
     reviews = Review.objects.filter(reviewed_user=user, is_approved=True)
@@ -195,7 +195,7 @@ def reviews_stats_api(request, username):
 
 @login_required
 def my_reviews_view(request):
-    """Review-urile pe care le-am lăsat eu"""
+    """The reviews I have written"""
     reviews = Review.objects.filter(
         reviewer=request.user
     ).select_related('reviewed_user', 'listing').order_by('-created_at')

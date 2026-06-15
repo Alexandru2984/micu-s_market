@@ -7,26 +7,26 @@ from django.dispatch import receiver
 User = get_user_model()
 
 class Review(models.Model):
-    # Cine scrie review-ul
+    # Who writes the review
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews_given', verbose_name="Recenzor")
-    # Pentru cine se scrie review-ul
+    # Who the review is about
     reviewed_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews_received', verbose_name="Utilizator recenzat")
-    # Anunțul pentru care se face review-ul (opțional)
+    # The listing the review is about (optional)
     listing = models.ForeignKey('listings.Listing', on_delete=models.SET_NULL, null=True, blank=True, related_name='reviews', verbose_name="Anunț")
-    
-    # Conținutul review-ului
+
+    # The review content
     rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], verbose_name="Rating")
     title = models.CharField(max_length=200, blank=True, verbose_name="Titlu")
     comment = models.TextField(verbose_name="Comentariu")
-    
-    # Tipul de tranzacție
+
+    # Transaction type
     TRANSACTION_TYPE_CHOICES = [
         ('purchase', 'Cumpărare'),
         ('sale', 'Vânzare'),
     ]
     transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPE_CHOICES, verbose_name="Tip tranzacție")
     
-    # Date și status
+    # Dates and status
     is_approved = models.BooleanField(default=True, verbose_name="Aprobat")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creat la")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Actualizat la")
@@ -35,7 +35,7 @@ class Review(models.Model):
         ordering = ['-created_at']
         verbose_name = "Recenzie"
         verbose_name_plural = "Recenzii"
-        # Un user poate lăsa un singur review pentru o anumită tranzacție
+        # A user can leave only one review per transaction
         unique_together = ['reviewer', 'reviewed_user', 'listing']
     
     def __str__(self):
@@ -43,13 +43,13 @@ class Review(models.Model):
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # Actualizează statisticile utilizatorului recenzat
+        # Update the reviewed user's statistics
         if hasattr(self.reviewed_user, 'profile'):
             self.reviewed_user.profile.update_statistics()
 
 
 class ReviewResponse(models.Model):
-    """Răspunsul utilizatorului la un review primit"""
+    """The user's response to a received review"""
     review = models.OneToOneField(Review, on_delete=models.CASCADE, related_name='response', verbose_name="Review")
     response_text = models.TextField(verbose_name="Răspuns")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creat la")

@@ -1,5 +1,5 @@
 """
-Teste pentru sistemul de recenzii — prevenire self-review, duplicate, access control
+Tests for the reviews system — preventing self-review, duplicates, access control
 """
 from django.test import TestCase, Client
 from django.urls import reverse
@@ -13,7 +13,7 @@ User = get_user_model()
 
 
 class ReviewSecurityTestCase(TestCase):
-    """Teste de securitate pentru review-uri"""
+    """Security tests for reviews"""
 
     def setUp(self):
         self.client = Client()
@@ -57,7 +57,7 @@ class ReviewSecurityTestCase(TestCase):
         )
 
     def test_cannot_review_yourself(self):
-        """Utilizatorul nu poate lăsa o recenzie pentru sine însuși"""
+        """A user cannot leave a review for themselves"""
         self.client.login(username='reviewer', password='ReviewPass123!')
         response = self.client.post(
             reverse('reviews:create_review', kwargs={'username': self.reviewer.username}),
@@ -67,12 +67,12 @@ class ReviewSecurityTestCase(TestCase):
                 'rating': 5
             }
         )
-        # Trebuie redirecționat cu eroare, NU creat review
+        # Must redirect with an error, NOT create a review
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Review.objects.filter(reviewer=self.reviewer, reviewed_user=self.reviewer).exists())
 
     def test_duplicate_review_prevented(self):
-        """Nu se pot lăsa două review-uri pentru același utilizator/anunț"""
+        """Two reviews cannot be left for the same user/listing"""
         Review.objects.create(
             reviewer=self.reviewer,
             reviewed_user=self.reviewed,
@@ -92,16 +92,16 @@ class ReviewSecurityTestCase(TestCase):
                 'rating': 1
             }
         )
-        # Trebuie redirecționat cu warning
+        # Must redirect with a warning
         self.assertEqual(response.status_code, 302)
-        # Trebuie să existe un singur review
+        # Only a single review must exist
         self.assertEqual(
             Review.objects.filter(reviewer=self.reviewer, reviewed_user=self.reviewed).count(),
             1
         )
 
     def test_review_listing_must_belong_to_reviewed_user(self):
-        """Review-ul nu poate fi atașat la anunțul altui utilizator."""
+        """A review cannot be attached to another user's listing."""
         self.client.login(username='reviewer', password='ReviewPass123!')
         response = self.client.post(
             reverse('reviews:create_review', kwargs={'username': self.reviewed.username}) +
@@ -124,14 +124,14 @@ class ReviewSecurityTestCase(TestCase):
         )
 
     def test_create_review_requires_login(self):
-        """Crearea de review-uri necesită autentificare"""
+        """Creating reviews requires authentication"""
         response = self.client.get(
             reverse('reviews:create_review', kwargs={'username': self.reviewed.username})
         )
         self.assertEqual(response.status_code, 302)
 
     def test_my_reviews_requires_login(self):
-        """Pagina 'review-urile mele' necesită autentificare"""
+        """The 'my reviews' page requires authentication"""
         response = self.client.get(reverse('reviews:my_reviews'))
         self.assertEqual(response.status_code, 302)
 
@@ -143,7 +143,7 @@ class ReviewSecurityTestCase(TestCase):
         self.assertEqual(response.status_code, 405)
 
     def test_delete_review_only_by_author(self):
-        """Doar autorul poate șterge propriul review"""
+        """Only the author can delete their own review"""
         review = Review.objects.create(
             reviewer=self.reviewer,
             reviewed_user=self.reviewed,
@@ -153,7 +153,7 @@ class ReviewSecurityTestCase(TestCase):
             transaction_type='purchase',
             rating=3
         )
-        # Alt user încearcă să șteargă
+        # A different user tries to delete it
         self.client.login(username='reviewed', password='ReviewedPass123!')
         response = self.client.post(
             reverse('reviews:delete_review', kwargs={'review_id': review.pk})
@@ -162,7 +162,7 @@ class ReviewSecurityTestCase(TestCase):
         self.assertTrue(Review.objects.filter(pk=review.pk).exists())
 
     def test_delete_review_recalculates_profile_rating(self):
-        """Ștergerea unei recenzii actualizează ratingul public al profilului."""
+        """Deleting a review updates the profile's public rating."""
         review = Review.objects.create(
             reviewer=self.reviewer,
             reviewed_user=self.reviewed,
@@ -181,7 +181,7 @@ class ReviewSecurityTestCase(TestCase):
         self.assertEqual(self.reviewed.profile.average_rating, 0)
 
     def test_bulk_delete_review_recalculates_profile_rating(self):
-        """Ștergerile bulk din admin/queryset actualizează ratingul profilului."""
+        """Bulk deletes from admin/queryset update the profile rating."""
         Review.objects.create(
             reviewer=self.reviewer,
             reviewed_user=self.reviewed,
