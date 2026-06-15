@@ -4,7 +4,7 @@
 
 {% block content %}
 
-{# Alegem valorile din context (fără variabile inexistente) #}
+{# Pick the values from the context (no nonexistent variables) #}
 {% firstof reviewed_user.username reviewed_user.get_username reviewed_user as display_user %}
 {% firstof avg_rating average_rating 0 as avg %}
 {% firstof total_reviews page_obj.paginator.count 0 as cnt %}
@@ -22,7 +22,7 @@
         <span style="color:#94a3b8"> • {{ r.created_at|date:"j M Y" }}</span>
       </div>
       <div style="color:#f59e0b;letter-spacing:.05em;margin:.15rem 0">
-        {# stele simple, fără dependențe #}
+        {# simple stars, no dependencies #}
         {% with rating=r.rating|default:0 %}
           {% for _ in "12345"|make_list %}
             {% if forloop.counter <= rating %}★{% else %}☆{% endif %}

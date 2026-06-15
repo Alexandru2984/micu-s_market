@@ -1,9 +1,9 @@
-// Badge de mesaje necitite în timp real prin WebSocket. Serverul trimite numărul
-// la conectare și la fiecare mesaj nou. Scriptul de polling din header rămâne ca
-// fallback (ex. pentru scăderea contorului după citire / când WS-ul e indisponibil).
+// Real-time unread-message badge over WebSocket. The server sends the count
+// on connect and on every new message. The header polling script remains as a
+// fallback (e.g. to decrement the counter after reading / when the WS is unavailable).
 (function () {
     const badge = document.getElementById('unread-count');
-    if (!badge) return; // doar utilizatorii autentificați au badge
+    if (!badge) return; // only authenticated users have a badge
 
     function setCount(n) {
         if (n > 0) {

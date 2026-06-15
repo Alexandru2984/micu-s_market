@@ -1,14 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
   
-  // Inițializează compresia pentru avatar
+  // Initialize avatar compression
   initializeAvatarCompression();
-  
-  // Inițializează compresia pentru imagini listing
+
+  // Initialize compression for listing images
   initializeListingImageCompression();
 });
 
 /**
- * Comprimă și redimensionează avatarul de profil
+ * Compress and resize the profile avatar
  */
 function initializeAvatarCompression() {
   const avatarInput = document.getElementById('id_avatar');
@@ -18,32 +18,32 @@ function initializeAvatarCompression() {
     const file = e.target.files[0];
     if (!file || !file.type.match('image.*')) return;
     
-    // Preview și compresie pentru avatar
+    // Preview and compression for the avatar
     compressImage(file, {
       maxWidth: 300,
       maxHeight: 300,
       quality: 0.8,
       outputFormat: 'webp'
     }).then(compressedFile => {
-      // Înlocuiește fișierul original cu cel comprimat
+      // Replace the original file with the compressed one
       const dt = new DataTransfer();
       dt.items.add(compressedFile);
       avatarInput.files = dt.files;
-      
-      // Afișează preview
+
+      // Show preview
       showImagePreview(compressedFile, 'avatar-preview');
     });
   });
 }
 
 /**
- * Comprimă imaginile pentru listing-uri
+ * Compress images for listings
  */
 function initializeListingImageCompression() {
   const imageInputs = document.querySelectorAll('input[type="file"][accept*="image"]');
   
   imageInputs.forEach(input => {
-    if (input.id === 'id_avatar') return; // Skip avatar, e tratat separat
+    if (input.id === 'id_avatar') return; // Skip avatar, it's handled separately
     
     input.addEventListener('change', function(e) {
       const files = Array.from(e.target.files);
@@ -59,12 +59,12 @@ function initializeListingImageCompression() {
           outputFormat: 'webp'
         });
       })).then(compressedFiles => {
-        // Înlocuiește fișierele originale cu cele comprimate
+        // Replace the original files with the compressed ones
         const dt = new DataTransfer();
         compressedFiles.forEach(file => dt.items.add(file));
         input.files = dt.files;
-        
-        // Afișează preview pentru toate imaginile
+
+        // Show preview for all images
         showMultipleImagePreview(compressedFiles, input.id + '-preview');
       });
     });
@@ -72,7 +72,7 @@ function initializeListingImageCompression() {
 }
 
 /**
- * Funcție principală pentru comprimarea imaginilor
+ * Main function for compressing images
  */
 function compressImage(file, options = {}) {
   return new Promise((resolve) => {
@@ -88,25 +88,25 @@ function compressImage(file, options = {}) {
     const img = new Image();
     
     img.onload = function() {
-      // Calculează dimensiunile noi păstrând aspect ratio
+      // Compute the new dimensions while keeping the aspect ratio
       let { width, height } = calculateDimensions(img.width, img.height, maxWidth, maxHeight);
       
       canvas.width = width;
       canvas.height = height;
       
-      // Desenează imaginea redimensionată
+      // Draw the resized image
       ctx.drawImage(img, 0, 0, width, height);
-      
-      // Convertește la blob în formatul dorit
+
+      // Convert to a blob in the desired format
       canvas.toBlob((blob) => {
-        // Creează un nou fișier cu numele original dar extensia nouă
+        // Create a new file with the original name but the new extension
         const newFileName = file.name.replace(/\.[^/.]+$/, `.${outputFormat}`);
         const compressedFile = new File([blob], newFileName, {
           type: `image/${outputFormat}`,
           lastModified: Date.now()
         });
         
-        console.log(`Imaginea ${file.name} comprimată: ${(file.size / 1024).toFixed(1)}KB → ${(compressedFile.size / 1024).toFixed(1)}KB`);
+        console.log(`Image ${file.name} compressed: ${(file.size / 1024).toFixed(1)}KB → ${(compressedFile.size / 1024).toFixed(1)}KB`);
         resolve(compressedFile);
       }, `image/${outputFormat}`, quality);
     };
@@ -116,13 +116,13 @@ function compressImage(file, options = {}) {
 }
 
 /**
- * Calculează dimensiunile noi păstrând aspect ratio
+ * Compute the new dimensions while keeping the aspect ratio
  */
 function calculateDimensions(originalWidth, originalHeight, maxWidth, maxHeight) {
   let width = originalWidth;
   let height = originalHeight;
   
-  // Redimensionează doar dacă e necesar
+  // Resize only if necessary
   if (width > maxWidth) {
     height = (height * maxWidth) / width;
     width = maxWidth;
@@ -137,7 +137,7 @@ function calculateDimensions(originalWidth, originalHeight, maxWidth, maxHeight)
 }
 
 /**
- * Afișează preview pentru o singură imagine
+ * Show preview for a single image
  */
 function showImagePreview(file, containerId) {
   const container = document.getElementById(containerId) || createPreviewContainer(containerId);
@@ -158,7 +158,7 @@ function showImagePreview(file, containerId) {
 }
 
 /**
- * Afișează preview pentru multiple imagini
+ * Show preview for multiple images
  */
 function showMultipleImagePreview(files, containerId) {
   const container = document.getElementById(containerId) || createPreviewContainer(containerId);
@@ -184,7 +184,7 @@ function showMultipleImagePreview(files, containerId) {
 }
 
 /**
- * Creează container pentru preview dacă nu există
+ * Create a preview container if it does not exist
  */
 function createPreviewContainer(containerId) {
   const container = document.createElement('div');
@@ -198,7 +198,7 @@ function createPreviewContainer(containerId) {
     background-color: #f9f9f9;
   `;
   
-  // Încearcă să găsească un loc potrivit să insereze container-ul
+  // Try to find a suitable place to insert the container
   const fileInput = document.querySelector(`input[type="file"]`);
   if (fileInput && fileInput.parentNode) {
     fileInput.parentNode.appendChild(container);
@@ -208,7 +208,7 @@ function createPreviewContainer(containerId) {
 }
 
 /**
- * Utility pentru formatarea dimensiunii fișierelor
+ * Utility for formatting file sizes
  */
 function formatFileSize(bytes) {
   if (bytes === 0) return '0 Bytes';

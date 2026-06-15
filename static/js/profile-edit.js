@@ -1,6 +1,6 @@
 // Profile Edit JavaScript functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Adaugă funcționalitate pentru preview avatar
+    // Add avatar preview functionality
     const avatarInput = document.getElementById('id_avatar');
     if (avatarInput) {
         avatarInput.addEventListener('change', function(e) {

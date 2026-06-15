@@ -1,5 +1,5 @@
-// Comutator temă light/dark. Tema inițială e aplicată de scriptul inline din <head>
-// (anti-FOUC) înainte de paint; aici doar gestionăm butonul și persistăm alegerea.
+// Light/dark theme toggle. The initial theme is applied by the inline script in <head>
+// (anti-FOUC) before paint; here we only handle the button and persist the choice.
 (function () {
     const STORAGE_KEY = 'mm-theme';
 

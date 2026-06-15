@@ -1,6 +1,6 @@
-// Chat în timp real prin WebSocket (Django Channels), cu fallback AJAX pentru
-// atașamente / când WS-ul e indisponibil. Mesajele proprii se randează la ecoul
-// serverului (au id real); deduplicare după id ca să nu apară dublate.
+// Real-time chat over WebSocket (Django Channels), with an AJAX fallback for
+// attachments / when the WS is unavailable. Own messages are rendered on the
+// server's echo (they have a real id); deduplicated by id so they don't appear twice.
 (function () {
     const root = document.getElementById('chatRoot');
     if (!root) return;
@@ -120,13 +120,13 @@
         return false;
     }
 
-    // ---- Trimitere mesaj ----
+    // ---- Send message ----
     async function submit() {
         const content = input.value.trim();
         const hasFiles = fileInput.files && fileInput.files.length > 0;
         if (!content && !hasFiles) return;
 
-        // Cu atașamente sau fără WS → POST multipart (fallback). Altfel, prin WS.
+        // With attachments or without WS → multipart POST (fallback). Otherwise, over WS.
         if (hasFiles || !send({ type: 'message', content: content })) {
             await postFallback(content, hasFiles);
         }
@@ -155,7 +155,7 @@
                 const data = await resp.json();
                 if (data && data.message) renderMessage(data.message);
             }
-        } catch (e) { /* nimic — utilizatorul poate reîncerca */ }
+        } catch (e) { /* nothing — the user can retry */ }
     }
 
     // ---- UI composer ----

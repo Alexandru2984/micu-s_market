@@ -16,15 +16,15 @@ document.querySelector('.contact-btn')?.addEventListener('click', function() {
 // Favorite functionality
 document.querySelector('.favorite-btn')?.addEventListener('click', function() {
     const icon = this.querySelector('i');
-    const textSpan = this.querySelector('span'); // Selecționează elementul <span>
+    const textSpan = this.querySelector('span'); // Select the <span> element
     
     if (icon.classList.contains('fas')) {
-        // Logica pentru a elimina din favorite
+        // Logic to remove from favorites
         icon.classList.remove('fas');
         icon.classList.add('far');
         textSpan.textContent = 'Adaugă la favorite';
     } else {
-        // Logica pentru a adăuga la favorite
+        // Logic to add to favorites
         icon.classList.remove('far');
         icon.classList.add('fas');
         textSpan.textContent = 'În favorite';
