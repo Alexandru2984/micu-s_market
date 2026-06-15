@@ -9,7 +9,7 @@ class Favorite(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Adăugat la")
     
     class Meta:
-        unique_together = ['user', 'listing']  # Un user nu poate adăuga același anunț de mai multe ori la favorite
+        unique_together = ['user', 'listing']  # A user cannot favorite the same listing more than once
         ordering = ['-created_at']
         verbose_name = "Favorit"
         verbose_name_plural = "Favorite"
@@ -23,7 +23,7 @@ class Favorite(models.Model):
 
 
 class SavedSearch(models.Model):
-    """Căutări salvate de utilizatori pentru notificări"""
+    """Searches saved by users for notifications"""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved_searches', verbose_name="Utilizator")
     name = models.CharField(max_length=100, verbose_name="Nume căutare")
     search_query = models.CharField(max_length=200, blank=True, verbose_name="Termen căutare")
@@ -50,7 +50,7 @@ class SavedSearch(models.Model):
         return f"{self.user.username} - {self.name}"
     
     def get_search_params(self):
-        """Returnează parametrii de căutare ca dicționar"""
+        """Return the search parameters as a dictionary"""
         params = {}
         if self.search_query:
             params['q'] = self.search_query
