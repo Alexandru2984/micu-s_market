@@ -74,7 +74,6 @@ INSTALLED_APPS = [
     "audit.apps.AuditConfig",
     "billing.apps.BillingConfig",
     "jobs.apps.JobsConfig",
-    # "ws",  # doar dacă ai app ws
 ]
 
 MIDDLEWARE = [

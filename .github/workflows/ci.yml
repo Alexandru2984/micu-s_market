@@ -86,7 +86,7 @@ jobs:
         run: pip-audit -r requirements.txt
 
       - name: Static security scan
-        run: bandit -q -r Micu_market accounts api audit billing categories chat dashboard favorites jobs listings notifications pages reviews search ws -x "*/tests.py,*/migrations/*"
+        run: bandit -q -r Micu_market accounts api audit billing categories chat dashboard favorites jobs listings notifications pages reviews search -x "*/tests.py,*/migrations/*"
 
   deploy-check:
     name: Django deploy checks
