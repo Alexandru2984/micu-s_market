@@ -21,21 +21,21 @@ class Category(models.Model):
         return self.name
     
     def get_absolute_url(self):
-        # Categoriile se răsfoiesc prin lista de anunțuri filtrată (?category=slug);
-        # ruta categories:category_detail nu primește slug, deci reverse-ul ei dădea
-        # NoReverseMatch (500) oriunde era folosit get_absolute_url.
+        # Categories are browsed through the filtered listings list (?category=slug);
+        # the categories:category_detail route takes no slug, so reversing it raised
+        # NoReverseMatch (500) wherever get_absolute_url was used.
         return f"{reverse('listings:list')}?category={self.slug}"
-    
+
     @property
     def get_all_children(self):
-        """Returnează toate subcategoriile recursiv (cu protecție la loop infinit)"""
+        """Return all subcategories recursively (with infinite-loop protection)"""
         return self._collect_children(visited=set())
 
     def _collect_children(self, visited):
-        """Colectare recursivă cu set de vizitate pentru a preveni cicluri infinite"""
+        """Recursive collection with a visited set to prevent infinite cycles"""
         children = []
         if self.pk in visited:
-            return children  # previne recursia infinită
+            return children  # prevents infinite recursion
         visited.add(self.pk)
         for child in self.subcategories.filter(is_active=True):
             children.append(child)
