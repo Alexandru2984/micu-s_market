@@ -82,6 +82,7 @@ MIDDLEWARE = [
     "Micu_market.security.ClientIPMiddleware",
     "Micu_market.security.SecurityHeadersMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -150,12 +151,20 @@ LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
 
 # ======================
-# LOCALE
+# LOCALE / i18n
 # ======================
-LANGUAGE_CODE = "ro-ro"
+LANGUAGE_CODE = "ro"
 TIME_ZONE = "Europe/Bucharest"
 USE_I18N = True
 USE_TZ = True
+
+# Supported languages. Romanian is the source language; English is the first
+# translation. Translations live in locale/<lang>/LC_MESSAGES/django.po.
+LANGUAGES = [
+    ("ro", "Română"),
+    ("en", "English"),
+]
+LOCALE_PATHS = [BASE_DIR / "locale"]
 
 # ======================
 # STATIC / MEDIA
