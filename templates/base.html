@@ -83,6 +83,7 @@
     <script src="{% static 'js/pwa.js' %}" defer></script>
     <script src="{% static 'js/cookie-consent.js' %}" defer></script>
     <script src="{% static 'js/theme.js' %}" defer></script>
+    {% if user.is_authenticated %}<script src="{% static 'js/notifications.js' %}" defer></script>{% endif %}
     {% block extra_js %}{% endblock %}
 </body>
 </html>
