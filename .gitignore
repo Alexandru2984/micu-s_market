@@ -9,11 +9,11 @@ env/
 *.bak*
 !.env.example
 
-# Settings locale/temporare (nu se comit)
+# Local/temporary settings (not committed)
 Micu_market/settings_local.py
 Micu_market/settings_loadtest.py
 
-# Date seed cu PII sau date sensibile
+# Seed data with PII or sensitive data
 backup_seed.json
 *.json.bak
 

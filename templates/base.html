@@ -1,22 +1,22 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="{{ LANGUAGE_CODE|default:'ro' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Micu's Market{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}Micu's Market este marketplace-ul pentru anunțuri locale, cumpărături sigure și vânzări rapide în România.{% endblock %}">
+    <meta name="description" content="{% block meta_description %}{% trans "Micu's Market este marketplace-ul pentru anunțuri locale, cumpărături sigure și vânzări rapide în România." %}{% endblock %}">
     <meta name="robots" content="{% block meta_robots %}index,follow{% endblock %}">
     <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
     <meta property="og:site_name" content="Micu's Market">
     <meta property="og:title" content="{% block og_title %}Micu's Market{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}Anunțuri locale, vânzători verificați și cumpărături rapide în România.{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{% trans "Anunțuri locale, vânzători verificați și cumpărături rapide în România." %}{% endblock %}">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
     <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
     {% block og_image %}{% endblock %}
     <meta name="twitter:card" content="{% block twitter_card %}summary{% endblock %}">
     <meta name="twitter:title" content="{% block twitter_title %}Micu's Market{% endblock %}">
-    <meta name="twitter:description" content="{% block twitter_description %}Anunțuri locale, vânzători verificați și cumpărături rapide în România.{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{% trans "Anunțuri locale, vânzători verificați și cumpărături rapide în România." %}{% endblock %}">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
@@ -70,10 +70,11 @@
 
     <div class="cookie-consent" id="cookieConsent" hidden>
         <div class="cookie-consent__text">
-            Folosim cookie-uri esențiale pentru autentificare, securitate și preferințe. Detalii în
-            <a href="{% url 'pages:privacy' %}">politica de confidențialitate</a>.
+            {% url 'pages:privacy' as privacy_url %}
+            {% blocktrans %}Folosim cookie-uri esențiale pentru autentificare, securitate și preferințe. Detalii în
+            <a href="{{ privacy_url }}">politica de confidențialitate</a>.{% endblocktrans %}
         </div>
-        <button type="button" class="cookie-consent__button" id="cookieConsentAccept">Accept</button>
+        <button type="button" class="cookie-consent__button" id="cookieConsentAccept">{% trans "Accept" %}</button>
     </div>
     
     <!-- JavaScript -->

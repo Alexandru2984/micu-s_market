@@ -97,7 +97,7 @@ ROOT_URLCONF = "Micu_market.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],  # PRIORITATE: template-uri globale
+        "DIRS": [BASE_DIR / "templates"],  # PRIORITY: global templates
         "APP_DIRS": True,  # then per-app templates
         "OPTIONS": {
             "context_processors": [
@@ -105,6 +105,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.request",  # required by allauth
+                "django.template.context_processors.i18n",  # LANGUAGE_CODE/LANGUAGES for the switcher
             ],
         },
     },

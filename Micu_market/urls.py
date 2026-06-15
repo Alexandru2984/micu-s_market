@@ -15,6 +15,9 @@ urlpatterns = [
     path("offline/", offline_view, name="offline"),
     path(settings.ADMIN_URL, admin.site.urls),
 
+    # Language switcher (set_language redirect view)
+    path("i18n/", include("django.conf.urls.i18n")),
+
     # Django Allauth URLs
     path("accounts/", include("allauth.urls")),
     

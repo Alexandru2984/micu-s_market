@@ -43,3 +43,36 @@
     font-weight: 600;
     border: 2px solid white;
 }
+
+/* Language switcher */
+.lang-switcher {
+    display: inline-flex;
+    gap: 2px;
+    align-items: center;
+    margin-left: 0.25rem;
+}
+
+.lang-switcher .lang-btn {
+    appearance: none;
+    border: 1px solid var(--border, #d3d8df);
+    background: var(--surface, #fff);
+    color: var(--text-muted, #5f6b7a);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 4px 7px;
+    border-radius: var(--radius-sm, 8px);
+    cursor: pointer;
+    transition: background var(--transition, 150ms ease), color var(--transition, 150ms ease);
+}
+
+.lang-switcher .lang-btn:hover {
+    background: var(--surface-2, #f1f3f5);
+    color: var(--text, #14181f);
+}
+
+.lang-switcher .lang-btn.active {
+    background: var(--accent, #14b8a6);
+    border-color: var(--accent, #14b8a6);
+    color: var(--accent-contrast, #fff);
+}
