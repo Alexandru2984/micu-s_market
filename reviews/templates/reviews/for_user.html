@@ -6,7 +6,7 @@
 {% block content %}
 <div class="reviews-container">
     <div class="container">
-        <!-- Header utilizator -->
+        <!-- User header -->
         <div class="user-header">
             <div class="user-info">
                 <div class="user-avatar">
@@ -57,7 +57,7 @@
         </div>
 
         {% if total_reviews > 0 %}
-            <!-- Statistici rating -->
+            <!-- Rating statistics -->
             <div class="rating-stats">
                 <h3>Distribuția rating-urilor</h3>
                 <div class="rating-bars">
@@ -144,7 +144,7 @@
                             {% endif %}
                         </div>
                         
-                        <!-- Răspunsul proprietarului -->
+                        <!-- Owner's response -->
                         {% if review.response %}
                             <div class="review-response">
                                 <div class="response-header">

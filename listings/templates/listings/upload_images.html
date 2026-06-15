@@ -88,12 +88,12 @@
                     
                     <div id="image-forms" class="space-y-4">
                         {% for form in formset %}
-                            {% if not form.instance.pk %}  <!-- Doar formele pentru imagini noi -->
+                            {% if not form.instance.pk %}  <!-- Only the forms for new images -->
                                 <div class="image-form-row border border-gray-200 rounded-lg p-4">
                                     {{ form.id }}
                                     
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <!-- Imagine -->
+                                        <!-- Image -->
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                                 {{ form.image.label }}

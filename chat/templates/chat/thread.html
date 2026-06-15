@@ -8,7 +8,7 @@
 {% block content %}
 <div class="conversation-container">
     <div class="container">
-        <!-- Header conversație -->
+        <!-- Conversation header -->
         <div class="conversation-header">
             <div class="header-left">
                 <a href="{% url 'chat:inbox' %}" class="back-btn">
@@ -44,7 +44,7 @@
             </div>
         </div>
 
-        <!-- Mesaje -->
+        <!-- Messages -->
         <div class="messages-container" id="messagesContainer">
             <div class="messages-list" id="messagesList">
                 {% for message in page_obj reversed %}
@@ -63,7 +63,7 @@
                             <div class="message-bubble">
                                 <p>{{ message.content|linebreaks }}</p>
                                 
-                                <!-- Atașamente -->
+                                <!-- Attachments -->
                                 {% if message.attachments.all %}
                                     <div class="message-attachments">
                                         {% for attachment in message.attachments.all %}
@@ -96,7 +96,7 @@
             </div>
         </div>
 
-        <!-- Form pentru mesaj nou -->
+        <!-- Form for a new message -->
         <div class="message-form-container">
             <form id="messageForm" method="post" action="{% url 'chat:send_message' conversation.pk %}" enctype="multipart/form-data">
                 {% csrf_token %}

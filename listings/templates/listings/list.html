@@ -131,7 +131,7 @@
             </ol>
         </nav>
 
-        <!-- Header cu titlu și filtre -->
+        <!-- Header with title and filters -->
         <div class="listings-header">
             <div class="header-content">
                 <h1>
@@ -232,7 +232,7 @@
         
         <!-- Layout principal -->
         <div class="listings-layout">
-            <!-- Sidebar filtre -->
+            <!-- Filters sidebar -->
             <aside class="filters-sidebar">
                 <div class="filters-card">
                     <div class="filters-header">
@@ -240,7 +240,7 @@
                     </div>
                     
                     <form method="get" class="filters-form" id="filtersForm">
-                        <!-- Căutare -->
+                        <!-- Search -->
                         <div class="filter-group">
                             <label for="search" class="filter-label">
                                 <i class="fas fa-search"></i>
@@ -253,7 +253,7 @@
                             </div>
                         </div>
                         
-                        <!-- Categoria -->
+                        <!-- Category -->
                         <div class="filter-group">
                             <label for="category" class="filter-label">
                                 <i class="fas fa-tags"></i>
@@ -273,7 +273,7 @@
                             </div>
                         </div>
                         
-                        <!-- Prețul -->
+                        <!-- Price -->
                         <div class="filter-group">
                             <label class="filter-label">
                                 <i class="fas fa-euro-sign"></i>
@@ -335,7 +335,7 @@
                             </div>
                         </div>
                         
-                        <!-- Orașul -->
+                        <!-- City -->
                         <div class="filter-group">
                             <label for="city" class="filter-label">
                                 <i class="fas fa-map-marker-alt"></i>
@@ -405,10 +405,10 @@
                 </div>
             </aside>
             
-            <!-- Conținutul principal -->
+            <!-- Main content -->
             <main class="listings-main">
                 {% if page_obj %}
-                    <!-- Grila cu anunțuri -->
+                    <!-- Listings grid -->
                     <div class="listings-grid" data-listings-grid>
                         {% for listing in page_obj %}
                             <a href="{% url 'listings:detail' listing.slug %}" class="listing-card">
@@ -477,7 +477,7 @@
                     {% endif %}
                     
                 {% else %}
-                    <!-- Stare goală -->
+                    <!-- Empty state -->
                     <div class="no-listings" data-listings-empty>
                         <i class="fas fa-search"></i>
                         <h3>Nu am găsit anunțuri</h3>
