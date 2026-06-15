@@ -20,7 +20,7 @@ User = get_user_model()
 @ratelimit(key='ip', rate=settings.AUTH_REGISTER_RATE, method='POST', block=True)
 @sensitive_post_parameters('password1', 'password2')
 def register_view(request):
-    """Înregistrare utilizator nou"""
+    """Register a new user"""
     if request.user.is_authenticated:
         return redirect('listings:home')
     
@@ -40,7 +40,7 @@ def register_view(request):
 @ratelimit(key='post:username', rate=settings.AUTH_LOGIN_USER_RATE, method='POST', block=True)
 @sensitive_post_parameters('password')
 def login_view(request):
-    """Autentificare utilizator"""
+    """Authenticate a user"""
     if request.user.is_authenticated:
         return redirect('listings:home')
     
@@ -69,7 +69,7 @@ def login_view(request):
 
 @require_POST
 def logout_view(request):
-    """Deconectare utilizator — acceptă doar POST pentru a preveni CSRF force-logout"""
+    """Log the user out — accepts POST only to prevent CSRF force-logout"""
     actor = request.user if request.user.is_authenticated else None
     audit_log("auth.logout", request=request, actor=actor)
     logout(request)
@@ -78,12 +78,12 @@ def logout_view(request):
 
 @login_required
 def profile_view(request):
-    """Profilul utilizatorului curent"""
+    """The current user's profile"""
     from django.db.models import Q
-    # Asigură-te că utilizatorul are un profil
+    # Make sure the user has a profile
     profile, created = UserProfile.objects.get_or_create(user=request.user)
-    
-    # Calculează statistici într-un singur query agregat
+
+    # Compute statistics in a single aggregate query
     stats_qs = Listing.objects.filter(owner=request.user).aggregate(
         total=Count('id'),
         active=Count('id', filter=Q(status='active')),
@@ -105,7 +105,7 @@ def profile_view(request):
 
 @login_required
 def profile_edit_view(request):
-    """Editează profilul utilizatorului"""
+    """Edit the user's profile"""
     profile, created = UserProfile.objects.get_or_create(user=request.user)
     
     if request.method == 'POST':
@@ -127,7 +127,7 @@ def profile_edit_view(request):
 @login_required
 @require_POST
 def request_verification_view(request):
-    """Trimite profilul utilizatorului către verificare manuală."""
+    """Submit the user's profile for manual verification."""
     profile, created = UserProfile.objects.get_or_create(user=request.user)
 
     if profile.is_verified:
@@ -143,19 +143,19 @@ def request_verification_view(request):
     return redirect('accounts:profile')
 
 def public_profile_view(request, username):
-    """Profilul public al unui utilizator"""
+    """A user's public profile"""
     user = get_object_or_404(User, username=username)
-    
-    # Nu auto-crea profiluri în view-uri GET publice
+
+    # Do not auto-create profiles in public GET views
     try:
         profile = user.profile
     except UserProfile.DoesNotExist:
         profile = None
-    
-    # Anunțurile active ale utilizatorului
+
+    # The user's active listings
     listings = Listing.objects.filter(owner=user, status='active').order_by('-created_at')[:6]
-    
-    # Statistici publice — un singur query
+
+    # Public statistics — a single query
     from django.db.models import Q
     stats_qs = Listing.objects.filter(owner=user).aggregate(
         total=Count('id', filter=Q(status='active')),
@@ -207,5 +207,5 @@ def report_user_view(request, username):
 
     return redirect('accounts:public_profile', username=username)
 
-# my_listings_view a fost mutat în listings/views.py (versiunea canonică cu filtrare status)
-# URL-ul accounts:my_listings poate redirecta acolo dacă e nevoie
+# my_listings_view was moved to listings/views.py (the canonical version with status filtering)
+# The accounts:my_listings URL can redirect there if needed

@@ -36,7 +36,7 @@ class UserProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    # Statistici
+    # Statistics
     total_listings = models.IntegerField(default=0, verbose_name="Total anunțuri")
     total_sales = models.IntegerField(default=0, verbose_name="Total vânzări")
     average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00, verbose_name="Rating mediu")
@@ -50,8 +50,8 @@ class UserProfile(models.Model):
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        
-        # Redimensionează avatarul
+
+        # Resize the avatar
         if self.avatar:
             img_path = self.avatar.path
             with Image.open(img_path) as img:
@@ -102,16 +102,16 @@ class UserProfile(models.Model):
         ])
     
     def update_statistics(self):
-        """Actualizează statisticile utilizatorului — query-uri SQL, nu Python loops"""
+        """Update the user's statistics — SQL queries, not Python loops"""
         from listings.models import Listing
         from reviews.models import Review
         from django.db.models import Avg
 
-        # Contorizare anunțuri active și vândute
+        # Count active and sold listings
         self.total_listings = Listing.objects.filter(owner=self.user, status='active').count()
         self.total_sales = Listing.objects.filter(owner=self.user, status='sold').count()
 
-        # Rating mediu — Avg SQL, nu sum() în Python
+        # Average rating — SQL Avg, not sum() in Python
         result = Review.objects.filter(
             reviewed_user=self.user,
             is_approved=True
@@ -121,20 +121,20 @@ class UserProfile(models.Model):
         self.save(update_fields=['total_listings', 'total_sales', 'average_rating'])
 
 
-# Signal pentru a crea automat un profil când se creează un user nou
+# Signal that automatically creates a profile when a new user is created
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-    """Creează profilul şi preferințele la primul save al user-ului"""
+    """Create the profile and preferences on the user's first save"""
     if created:
         UserProfile.objects.get_or_create(user=instance)
-        # Notă: NotificationPreference e creat din notifications/models.py signal
+        # Note: NotificationPreference is created by the notifications/models.py signal
 
 
 def _update_profile_stats(user):
-    """Helper: actualizează statisticile profilului dacă există"""
+    """Helper: update the profile statistics if a profile exists"""
     try:
         user.profile.update_statistics()
     except UserProfile.DoesNotExist:

@@ -1,5 +1,5 @@
 """
-Teste pentru sistemul de autentificare și profiluri
+Tests for the authentication and profiles system
 """
 from django.test import TestCase, Client
 from django.urls import reverse
@@ -11,7 +11,7 @@ User = get_user_model()
 
 
 class AuthViewsTestCase(TestCase):
-    """Teste pentru login, logout, register"""
+    """Tests for login, logout, register"""
 
     def setUp(self):
         self.client = Client()
@@ -22,18 +22,18 @@ class AuthViewsTestCase(TestCase):
         )
 
     def test_login_view_get(self):
-        """Pagina de login se încarcă corect"""
+        """The login page loads correctly"""
         response = self.client.get(reverse('accounts:login'))
         self.assertIn(response.status_code, [200, 301, 302])
 
     def test_login_authenticated_redirect(self):
-        """Utilizatorul autentificat este redirecționat de pe login"""
+        """An authenticated user is redirected away from login"""
         self.client.login(username='testuser', password='SecurePass123!')
         response = self.client.get(reverse('accounts:login'))
         self.assertEqual(response.status_code, 302)
 
     def test_login_rejects_external_next_url(self):
-        """Loginul nu redirecționează către domenii externe din next"""
+        """Login does not redirect to external domains via next"""
         response = self.client.post(
             reverse('accounts:login') + '?next=https://evil.example/phish',
             {'username': 'testuser', 'password': 'SecurePass123!'},
@@ -42,22 +42,22 @@ class AuthViewsTestCase(TestCase):
         self.assertEqual(response.url, reverse('listings:home'))
 
     def test_logout_requires_post(self):
-        """Logout custom acceptă DOAR POST, nu GET (protecție CSRF force-logout)"""
+        """Custom logout accepts POST ONLY, not GET (CSRF force-logout protection)"""
         self.client.login(username='testuser', password='SecurePass123!')
-        
-        # GET pe logout NU trebuie să deconecteze
+
+        # A GET on logout must NOT log the user out
         response = self.client.get(reverse('accounts:logout'))
-        # Trebuie să returneze 405 (Method Not Allowed)
+        # It must return 405 (Method Not Allowed)
         self.assertEqual(response.status_code, 405)
 
     def test_logout_post_works(self):
-        """Logout via POST funcționează corect"""
+        """Logout via POST works correctly"""
         self.client.login(username='testuser', password='SecurePass123!')
         response = self.client.post(reverse('accounts:logout'))
         self.assertEqual(response.status_code, 302)
 
     def test_register_view_get(self):
-        """Pagina de înregistrare se încarcă"""
+        """The registration page loads"""
         response = self.client.get(reverse('accounts:register'))
         self.assertIn(response.status_code, [200, 301, 302])
 
@@ -77,13 +77,13 @@ class AuthViewsTestCase(TestCase):
         self.assertIn('email', form.errors)
 
     def test_profile_view_requires_login(self):
-        """Profile view necesită autentificare"""
+        """The profile view requires authentication"""
         response = self.client.get(reverse('accounts:profile'))
         self.assertEqual(response.status_code, 302)
         self.assertIn('/login', response.url)
 
     def test_profile_view_authenticated(self):
-        """Profilul se afișează pentru utilizatorul autentificat"""
+        """The profile is shown for an authenticated user"""
         self.client.login(username='testuser', password='SecurePass123!')
         response = self.client.get(reverse('accounts:profile'))
         self.assertEqual(response.status_code, 200)
@@ -113,12 +113,12 @@ class AuthViewsTestCase(TestCase):
         self.assertIn('email', form.errors)
 
     def test_request_verification_requires_login(self):
-        """Cererea de verificare necesită autentificare."""
+        """The verification request requires authentication."""
         response = self.client.post(reverse('accounts:request_verification'))
         self.assertEqual(response.status_code, 302)
 
     def test_authenticated_user_can_request_verification(self):
-        """Utilizatorul autentificat poate cere verificarea profilului."""
+        """An authenticated user can request profile verification."""
         self.client.login(username='testuser', password='SecurePass123!')
         response = self.client.post(reverse('accounts:request_verification'))
 
@@ -128,7 +128,7 @@ class AuthViewsTestCase(TestCase):
         self.assertIsNotNone(self.user.profile.verification_requested_at)
 
     def test_pending_verification_request_is_not_duplicated(self):
-        """Cererea pending nu este rescrisă la POST-uri repetate."""
+        """A pending request is not overwritten by repeated POSTs."""
         self.user.profile.request_verification()
         requested_at = self.user.profile.verification_requested_at
 
@@ -141,11 +141,11 @@ class AuthViewsTestCase(TestCase):
         self.assertEqual(self.user.profile.verification_requested_at, requested_at)
 
     def test_public_profile_view(self):
-        """Profilul public este accesibil fără autentificare"""
+        """The public profile is accessible without authentication"""
         response = self.client.get(
             reverse('accounts:public_profile', kwargs={'username': self.user.username})
         )
-        self.assertIn(response.status_code, [200, 404])  # 404 dacă nu există profil
+        self.assertIn(response.status_code, [200, 404])  # 404 if no profile exists
 
     def test_report_user_requires_login(self):
         response = self.client.post(
@@ -178,7 +178,7 @@ class AuthViewsTestCase(TestCase):
 
 
 class UserProfileModelTestCase(TestCase):
-    """Teste pentru modelul UserProfile"""
+    """Tests for the UserProfile model"""
 
     def setUp(self):
         self.user = User.objects.create_user(
@@ -188,19 +188,19 @@ class UserProfileModelTestCase(TestCase):
         )
 
     def test_profile_created_on_user_creation(self):
-        """Profilul este creat automat când se creează un user"""
+        """The profile is created automatically when a user is created"""
         from accounts.models import UserProfile
         self.assertTrue(UserProfile.objects.filter(user=self.user).exists())
 
     def test_update_statistics_no_reviews(self):
-        """update_statistics funcționează fără review-uri"""
+        """update_statistics works without any reviews"""
         profile = self.user.profile
         profile.update_statistics()
         self.assertEqual(profile.average_rating, 0)
         self.assertEqual(profile.total_listings, 0)
 
     def test_approve_verification_marks_profile_verified(self):
-        """Aprobarea verificării setează badge-ul real."""
+        """Approving verification sets the real badge."""
         profile = self.user.profile
         profile.request_verification()
         profile.approve_verification()
@@ -211,7 +211,7 @@ class UserProfileModelTestCase(TestCase):
         self.assertIsNotNone(profile.verification_reviewed_at)
 
     def test_reject_verification_marks_profile_rejected(self):
-        """Respingerea verificării păstrează profilul neverificat."""
+        """Rejecting verification keeps the profile unverified."""
         profile = self.user.profile
         profile.request_verification()
         profile.reject_verification('Date insuficiente.')

@@ -7,16 +7,16 @@ import re
 class CustomAccountAdapter(DefaultAccountAdapter):
     def generate_unique_username(self, txts, regex=None):
         """
-        Generează un username unic din email
+        Generate a unique username from the email
         """
-        # Extrage partea din față a emailului
+        # Extract the local part of the email
         if txts:
             email_part = txts[0].split('@')[0]
-            # Curăță caractere speciale
+            # Strip special characters
             username = re.sub(r'[^a-zA-Z0-9._-]', '', email_part)
-            username = username[:30]  # Limitează la 30 caractere
-            
-            # Verifică dacă există deja
+            username = username[:30]  # Limit to 30 characters
+
+            # Check whether it already exists
             counter = 1
             original_username = username
             while User.objects.filter(username=username).exists():
@@ -27,12 +27,12 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             
             return username
         
-        # Fallback la metoda default
+        # Fall back to the default method
         return super().generate_unique_username(txts, regex)
-    
+
     def populate_username(self, request, user):
         """
-        Populează username-ul pentru user nou
+        Populate the username for a new user
         """
         if hasattr(user, 'email') and user.email:
             username = self.generate_unique_username([user.email])

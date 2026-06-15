@@ -66,7 +66,7 @@ class CustomAuthenticationForm(AuthenticationForm):
     }))
 
 class UserProfileForm(forms.ModelForm):
-    # Câmpuri pentru User
+    # Fields stored on the User model
     first_name = forms.CharField(
         max_length=30, 
         required=False,
@@ -132,11 +132,11 @@ class UserProfileForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        # Extrage user-ul din kwargs
+        # Pull the user out of kwargs
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        
-        # Populează câmpurile User dacă există
+
+        # Populate the User fields if a user is provided
         if self.user:
             self.fields['first_name'].initial = self.user.first_name
             self.fields['last_name'].initial = self.user.last_name
@@ -144,8 +144,8 @@ class UserProfileForm(forms.ModelForm):
 
     def save(self, commit=True):
         profile = super().save(commit=False)
-        
-        # Actualizează câmpurile User
+
+        # Update the User fields
         if self.user:
             self.user.first_name = self.cleaned_data['first_name']
             self.user.last_name = self.cleaned_data['last_name']
@@ -160,17 +160,17 @@ class UserProfileForm(forms.ModelForm):
     def clean_avatar(self):
         avatar = self.cleaned_data.get('avatar')
         if avatar:
-            # Verifică dimensiunea fişierului (max 5MB)
+            # Check the file size (max 5MB)
             if avatar.size > 5 * 1024 * 1024:
                 raise forms.ValidationError('Imaginea nu poate fi mai mare de 5MB.')
-            
-            # Verifică extensia
+
+            # Check the extension
             valid_extensions = ['jpg', 'jpeg', 'png', 'webp']
             ext = avatar.name.rsplit('.', 1)[-1].lower() if '.' in avatar.name else ''
             if ext not in valid_extensions:
                 raise forms.ValidationError('Doar fişierele JPG, PNG şi WebP sunt acceptate.')
-            
-            # Verifică conținutul real al fişierului cu Pillow
+
+            # Check the real file content with Pillow
             try:
                 from PIL import Image as PilImage
                 avatar.seek(0)
