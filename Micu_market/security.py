@@ -36,9 +36,9 @@ class SecurityHeadersMiddleware:
         response.setdefault("Cross-Origin-Opener-Policy", getattr(settings, "CROSS_ORIGIN_OPENER_POLICY", "same-origin"))
         response.setdefault("X-Download-Options", "noopen")
 
-        # CSP enforced este servit de nginx (snippets/security-headers.conf) ca
-        # sursă unică pentru market — nu îl dublăm din Django. Aici păstrăm doar
-        # varianta report-only mai strictă, care nu intră în conflict.
+        # The enforced CSP is served by nginx (snippets/security-headers.conf) as the
+        # single source for market — we don't duplicate it from Django. Here we
+        # keep only the stricter report-only variant, which doesn't conflict.
         csp_report_only = getattr(settings, "CONTENT_SECURITY_POLICY_REPORT_ONLY", "")
         if csp_report_only:
             response.setdefault("Content-Security-Policy-Report-Only", csp_report_only)

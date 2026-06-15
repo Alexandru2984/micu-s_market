@@ -1,6 +1,5 @@
-"""La crearea unui mesaj nou, împinge numărul de necitite către destinatar pe
-WebSocket (badge live). Best-effort: o eroare de channel layer nu trebuie să
-afecteze salvarea mesajului."""
+"""On a new message, push the unread count to the recipient over WebSocket (live
+badge). Best-effort: a channel-layer error must not affect saving the message."""
 import logging
 
 from asgiref.sync import async_to_sync

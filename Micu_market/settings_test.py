@@ -23,7 +23,7 @@ CSRF_COOKIE_SECURE = False
 
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
-# Testele nu au nevoie de Redis: channel layer în memorie.
+# Tests do not need Redis: in-memory channel layer.
 CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
 PASSWORD_HASHERS = [

@@ -1,5 +1,5 @@
-"""Publicare mesaje pe channel layer — folosit atât de consumer (WS), cât și de
-view-ul de fallback/atașamente, ca să existe o singură formă serializată."""
+"""Publish messages to the channel layer — used by both the consumer (WS) and the
+fallback/attachment view, so there is a single serialized form."""
 import logging
 
 from asgiref.sync import async_to_sync
@@ -13,7 +13,7 @@ def conversation_group(conversation_id):
 
 
 def serialize_message(message):
-    """Reprezentarea JSON a unui mesaj trimisă către clienți (identică pe WS și POST)."""
+    """JSON representation of a message sent to clients (identical over WS and POST)."""
     return {
         "id": message.id,
         "content": message.content,
@@ -32,9 +32,9 @@ def serialize_message(message):
 
 
 def broadcast_message(message):
-    """Trimite un mesaj (deja salvat) către grupul conversației. Sincron — apelabil
-    din view-uri obișnuite. Best-effort: mesajul e deja persistat, deci o eroare de
-    channel layer (ex. Redis indisponibil) nu trebuie să dărâme request-ul HTTP."""
+    """Send an already-saved message to the conversation group. Synchronous — callable
+    from regular views. Best-effort: the message is already persisted, so a channel
+    layer error (e.g. Redis unavailable) must not break the HTTP request."""
     layer = get_channel_layer()
     if layer is None:
         return

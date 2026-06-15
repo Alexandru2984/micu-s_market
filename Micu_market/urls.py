@@ -21,7 +21,7 @@ urlpatterns = [
     # Homepage
     path("", include(("listings.urls", "listings"), namespace="listings")),
     
-    # Aplicații
+    # Apps
     path("pages/", include(("pages.urls", "pages"), namespace="pages")),
     path("accounts/custom/", include(("accounts.urls", "accounts"), namespace="accounts")),
     path("categories/", include(("categories.urls", "categories"), namespace="categories")),

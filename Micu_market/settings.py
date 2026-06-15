@@ -11,13 +11,13 @@ from dotenv import load_dotenv
 # ======================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# încarcă variabile din .env (plasat lângă manage.py)
+# Load variables from .env (placed next to manage.py)
 load_dotenv(BASE_DIR / ".env")
 
 # ======================
 # SECRET / DEBUG
 # ======================
-# IMPORTANT: SECRET_KEY sau DJANGO_SECRET_KEY trebuie setat în .env — aplicația va crăpa intenționat dacă lipsesc
+# IMPORTANT: SECRET_KEY or DJANGO_SECRET_KEY must be set in .env — the app fails intentionally if missing
 SECRET_KEY = os.environ.get("SECRET_KEY") or os.environ.get("DJANGO_SECRET_KEY")
 if not SECRET_KEY:
     raise RuntimeError(
@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django.contrib.sites",  # necesar pentru allauth
+    "django.contrib.sites",  # required by allauth
     "django.contrib.sitemaps",
     "django.contrib.postgres",
 
@@ -56,8 +56,8 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.mfa",  # 2FA (TOTP + recovery codes)
-    # "allauth.socialaccount.providers.google",  # dacă vrei Google login
-    # "allauth.socialaccount.providers.facebook",  # dacă vrei Facebook login
+    # "allauth.socialaccount.providers.google",  # enable for Google login
+    # "allauth.socialaccount.providers.facebook",  # enable for Facebook login
 
     # apps proiect
     "pages.apps.PagesConfig",
@@ -98,13 +98,13 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "templates"],  # PRIORITATE: template-uri globale
-        "APP_DIRS": True,  # apoi template-urile din aplicații
+        "APP_DIRS": True,  # then per-app templates
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "django.template.context_processors.request",  # necesar pentru allauth
+                "django.template.context_processors.request",  # required by allauth
             ],
         },
     },
@@ -190,9 +190,9 @@ CACHES = {
 }
 RATELIMIT_USE_CACHE = os.getenv("RATELIMIT_USE_CACHE", "default")
 
-# Channels (WebSocket) — layer Redis ca group_send să treacă între workerii uvicorn.
-# DB Redis dedicat (/2) ca să nu se ciocnească cu cache/ratelimit. Pentru dev fără
-# Redis se poate forța layerul in-memory cu CHANNELS_IN_MEMORY=1.
+# Channels (WebSocket) — Redis layer so group_send works across uvicorn workers.
+# Dedicated Redis DB (/2) to avoid clashing with cache/ratelimit. For dev without
+# Redis, the in-memory layer can be forced with CHANNELS_IN_MEMORY=1.
 CHANNELS_REDIS_URL = os.getenv("CHANNELS_REDIS_URL", os.getenv("REDIS_URL", "redis://127.0.0.1:6379/2"))
 if os.getenv("CHANNELS_IN_MEMORY") == "1":
     CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
@@ -223,7 +223,7 @@ LISTING_RISK_TERMS = _split_env(
 )
 CHAT_MESSAGE_MAX_LENGTH = int(os.getenv("CHAT_MESSAGE_MAX_LENGTH", "5000"))
 
-# Security settings pentru producție
+# Security settings for production
 if not DEBUG:
     SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "True") == "True"
     SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "31536000"))
@@ -233,7 +233,7 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "True") == "True"
     SECURE_REFERRER_POLICY = "same-origin"
 
-# Security settings — active întotdeauna (nu doar în producție)
+# Security settings — always active (not only in production)
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
 X_FRAME_OPTIONS = "DENY"
@@ -244,10 +244,10 @@ CSRF_COOKIE_SAMESITE = os.getenv("CSRF_COOKIE_SAMESITE", "Lax")
 PERMISSIONS_POLICY = os.getenv("PERMISSIONS_POLICY", "geolocation=(), microphone=(), camera=()")
 CROSS_ORIGIN_RESOURCE_POLICY = os.getenv("CROSS_ORIGIN_RESOURCE_POLICY", "same-site")
 CROSS_ORIGIN_OPENER_POLICY = os.getenv("CROSS_ORIGIN_OPENER_POLICY", "same-origin")
-# CSP enforced este servit de nginx (snippets/security-headers.conf) ca sursă
-# unică pentru market. Aici definim doar o variantă strictă (script-src fără
-# 'unsafe-inline', plus object-src/base-uri/form-action) rulată în report-only,
-# ca să raporteze ce ar trebui curățat (handlerele onclick) înainte de lockdown.
+# The enforced CSP is served by nginx (snippets/security-headers.conf) as the
+# single source for market. Here we only define a stricter variant (script-src
+# without 'unsafe-inline', plus object-src/base-uri/form-action) run in
+# report-only, to surface what must be cleaned up (onclick handlers) before lockdown.
 DEFAULT_CONTENT_SECURITY_POLICY_REPORT_ONLY = (
     "default-src 'self'; "
     "script-src 'self'; "
@@ -265,7 +265,7 @@ CONTENT_SECURITY_POLICY_REPORT_ONLY = os.getenv(
     DEFAULT_CONTENT_SECURITY_POLICY_REPORT_ONLY,
 )
 
-# Setări HTTPS active doar când nu suntem în dev local
+# HTTPS settings active only when not in local dev
 if not DEBUG:
     SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "True") == "True"
     SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "31536000"))
@@ -274,8 +274,8 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "True") == "True"
     CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "True") == "True"
 
-# Sesiuni — expiră după 2 săptămâni (nu sesiuni permanente)
-SESSION_COOKIE_AGE = 1209600  # 14 zile în secunde
+# Sessions — expire after 2 weeks (not permanent sessions)
+SESSION_COOKIE_AGE = 1209600  # 14 days in seconds
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 # ======================
@@ -309,30 +309,30 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-# Custom adapter pentru username auto-generat
+# Custom adapter for auto-generated username
 ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'
 
-# Allauth settings (sintaxa nouă)
+# Allauth settings (new syntax)
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_USER_MODEL_EMAIL_FIELD = 'email'
-# ACCOUNT_USERNAME_REQUIRED = False  # DEPRECATED - folosim ACCOUNT_SIGNUP_FIELDS
+# ACCOUNT_USERNAME_REQUIRED = False  # DEPRECATED - we use ACCOUNT_SIGNUP_FIELDS
 
-# Signup fields (înlocuiește ACCOUNT_USERNAME_REQUIRED)
+# Signup fields (replaces ACCOUNT_USERNAME_REQUIRED)
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 
 # Auto-generate username from email
 ACCOUNT_PRESERVE_USERNAME_CASING = False
-ACCOUNT_SESSION_REMEMBER = None  # None = întreabă utilizatorul ("ține-mă minte")
+ACCOUNT_SESSION_REMEMBER = None  # None = ask the user ("remember me")
 
 # Rate limits extinse
 ACCOUNT_RATE_LIMITS = {
-    'login_failed': '5/5m',       # 5 încercări eșuate la 5 minute
-    'signup': '5/h',              # 5 înregistrări pe oră per IP
-    'send_email': '3/5m',         # 3 emailuri (reset parolă) la 5 minute
-    'confirm_email': '3/h',       # 3 confirmări email la oră
+    'login_failed': '5/5m',       # 5 failed attempts per 5 minutes
+    'signup': '5/h',              # 5 signups per hour per IP
+    'send_email': '3/5m',         # 3 emails (password reset) per 5 minutes
+    'confirm_email': '3/h',       # 3 email confirmations per hour
 }
 
 # Email confirmation settings
@@ -340,8 +340,8 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = os.getenv("ACCOUNT_CONFIRM_EMAIL_ON_GET", "False"
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
 
-# MFA / 2FA (allauth.mfa) — TOTP + coduri de recuperare. Webauthn e dezactivat
-# (necesită pachetul fido2, neinstalat). Opt-in: utilizatorii îl activează din cont.
+# MFA / 2FA (allauth.mfa) — TOTP + recovery codes. Webauthn is disabled
+# (webauthn needs the fido2 package). Opt-in: users enable it from their account.
 MFA_SUPPORTED_TYPES = ['totp', 'recovery_codes']
 MFA_TOTP_ISSUER = "Micu's Market"
 
@@ -391,5 +391,5 @@ TRUSTED_PROXY_CHAIN_CONFIGURED = os.getenv("DJANGO_TRUSTED_PROXY_CHAIN_CONFIGURE
 # allauth
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
-# Email backend for development (decomentează pentru testare în consolă)
+# Email backend for development (uncomment for console testing)
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

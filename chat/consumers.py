@@ -1,7 +1,7 @@
-"""WebSocket consumer pentru chat în timp real.
+"""WebSocket consumer for real-time chat.
 
-Securitate: conexiunea e acceptată doar pentru un participant autentificat al
-conversației. Origin-ul e validat în asgi.py (AllowedHostsOriginValidator)."""
+Security: the connection is accepted only for an authenticated participant of the
+conversation. The Origin is validated in asgi.py (AllowedHostsOriginValidator)."""
 import json
 import time
 
@@ -11,8 +11,8 @@ from django.conf import settings
 
 from .broadcast import conversation_group, serialize_message
 
-# Interval minim între două mesaje pe aceeași conexiune (anti-spam; django-ratelimit
-# nu acoperă WebSocket-urile).
+# Minimum interval between two messages on the same connection (anti-spam;
+# django-ratelimit does not cover WebSockets).
 MIN_MESSAGE_INTERVAL = 0.3
 
 
@@ -33,7 +33,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.group, self.channel_name)
         await self.accept()
 
-        # La deschidere, marchează citit și anunță cealaltă parte (read receipts).
+        # On open, mark as read and notify the other side (read receipts).
         await self._mark_read()
         await self.channel_layer.group_send(self.group, {"type": "chat.read", "by": self.user.id})
 
@@ -72,7 +72,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         payload = await self._serialize(message)
         await self.channel_layer.group_send(self.group, {"type": "chat.message", "message": payload})
 
-    # --- handlers grup -> client ---
+    # --- group handlers -> client ---
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({"type": "message", "message": event["message"]}))
 
@@ -84,7 +84,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if event["by"] != self.user.id:
             await self.send(text_data=json.dumps({"type": "read", "by": event["by"]}))
 
-    # --- acces DB ---
+    # --- DB access ---
     @database_sync_to_async
     def _is_participant(self):
         from .models import Conversation

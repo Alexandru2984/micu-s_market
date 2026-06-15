@@ -6,4 +6,4 @@ class NotificationsConfig(AppConfig):
     name = 'notifications'
 
     def ready(self):
-        from . import signals  # noqa: F401  (înregistrează semnalul de badge live)
+        from . import signals  # noqa: F401  (registers the live-badge signal)

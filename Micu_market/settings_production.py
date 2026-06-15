@@ -22,7 +22,7 @@ def _required_csv_env(name):
     return values
 
 
-# Security settings pentru producție
+# Security settings for production
 DEBUG = False
 ALLOWED_HOSTS = _required_csv_env('DJANGO_ALLOWED_HOSTS')
 
@@ -78,8 +78,8 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASS'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '5432'),
-        # Conexiuni persistente (evită overhead-ul de a deschide o conexiune nouă
-        # la fiecare request), cu verificare de sănătate înainte de reutilizare.
+        # Persistent connections (avoid the overhead of opening a new connection
+        # per request), with a health check before reuse.
         'CONN_MAX_AGE': int(os.getenv('DB_CONN_MAX_AGE', '60')),
         'CONN_HEALTH_CHECKS': True,
     }

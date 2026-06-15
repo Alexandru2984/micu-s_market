@@ -1,7 +1,7 @@
 """
 ASGI config for Micu_market.
 
-Routează HTTP prin aplicația Django standard și WebSocket prin Django Channels.
+Routes HTTP through the standard Django app and WebSocket through Django Channels.
 """
 
 import os
@@ -10,7 +10,7 @@ from django.core.asgi import get_asgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Micu_market.settings')
 
-# Inițializează Django (încarcă app registry) ÎNAINTE de a importa consumers/routing.
+# Initialise Django (load the app registry) BEFORE importing consumers/routing.
 django_asgi_app = get_asgi_application()
 
 from channels.auth import AuthMiddlewareStack  # noqa: E402
