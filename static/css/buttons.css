@@ -1,6 +1,6 @@
-/* BUTOANE - buttons.css - search / filter / reset (PRIORITATE MAXIMĂ) */
+/* BUTTONS - buttons.css - search / filter / reset (MAXIMUM PRIORITY) */
 
-/* Buton căutare principală */
+/* Main search button */
 #searchButton,
 .quick-search-btn#searchButton {
     background: linear-gradient(135deg, var(--accent) 0%, var(--accent-active) 100%) !important;
@@ -50,7 +50,7 @@
     animation: pulse 2s infinite !important;
 }
 
-/* Buton aplicare filtre */
+/* Apply filters button */
 #filterButton,
 .btn-apply-filters#filterButton {
     flex: 2 !important;
@@ -101,7 +101,7 @@
     animation: bounce 1s infinite !important;
 }
 
-/* Buton resetare */
+/* Reset button */
 #resetButton,
 .btn-reset-filters#resetButton {
     flex: 1 !important;
@@ -140,7 +140,7 @@
     animation: shake 2s infinite !important;
 }
 
-/* ANIMAȚII */
+/* ANIMATIONS */
 @keyframes pulse {
     0%, 100% { transform: scale(1); opacity: 1; }
     50% { transform: scale(1.1); opacity: 0.8; }

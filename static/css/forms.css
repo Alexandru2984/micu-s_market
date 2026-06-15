@@ -57,7 +57,7 @@ select.form-control {
     flex-wrap: wrap;
 }
 
-/* Buton Anulează */
+/* Cancel button */
 .btn-cancel {
     display: inline-flex;
     align-items: center;
@@ -83,7 +83,7 @@ select.form-control {
     text-decoration: none;
 }
 
-/* Buton Șterge */
+/* Delete button */
 .btn-delete {
     display: inline-flex;
     align-items: center;
@@ -109,7 +109,7 @@ select.form-control {
     text-decoration: none;
 }
 
-/* Buton Salvează */
+/* Save button */
 .btn-save {
     display: inline-flex;
     align-items: center;
@@ -138,7 +138,7 @@ select.form-control {
     box-shadow: 0 3px 15px rgba(20, 184, 166, 0.3);
 }
 
-/* Link-uri pentru acțiuni anunț în header */
+/* Links for listing actions in the header */
 .listing-header {
     display: flex;
     align-items: center;
@@ -179,7 +179,7 @@ select.form-control {
     color: var(--text);
 }
 
-/* Link pentru secțiunea imagini */
+/* Link for the images section */
 .image-section-header a {
     display: inline-flex;
     align-items: center;
@@ -202,7 +202,7 @@ select.form-control {
     text-decoration: none;
 }
 
-/* Responsive pentru butoane */
+/* Responsive for buttons */
 @media (max-width: 768px) {
     .form-actions {
         flex-direction: column;
@@ -246,7 +246,7 @@ select.form-control {
     flex-wrap: wrap;
 }
 
-/* Buton Înapoi */
+/* Back button */
 .btn-back {
     display: inline-flex;
     align-items: center;
@@ -270,7 +270,7 @@ select.form-control {
     color: white;
 }
 
-/* Buton Delete Final */
+/* Final Delete button */
 .btn-delete-final {
     display: inline-flex;
     align-items: center;
@@ -306,7 +306,7 @@ select.form-control {
     transform: none !important;
 }
 
-/* Responsive pentru delete page */
+/* Responsive for the delete page */
 @media (max-width: 768px) {
     .delete-actions {
         flex-direction: column;
@@ -537,7 +537,7 @@ select.form-control {
     margin-right: 0.5rem;
 }
 
-/* Responsive pentru image forms */
+/* Responsive for image forms */
 @media (max-width: 768px) {
     #image-forms {
         grid-template-columns: 1fr;
@@ -776,7 +776,7 @@ select.form-control {
     margin: 0;
 }
 
-/* Responsive pentru listing preview */
+/* Responsive for the listing preview */
 @media (max-width: 768px) {
     .listing-preview-content {
         grid-template-columns: 1fr;
@@ -933,7 +933,7 @@ select.form-control {
     }
 }
 
-/* Animation pentru cursor hover pe imagine */
+/* Animation for cursor hover on the image */
 .listing-image-container {
     transition: all 0.3s ease;
 }

@@ -1,14 +1,14 @@
 /* ============================================================================
-   Design tokens — fundația sistemului de design (Micu's Market)
-   Stil: modern marketplace, curat. Accent: teal.
+   Design tokens — the foundation of the design system (Micu's Market)
+   Style: modern marketplace, clean. Accent: teal.
    Light = :root, Dark = [data-theme="dark"].
-   Acest fișier se încarcă PRIMUL; restul CSS-ului consumă variabilele de aici.
+   This file loads FIRST; the rest of the CSS consumes the variables defined here.
    ============================================================================ */
 
 :root {
     color-scheme: light;
 
-    /* Suprafețe / fundaluri */
+    /* Surfaces / backgrounds */
     --bg: #f6f7f9;
     --surface: #ffffff;
     --surface-2: #f1f3f5;
@@ -28,7 +28,7 @@
     --accent-soft: #d6f3ef;
     --accent-contrast: #ffffff;
 
-    /* Semantice */
+    /* Semantic */
     --danger: #e0484d;
     --danger-soft: #fde7e8;
     --success: #1f9d57;
@@ -38,14 +38,14 @@
     --info: #2f6fed;
     --info-soft: #e6effd;
 
-    /* Bule de chat */
+    /* Chat bubbles */
     --bubble-received-bg: #ffffff;
     --bubble-received-text: #14181f;
     --bubble-received-border: #e4e7eb;
     --bubble-sent-bg: #14b8a6;
     --bubble-sent-text: #ffffff;
 
-    /* Spațiere (4px scale) */
+    /* Spacing (4px scale) */
     --space-1: 0.25rem;
     --space-2: 0.5rem;
     --space-3: 0.75rem;
@@ -55,19 +55,19 @@
     --space-7: 2.5rem;
     --space-8: 3rem;
 
-    /* Raze */
+    /* Radii */
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius-lg: 18px;
     --radius-xl: 24px;
     --radius-full: 9999px;
 
-    /* Umbre (soft) */
+    /* Shadows (soft) */
     --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.05);
     --shadow-md: 0 4px 10px rgba(16, 24, 40, 0.08), 0 2px 4px rgba(16, 24, 40, 0.05);
     --shadow-lg: 0 12px 28px rgba(16, 24, 40, 0.12), 0 4px 8px rgba(16, 24, 40, 0.06);
 
-    /* Tipografie */
+    /* Typography */
     --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
     --text-xs: 0.75rem;
     --text-sm: 0.875rem;
@@ -76,7 +76,7 @@
     --text-xl: 1.375rem;
     --text-2xl: 1.75rem;
 
-    /* Tranziții */
+    /* Transitions */
     --transition: 150ms ease;
     --transition-slow: 250ms ease;
 
@@ -128,9 +128,9 @@
     --shadow-lg: 0 14px 32px rgba(0, 0, 0, 0.55);
 }
 
-/* Aplicare globală — specificitate ridicată (html[data-theme]) ca să bată
-   regulile `body {}` hardcodate din style.css/base.css, deci dark mode prinde
-   pe toate paginile. Theming-ul complet al fiecărui ecran vine în Faza 2. */
+/* Global application — high specificity (html[data-theme]) so it overrides
+   the hardcoded `body {}` rules from style.css/base.css, so dark mode takes effect
+   on every page. Full theming of each screen comes in Phase 2. */
 html[data-theme] body {
     background: var(--bg);
     color: var(--text);
@@ -138,7 +138,7 @@ html[data-theme] body {
     transition: background var(--transition-slow), color var(--transition-slow);
 }
 
-/* Respectă utilizatorii care preferă mai puțină mișcare */
+/* Respect users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;

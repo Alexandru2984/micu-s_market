@@ -1,4 +1,4 @@
-/* Reset și bază */
+/* Reset and base */
 * {
     margin: 0;
     padding: 0;
@@ -23,7 +23,7 @@ body {
     padding: 2rem 0;
 }
 
-/* Mesaje de alertă */
+/* Alert messages */
 .messages {
     position: fixed;
     top: 80px;
@@ -68,7 +68,7 @@ body {
     to { transform: translateX(0); opacity: 1; }
 }
 
-/* Grid-uri și carduri */
+/* Grids and cards */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -197,7 +197,7 @@ body {
     margin-top: 0.25rem;
 }
 
-/* Utilități */
+/* Utilities */
 .text-center { text-align: center; }
 .text-left { text-align: left; }
 .text-right { text-align: right; }

@@ -406,7 +406,7 @@
     }
 }
 
-/* Butoanele principale */
+/* Main buttons */
 .btn-primary, .btn.btn-primary {
     width: 100%;
     padding: 1.2rem 1.5rem;
@@ -430,7 +430,7 @@
     background: linear-gradient(135deg, var(--accent) 0%, var(--accent) 100%);
 }
 
-/* Checkbox styling îmbunătățit */
+/* Improved checkbox styling */
 input[type="checkbox"] {
     width: 20px;
     height: 20px;
@@ -455,7 +455,7 @@ input[type="checkbox"] {
     margin-left: 0.5rem;
 }
 
-/* Link styling pentru paginile de autentificare */
+/* Link styling for the authentication pages */
 .auth-footer a,
 .auth-form a {
     color: var(--accent);

@@ -13,7 +13,7 @@ body {
     background: var(--bg);
 }
 
-/* Global styles pentru forms */
+/* Global styles for forms */
 .form-control {
     width: 100%;
     padding: 0.75rem;

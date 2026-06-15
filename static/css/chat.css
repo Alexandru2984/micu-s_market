@@ -1,6 +1,6 @@
 /* ============================================================================
-   Chat — stil "modern marketplace" pe token-uri (tokens.css).
-   Acoperă inbox-ul de conversații și fereastra de conversație (real-time).
+   Chat — "modern marketplace" style built on tokens (tokens.css).
+   Covers the conversations inbox and the conversation window (real-time).
    ============================================================================ */
 
 /* ---------- Inbox ---------- */
@@ -198,10 +198,10 @@
 .empty-state h3 { color: var(--text); margin: 0 0 var(--space-2); }
 .empty-state p { margin: 0 0 var(--space-5); }
 
-/* ---------- Conversație (real-time) ---------- */
-/* App-shell: pagina de conversație umple exact viewport-ul (header natural +
-   chat care ocupă restul), fără offset-uri magice și fără scroll de pagină.
-   Doar lista de mesaje derulează; compozitorul rămâne deasupra tastaturii. */
+/* ---------- Conversation (real-time) ---------- */
+/* App-shell: the conversation page fills the viewport exactly (natural header +
+   chat taking the rest), with no magic offsets and no page scroll.
+   Only the message list scrolls; the composer stays above the keyboard. */
 body.chat-page {
     display: flex;
     flex-direction: column;
@@ -221,7 +221,7 @@ body.chat-page .main-content {
 }
 body.chat-page .main-footer,
 body.chat-page .cookie-consent { display: none; }
-/* Pe mobil, header-ul nu se mai desface pe coloană (ocupa prea mult) */
+/* On mobile, the header no longer wraps to a column (it took too much space) */
 @media (max-width: 768px) {
     body.chat-page .header-content { flex-direction: row; flex-wrap: wrap; gap: 0.5rem; }
 }
@@ -326,7 +326,7 @@ body.chat-page .cookie-consent { display: none; }
 .chat-conversation__messages::-webkit-scrollbar { width: 8px; }
 .chat-conversation__messages::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: var(--radius-full); }
 
-/* Bule mesaje */
+/* Message bubbles */
 .chat-msg {
     display: flex;
     flex-direction: column;
@@ -373,7 +373,7 @@ body.chat-page .cookie-consent { display: none; }
 }
 .chat-msg__status .read { color: var(--accent); }
 
-/* Atașamente */
+/* Attachments */
 .chat-msg__attachments {
     display: flex;
     flex-wrap: wrap;
@@ -459,7 +459,7 @@ body.chat-page .cookie-consent { display: none; }
     background: var(--surface-2);
     color: var(--text);
     font-family: inherit;
-    /* 16px: previne zoom-ul automat pe iOS/Android la focus în input */
+    /* 16px: prevents automatic zoom on iOS/Android when the input is focused */
     font-size: 16px;
     line-height: 1.4;
     transition: border-color var(--transition), background var(--transition);
