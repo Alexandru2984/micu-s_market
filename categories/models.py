@@ -21,7 +21,10 @@ class Category(models.Model):
         return self.name
     
     def get_absolute_url(self):
-        return reverse('categories:category_detail', kwargs={'slug': self.slug})
+        # Categoriile se răsfoiesc prin lista de anunțuri filtrată (?category=slug);
+        # ruta categories:category_detail nu primește slug, deci reverse-ul ei dădea
+        # NoReverseMatch (500) oriunde era folosit get_absolute_url.
+        return f"{reverse('listings:list')}?category={self.slug}"
     
     @property
     def get_all_children(self):

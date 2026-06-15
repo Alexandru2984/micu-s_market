@@ -29,11 +29,11 @@
     <div class="grid">
       {% for item in listings %}
         <article class="card">
-          <a href="#">
-            {% if item.image %}
-              <img src="{{ item.image.url }}" alt="{{ item.title }}">
+          <a href="{% url 'listings:detail' item.slug %}">
+            {% if item.images.first %}
+              <img src="{{ item.images.first.image.url }}" alt="{{ item.title }}" loading="lazy" decoding="async">
             {% else %}
-              <img src="{% static 'img/no-image.png' %}" alt="No image">
+              <div class="no-image">📷</div>
             {% endif %}
             <h3>{{ item.title }}</h3>
           </a>
