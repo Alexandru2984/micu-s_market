@@ -25,12 +25,12 @@ def notifications_list_view(request):
 @require_POST
 @ratelimit(key='user', rate=settings.AJAX_WRITE_RATE, method='POST', block=True)
 def mark_read_view(request, pk=None):
-    """Marchează o notificare (sau toate) ca citite"""
+    """Mark one notification (or all) as read"""
     if pk:
         notification = get_object_or_404(Notification, pk=pk, recipient=request.user)
         notification.mark_as_read()
     else:
-        # Marchează toate ca citite
+        # Mark all as read
         Notification.objects.filter(
             recipient=request.user,
             is_read=False

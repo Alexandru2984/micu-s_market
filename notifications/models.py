@@ -6,7 +6,7 @@ from django.utils import timezone
 User = get_user_model()
 
 class Notification(models.Model):
-    """Sistemul de notificări pentru utilizatori"""
+    """The user notifications system"""
     
     NOTIFICATION_TYPES = [
         ('new_message', 'Mesaj nou'),
@@ -26,7 +26,7 @@ class Notification(models.Model):
     title = models.CharField(max_length=200, verbose_name="Titlu")
     message = models.TextField(verbose_name="Mesaj")
     
-    # Link către obiectul relevant (opțional)
+    # Link to the relevant object (optional)
     related_object_type = models.CharField(max_length=50, blank=True, verbose_name="Tip obiect")
     related_object_id = models.IntegerField(null=True, blank=True, verbose_name="ID obiect")
     action_url = models.URLField(blank=True, verbose_name="URL acțiune")
@@ -53,25 +53,25 @@ class Notification(models.Model):
         return f"Notificare pentru {self.recipient.username}: {self.title}"
     
     def mark_as_read(self):
-        """Marchează notificarea ca citită"""
+        """Mark the notification as read"""
         if not self.is_read:
             self.is_read = True
-            self.read_at = timezone.now()  # fix: models.timezone nu există
+            self.read_at = timezone.now()  # fix: models.timezone does not exist
             self.save(update_fields=['is_read', 'read_at'])
 
 
 class NotificationPreference(models.Model):
-    """Preferințele utilizatorilor pentru notificări"""
+    """User preferences for notifications"""
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='notification_preferences', verbose_name="Utilizator")
-    
-    # Preferințe email
+
+    # Email preferences
     email_new_messages = models.BooleanField(default=True, verbose_name="Email pentru mesaje noi")
     email_new_reviews = models.BooleanField(default=True, verbose_name="Email pentru recenzii noi")
     email_listing_updates = models.BooleanField(default=True, verbose_name="Email pentru actualizări anunțuri")
     email_price_alerts = models.BooleanField(default=True, verbose_name="Email pentru alerte preț")
     email_marketing = models.BooleanField(default=False, verbose_name="Email marketing")
     
-    # Preferințe notificări în aplicație
+    # In-app notification preferences
     app_new_messages = models.BooleanField(default=True, verbose_name="Notificare aplicație pentru mesaje")
     app_new_reviews = models.BooleanField(default=True, verbose_name="Notificare aplicație pentru recenzii")
     app_listing_updates = models.BooleanField(default=True, verbose_name="Notificare aplicație pentru anunțuri")
@@ -88,7 +88,7 @@ class NotificationPreference(models.Model):
         return f"Preferințe notificări - {self.user.username}"
 
 
-# Signal pentru a crea preferințe de notificare pentru utilizatori noi
+# Signal that creates notification preferences for new users
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
