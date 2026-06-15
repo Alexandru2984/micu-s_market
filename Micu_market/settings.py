@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "allauth.mfa",  # 2FA (TOTP + recovery codes)
     # "allauth.socialaccount.providers.google",  # dacă vrei Google login
     # "allauth.socialaccount.providers.facebook",  # dacă vrei Facebook login
 
@@ -330,6 +331,11 @@ ACCOUNT_RATE_LIMITS = {
 ACCOUNT_CONFIRM_EMAIL_ON_GET = os.getenv("ACCOUNT_CONFIRM_EMAIL_ON_GET", "False") == "True"
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
+
+# MFA / 2FA (allauth.mfa) — TOTP + coduri de recuperare. Webauthn e dezactivat
+# (necesită pachetul fido2, neinstalat). Opt-in: utilizatorii îl activează din cont.
+MFA_SUPPORTED_TYPES = ['totp', 'recovery_codes']
+MFA_TOTP_ISSUER = "Micu's Market"
 
 # Login/logout settings
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
