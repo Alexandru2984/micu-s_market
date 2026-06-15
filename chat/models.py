@@ -8,7 +8,7 @@ from pathlib import PurePath
 User = get_user_model()
 
 class Conversation(models.Model):
-    """Conversația dintre doi utilizatori despre un anunț"""
+    """Conversation between two users about a listing"""
     participants = models.ManyToManyField(User, related_name='conversations', verbose_name="Participanți")
     listing = models.ForeignKey('listings.Listing', on_delete=models.CASCADE, related_name='conversations', verbose_name="Anunț")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creat la")
@@ -32,20 +32,20 @@ class Conversation(models.Model):
         return reverse('chat:conversation', kwargs={'pk': self.pk})
     
     def get_other_participant(self, current_user):
-        """Returnează celălalt participant din conversație"""
+        """Return the other participant in the conversation"""
         return self.participants.exclude(id=current_user.id).first()
     
     def get_last_message(self):
-        """Returnează ultimul mesaj din conversație"""
+        """Return the last message in the conversation"""
         return self.messages.first()
     
     def mark_as_read(self, user):
-        """Marchează toate mesajele ca citite pentru un utilizator"""
+        """Mark all messages as read for a user"""
         self.messages.filter(receiver=user, is_read=False).update(is_read=True)
 
 
 class Message(models.Model):
-    """Mesaj într-o conversație"""
+    """Message in a conversation"""
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages', verbose_name="Conversație")
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages', verbose_name="Expeditor")
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages', verbose_name="Destinatar")
@@ -67,14 +67,14 @@ class Message(models.Model):
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # Actualizează updated_at pe conversație — fără write amplification
+        # Update the conversation's updated_at — without write amplification
         Conversation.objects.filter(pk=self.conversation_id).update(
             updated_at=timezone.now()
         )
 
 
 class MessageAttachment(models.Model):
-    """Atașamente pentru mesaje (imagini, documente)"""
+    """Attachments for messages (images, documents)"""
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='attachments', verbose_name="Mesaj")
     file = models.FileField(upload_to='chat/private/attachments/', verbose_name="Fișier")
     filename = models.CharField(max_length=255, verbose_name="Nume fișier")
@@ -97,7 +97,7 @@ class MessageAttachment(models.Model):
         if self.file:
             self.filename = get_valid_filename(PurePath(self.file.name).name)
             self.file_size = self.file.size
-            # Determină tipul fișierului
+            # Determine the file type
             if self.file.name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
                 self.file_type = 'image'
             elif self.file.name.lower().endswith(('.pdf', '.doc', '.docx', '.txt', '.xls', '.xlsx')):

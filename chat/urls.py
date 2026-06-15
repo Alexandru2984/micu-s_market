@@ -4,14 +4,14 @@ from . import views
 app_name = 'chat'
 
 urlpatterns = [
-    # Inbox principal
+    # Main inbox
     path('', views.inbox_view, name='inbox'),
-    
-    # Conversații
+
+    # Conversations
     path('conversation/<int:pk>/', views.conversation_view, name='conversation'),
     path('start/<slug:listing_slug>/', views.start_conversation_view, name='start_conversation'),
-    
-    # Acțiuni AJAX
+
+    # AJAX actions
     path('send/<int:conversation_pk>/', views.send_message_view, name='send_message'),
     path('attachments/<int:pk>/download/', views.attachment_download_view, name='attachment_download'),
     path('mark-read/<int:pk>/', views.mark_conversation_read, name='mark_read'),
