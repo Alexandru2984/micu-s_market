@@ -156,7 +156,7 @@ def populate_categories(clear_existing=False):
         order = 0
         
         for category_name, category_data in categories_data.items():
-            # Creează categoria principală
+            # Create the main category
             main_category, created = Category.objects.get_or_create(
                 name=category_name,
                 defaults={
@@ -173,7 +173,7 @@ def populate_categories(clear_existing=False):
             else:
                 print(f'⚠️  Categoria "{category_name}" există deja')
             
-            # Creează subcategoriile
+            # Create the subcategories
             sub_order = 0
             for sub_name in category_data['subcategories']:
                 sub_category, sub_created = Category.objects.get_or_create(

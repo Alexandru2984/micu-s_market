@@ -107,10 +107,10 @@ class ProjectUrlSecurityTests(TestCase):
     },
 )
 class StaticManifestRenderTests(TestCase):
-    """Randează paginile cheie sub manifest storage (ca în producție) ca să prindă
-    referințe {% static '...' %} către fișiere inexistente — o clasă de bug care
-    altfel trece de teste (settings_test nu folosește manifest storage) și
-    produce 500 doar în producție."""
+    """Render the key pages under manifest storage (as in production) to catch
+    {% static '...' %} references to nonexistent files — a class of bug that
+    otherwise passes tests (settings_test does not use manifest storage) and
+    only 500s in production."""
 
     @classmethod
     def setUpClass(cls):

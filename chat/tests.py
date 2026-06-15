@@ -24,7 +24,7 @@ INMEMORY_LAYER = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
 
 
 class ChatConversationTestCase(TestCase):
-    """Teste pentru access control conversații"""
+    """Tests for conversation access control"""
 
     def setUp(self):
         self.client = Client()
@@ -59,14 +59,14 @@ class ChatConversationTestCase(TestCase):
         )
 
     def test_start_conversation_requires_login(self):
-        """Pornirea unei conversații necesită autentificare"""
+        """Starting a conversation requires authentication"""
         response = self.client.post(
             reverse('chat:start_conversation', kwargs={'listing_slug': self.listing.slug})
         )
         self.assertEqual(response.status_code, 302)
 
     def test_start_conversation_requires_post(self):
-        """Pornirea unei conversații nu acceptă GET"""
+        """Starting a conversation does not accept GET"""
         self.client.login(username='buyer', password='BuyerPass123!')
         response = self.client.get(
             reverse('chat:start_conversation', kwargs={'listing_slug': self.listing.slug})
@@ -75,17 +75,17 @@ class ChatConversationTestCase(TestCase):
         self.assertFalse(Conversation.objects.exists())
 
     def test_cannot_start_conversation_with_self(self):
-        """Vânzătorul nu poate porni o conversație cu sine însuși"""
+        """The seller cannot start a conversation with themselves"""
         self.client.login(username='seller', password='SellerPass123!')
         response = self.client.post(
             reverse('chat:start_conversation', kwargs={'listing_slug': self.listing.slug})
         )
         self.assertEqual(response.status_code, 302)
-        # Nu trebuie creată nicio conversație
+        # No conversation must be created
         self.assertFalse(Conversation.objects.exists())
 
     def test_mark_conversation_read_requires_post(self):
-        """Endpointul separat de marcare ca citit nu acceptă GET"""
+        """The separate mark-as-read endpoint does not accept GET"""
         conv = Conversation.objects.create(listing=self.listing)
         conv.participants.add(self.buyer, self.seller)
 
@@ -108,7 +108,7 @@ class ChatConversationTestCase(TestCase):
         self.assertEqual(response.status_code, 405)
 
     def test_conversation_page_renders_for_participant(self):
-        """Pagina de conversație se randează corect pentru un participant."""
+        """The conversation page renders correctly for a participant."""
         conv = Conversation.objects.create(listing=self.listing)
         conv.participants.add(self.buyer, self.seller)
         Message.objects.create(conversation=conv, sender=self.seller, receiver=self.buyer, content='Salut!')
@@ -120,12 +120,12 @@ class ChatConversationTestCase(TestCase):
         self.assertContains(response, 'chat-conversation__messages')
 
     def test_third_user_cannot_access_conversation(self):
-        """Un utilizator terț nu poate accesa conversația altora"""
-        # Creează conversația între buyer și seller
+        """A third-party user cannot access others' conversation"""
+        # Create the conversation between buyer and seller
         conv = Conversation.objects.create(listing=self.listing)
         conv.participants.add(self.buyer, self.seller)
         
-        # Third user încearcă să acceseze
+        # The third user tries to access it
         self.client.login(username='third', password='ThirdPass123!')
         response = self.client.get(
             reverse('chat:conversation', kwargs={'pk': conv.pk})
@@ -133,12 +133,12 @@ class ChatConversationTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_inbox_requires_login(self):
-        """Inbox necesită autentificare"""
+        """The inbox requires authentication"""
         response = self.client.get(reverse('chat:inbox'))
         self.assertEqual(response.status_code, 302)
 
     def test_send_message_requires_post(self):
-        """Trimiterea de mesaje necesită POST"""
+        """Sending messages requires POST"""
         conv = Conversation.objects.create(listing=self.listing)
         conv.participants.add(self.buyer, self.seller)
         
@@ -178,7 +178,7 @@ class ChatConversationTestCase(TestCase):
         self.assertEqual(Message.objects.count(), 0)
 
     def test_send_message_creates_receiver_notification(self):
-        """Un mesaj nou creează notificare pentru destinatar."""
+        """A new message creates a notification for the recipient."""
         conv = Conversation.objects.create(listing=self.listing)
         conv.participants.add(self.buyer, self.seller)
 
@@ -194,7 +194,7 @@ class ChatConversationTestCase(TestCase):
         self.assertEqual(notification.related_object_id, conv.pk)
 
     def test_send_message_accepts_valid_text_attachment(self):
-        """Atașamentele text valide sunt salvate."""
+        """Valid text attachments are saved."""
         with tempfile.TemporaryDirectory() as media_root:
             with override_settings(MEDIA_ROOT=media_root):
                 conv = Conversation.objects.create(listing=self.listing)
@@ -219,7 +219,7 @@ class ChatConversationTestCase(TestCase):
                 self.assertEqual(response.json()['message']['attachments'][0]['filename'], 'nota.txt')
 
     def test_send_message_skips_spoofed_pdf_attachment(self):
-        """Fișierele care doar pretind că sunt PDF sunt ignorate."""
+        """Files that only pretend to be PDFs are ignored."""
         with tempfile.TemporaryDirectory() as media_root:
             with override_settings(MEDIA_ROOT=media_root):
                 conv = Conversation.objects.create(listing=self.listing)
@@ -269,7 +269,7 @@ class ChatConversationTestCase(TestCase):
                 self.assertEqual(response.json()['message']['attachments'], [])
 
     def test_attachment_download_allowed_for_participant(self):
-        """Participanții conversației pot descărca atașamentele."""
+        """Conversation participants can download the attachments."""
         with tempfile.TemporaryDirectory() as media_root:
             with override_settings(MEDIA_ROOT=media_root):
                 conv = Conversation.objects.create(listing=self.listing)
@@ -295,7 +295,7 @@ class ChatConversationTestCase(TestCase):
                 self.assertEqual(response['X-Content-Type-Options'], 'nosniff')
 
     def test_attachment_download_denied_for_non_participant(self):
-        """Utilizatorii din afara conversației nu pot descărca atașamentele."""
+        """Users outside the conversation cannot download the attachments."""
         with tempfile.TemporaryDirectory() as media_root:
             with override_settings(MEDIA_ROOT=media_root):
                 conv = Conversation.objects.create(listing=self.listing)
@@ -320,7 +320,7 @@ class ChatConversationTestCase(TestCase):
 
 @override_settings(CHANNEL_LAYERS=INMEMORY_LAYER)
 class ChatConsumerTestCase(TransactionTestCase):
-    """Teste pentru WebSocket consumer (chat real-time)."""
+    """Tests for the WebSocket consumer (real-time chat)."""
 
     def setUp(self):
         self.buyer = User.objects.create_user(username='ws_buyer', email='wsb@example.com', password='WsBuyer123!')
@@ -377,7 +377,7 @@ class ChatConsumerTestCase(TransactionTestCase):
             await buyer_comm.send_input(
                 {"type": "websocket.receive", "text": json.dumps({"type": "message", "content": "salut prin websocket"})}
             )
-            # Seller (cealaltă parte) primește mesajul live, fără reload.
+            # The seller (the other party) receives the message live, without a reload.
             received = None
             for _ in range(5):
                 out = await seller_comm.receive_output(timeout=5)
@@ -392,6 +392,6 @@ class ChatConsumerTestCase(TransactionTestCase):
         self.assertIsNotNone(received)
         self.assertEqual(received["message"]["content"], "salut prin websocket")
         self.assertEqual(received["message"]["sender"], "ws_buyer")
-        # Persistat în DB + notificare pentru destinatar.
+        # Persisted in the DB + notification for the recipient.
         self.assertTrue(Message.objects.filter(conversation=self.conv, content="salut prin websocket").exists())
         self.assertTrue(Notification.objects.filter(recipient=self.seller, notification_type="new_message").exists())

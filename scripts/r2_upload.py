@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Încarcă un fișier de backup în Cloudflare R2 (S3-compatibil) și curăță
-backup-urile offsite mai vechi decât retenția. Configurare din environment:
+"""Upload a backup file to Cloudflare R2 (S3-compatible) and prune the
+offsite backups older than the retention window. Configuration from the environment:
 
   R2_ENDPOINT_URL, R2_BUCKET, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY
-  R2_BACKUP_PREFIX (opțional, implicit "postgres/")
-  BACKUP_RETENTION_DAYS (opțional, implicit 14)
+  R2_BACKUP_PREFIX (optional, default "postgres/")
+  BACKUP_RETENTION_DAYS (optional, default 14)
 """
 import datetime
 import os
@@ -48,7 +48,7 @@ def main():
     s3.upload_file(path, bucket, key)
     print(f"uploaded s3://{bucket}/{key}")
 
-    # Retenție offsite: șterge obiectele mai vechi decât retention zile.
+    # Offsite retention: delete objects older than `retention` days.
     cutoff = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=retention)
     deleted = 0
     paginator = s3.get_paginator("list_objects_v2")

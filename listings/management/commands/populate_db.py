@@ -128,7 +128,7 @@ def make_img_bytes(title, subtitle=""):
     img = Image.new("RGB", (W, H), (230, 232, 236))
     d = ImageDraw.Draw(img)
 
-    # Titlu mare centrat, scalat să încapă
+    # Large centered title, scaled to fit
     f = get_font(96)
     while d.textlength(title, font=f) > W - 160 and getattr(f, "size", 96) > 36:
         f = get_font(getattr(f, "size", 96) - 6)
@@ -176,13 +176,13 @@ class Command(BaseCommand):
 
         if clear_existing:
             self.stdout.write(self.style.WARNING("🗑️  Ștergem datele existente..."))
-            # Ștergem doar anunțurile și utilizatorii fictivi (dar păstrăm superuserii)
+            # Delete only the fixture listings and users (but keep superusers)
             Listing.objects.all().delete()
             User.objects.filter(is_superuser=False).exclude(username="alex_mihai984").delete()
             self.stdout.write(self.style.SUCCESS("✅ Datele existente au fost șterse."))
 
         # ---------------------------------------------------------
-        # 1. Definire date categorii (sursă: populate_categories_script.py)
+        # 1. Define category data (source: populate_categories_script.py)
         # ---------------------------------------------------------
         categories_data = {
             'Electronice': {
@@ -421,7 +421,7 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(f"   ~ Utilizatorul {user.username} există deja")
 
-            # Actualizăm sau creăm profilul asociat
+            # Update or create the associated profile
             profile, p_created = UserProfile.objects.get_or_create(user=user)
             profile.phone = u_info['phone']
             profile.city = u_info['city']
@@ -434,7 +434,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("✅ Utilizatori și profile configurate."))
 
         # ---------------------------------------------------------
-        # 3. Creare anunțuri (Listings)
+        # 3. Create listings
         # ---------------------------------------------------------
         self.stdout.write("📦 Populare anunțuri...")
         listings_data = [
@@ -790,22 +790,22 @@ class Command(BaseCommand):
 
         count_created = 0
         for item in listings_data:
-            # Găsește categoria
+            # Find the category
             try:
                 category = Category.objects.get(name=item['category_name'])
             except Category.DoesNotExist:
-                # Fallback pe categoria principală dacă subcategoria nu există
+                # Fall back to the main category if the subcategory does not exist
                 self.stdout.write(self.style.WARNING(f"   ⚠️  Categoria {item['category_name']} nu există. Folosim fallback 'Altele'."))
                 category, _ = Category.objects.get_or_create(name='Diverse', defaults={'slug': 'diverse'})
 
             owner = user_objects.get(item['owner_username'], User.objects.first())
 
-            # Verifică dacă anunțul există deja pentru a evita duplicatele la rulări repetate
+            # Check whether the listing already exists to avoid duplicates on repeated runs
             if Listing.objects.filter(title=item['title'], owner=owner).exists():
                 self.stdout.write(f"   ~ Anunțul '{item['title']}' există deja.")
                 continue
 
-            # Creare anunț
+            # Create the listing
             listing = Listing.objects.create(
                 title=item['title'],
                 description=item['description'],
@@ -845,7 +845,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f"   + Creat anunțul '{listing.title}' (ID: {listing.pk}) cu {msg_type}."))
             count_created += 1
 
-        # Actualizează statisticile pentru toți utilizatorii la final
+        # Update statistics for all users at the end
         for user in User.objects.all():
             try:
                 if hasattr(user, 'profile'):

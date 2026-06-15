@@ -66,7 +66,7 @@ def conversation_view(request, pk):
     # Get the messages
     messages_list = conversation.messages.select_related('sender', 'receiver').prefetch_related('attachments').order_by('created_at')
     
-    # Paginare pentru mesaje
+    # Paginate the messages
     paginator = Paginator(messages_list, 50)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -113,8 +113,8 @@ def start_conversation_view(request, listing_slug):
         conversation = Conversation.objects.create(listing=listing)
         conversation.participants.add(request.user, listing.owner)
         
-        # Mesaj de welcome automat
-        welcome_message = f"Salut! Sunt interessat de anunțul tău '{listing.title}'."
+        # Automatic welcome message
+        welcome_message = f"Salut! Sunt interesat de anunțul tău '{listing.title}'."
         Message.objects.create(
             conversation=conversation,
             sender=request.user,

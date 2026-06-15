@@ -23,7 +23,7 @@ User = get_user_model()
 
 
 def create_test_image(filename='test.jpg', size=(100, 100), color=(255, 0, 0)):
-    """Generează un fișier imagine valid pentru teste"""
+    """Generate a valid image file for tests"""
     buffer = BytesIO()
     img = PilImage.new('RGB', size, color)
     img.save(buffer, format='JPEG')
@@ -32,7 +32,7 @@ def create_test_image(filename='test.jpg', size=(100, 100), color=(255, 0, 0)):
 
 
 class ListingCRUDTestCase(TestCase):
-    """Teste pentru crearea, editarea, ștergerea anunțurilor"""
+    """Tests for creating, editing, and deleting listings"""
 
     def setUp(self):
         self.client = Client()
@@ -62,7 +62,7 @@ class ListingCRUDTestCase(TestCase):
         )
 
     def test_listing_create_requires_login(self):
-        """Crearea de anunțuri necesită autentificare"""
+        """Creating listings requires authentication"""
         response = self.client.get(reverse('listings:create'))
         self.assertEqual(response.status_code, 302)
 
@@ -73,14 +73,14 @@ class ListingCRUDTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_listing_detail_accessible(self):
-        """Detaliile unui anunț activ sunt accesibile fără autentificare"""
+        """The details of an active listing are accessible without authentication"""
         response = self.client.get(
             reverse('listings:detail', kwargs={'slug': self.listing.slug})
         )
         self.assertEqual(response.status_code, 200)
 
     def test_listing_detail_view_count_has_cooldown(self):
-        """Refreshurile repetate de la același client nu scriu view-uri nelimitat."""
+        """Repeated refreshes from the same client do not write view counts without limit."""
         cache.clear()
         url = reverse('listings:detail', kwargs={'slug': self.listing.slug})
 
@@ -91,7 +91,7 @@ class ListingCRUDTestCase(TestCase):
         self.assertEqual(self.listing.views_count, 1)
 
     def test_listing_detail_has_seo_metadata(self):
-        """Pagina de anunț expune meta tags și structured data pentru indexare/share."""
+        """The listing page exposes meta tags and structured data for indexing/sharing."""
         response = self.client.get(
             reverse('listings:detail', kwargs={'slug': self.listing.slug})
         )
@@ -111,7 +111,7 @@ class ListingCRUDTestCase(TestCase):
         self.assertContains(response, self.listing.title)
 
     def test_listing_edit_requires_owner(self):
-        """Editarea anunțului este permisă doar proprietarului"""
+        """Editing a listing is allowed only for the owner"""
         self.client.login(username='other', password='OtherPass123!')
         response = self.client.get(
             reverse('listings:update', kwargs={'slug': self.listing.slug})
@@ -119,17 +119,17 @@ class ListingCRUDTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_listing_delete_requires_owner(self):
-        """Ștergerea anunțului este permisă doar proprietarului"""
+        """Deleting a listing is allowed only for the owner"""
         self.client.login(username='other', password='OtherPass123!')
         response = self.client.post(
             reverse('listings:delete', kwargs={'slug': self.listing.slug})
         )
         self.assertEqual(response.status_code, 404)
-        # Anunțul NU trebuie șters
+        # The listing must NOT be deleted
         self.assertTrue(Listing.objects.filter(pk=self.listing.pk).exists())
 
     def test_listing_owner_can_delete(self):
-        """Proprietarul poate șterge propriul anunț"""
+        """The owner can delete their own listing"""
         self.client.login(username='seller', password='SellerPass123!')
         response = self.client.post(
             reverse('listings:delete', kwargs={'slug': self.listing.slug})
@@ -138,12 +138,12 @@ class ListingCRUDTestCase(TestCase):
         self.assertFalse(Listing.objects.filter(pk=self.listing.pk).exists())
 
     def test_slug_generated_on_create(self):
-        """Slug-ul este generat automat la crearea anunțului"""
+        """The slug is generated automatically when the listing is created"""
         self.assertIsNotNone(self.listing.slug)
         self.assertIn('anunt', self.listing.slug.lower())
 
     def test_listing_create_rejects_invalid_uploaded_image(self):
-        """Uploadul custom de la creare folosește validarea server-side a imaginilor."""
+        """The custom upload on creation uses server-side image validation."""
         with tempfile.TemporaryDirectory() as media_root:
             with override_settings(MEDIA_ROOT=media_root):
                 self.client.login(username='seller', password='SellerPass123!')
@@ -169,8 +169,8 @@ class ListingCRUDTestCase(TestCase):
                 self.assertFalse(listing.images.exists())
 
     def test_pages_home_view_filters_active(self):
-        """pages/home_view returnează doar anunțuri active"""
-        # Creează un anunț inactiv
+        """pages/home_view returns only active listings"""
+        # Create an inactive listing
         inactive = Listing.objects.create(
             title='Anunț inactiv',
             description='Test',
@@ -181,12 +181,12 @@ class ListingCRUDTestCase(TestCase):
             status='inactive'
         )
         response = self.client.get(reverse('listings:home'))  # listings:home
-        # Anunțul inactiv nu trebuie să apară în response
+        # The inactive listing must not appear in the response
         if response.status_code == 200:
             self.assertNotIn(b'Anun\xc8\x9b inactiv', response.content)
 
     def test_report_listing_requires_login(self):
-        """Raportarea unui anunț necesită autentificare."""
+        """Reporting a listing requires authentication."""
         response = self.client.post(
             reverse('listings:report', kwargs={'slug': self.listing.slug}),
             {'reason': 'scam', 'details': 'suspect'},
@@ -195,7 +195,7 @@ class ListingCRUDTestCase(TestCase):
         self.assertFalse(ListingReport.objects.exists())
 
     def test_owner_cannot_report_own_listing(self):
-        """Proprietarul nu își poate raporta propriul anunț."""
+        """The owner cannot report their own listing."""
         self.client.login(username='seller', password='SellerPass123!')
         response = self.client.post(
             reverse('listings:report', kwargs={'slug': self.listing.slug}),
@@ -205,7 +205,7 @@ class ListingCRUDTestCase(TestCase):
         self.assertFalse(ListingReport.objects.exists())
 
     def test_authenticated_user_can_report_listing(self):
-        """Un utilizator autentificat poate raporta un anunț străin."""
+        """An authenticated user can report someone else's listing."""
         self.client.login(username='other', password='OtherPass123!')
         response = self.client.post(
             reverse('listings:report', kwargs={'slug': self.listing.slug}),
@@ -218,7 +218,7 @@ class ListingCRUDTestCase(TestCase):
         self.assertEqual(report.reason, 'misleading')
 
     def test_duplicate_active_report_is_prevented(self):
-        """Utilizatorul nu poate crea două rapoarte active pentru același anunț."""
+        """A user cannot create two active reports for the same listing."""
         ListingReport.objects.create(
             listing=self.listing,
             reporter=self.other_user,
@@ -234,7 +234,7 @@ class ListingCRUDTestCase(TestCase):
 
     @override_settings(LISTING_AUTO_HIDE_REPORT_THRESHOLD=2)
     def test_listing_auto_hides_after_report_threshold(self):
-        """Anunțul este ascuns temporar după pragul de rapoarte active."""
+        """The listing is temporarily hidden after the active-reports threshold."""
         reporter_one = User.objects.create_user(
             username='reporter1',
             email='reporter1@example.com',
@@ -258,7 +258,7 @@ class ListingCRUDTestCase(TestCase):
         self.assertTrue(Notification.objects.filter(recipient=self.user, notification_type='listing_rejected').exists())
 
     def test_promoted_listing_property_respects_expiry(self):
-        """Promovarea este activă doar cât timp nu a expirat."""
+        """A promotion is active only while it has not expired."""
         self.listing.is_featured = True
         self.listing.featured_until = timezone.now() + timedelta(days=1)
         self.assertTrue(self.listing.is_promoted)
@@ -267,7 +267,7 @@ class ListingCRUDTestCase(TestCase):
         self.assertFalse(self.listing.is_promoted)
 
     def test_home_shows_only_active_promoted_listings(self):
-        """Homepage afișează doar promovările active în secțiunea recomandată."""
+        """The homepage shows only active promotions in the recommended section."""
         active_promoted = Listing.objects.create(
             title='Promovat activ',
             description='Test',
@@ -299,7 +299,7 @@ class ListingCRUDTestCase(TestCase):
 
     @override_settings(LISTING_RISK_REVIEW_THRESHOLD=70)
     def test_suspicious_listing_is_sent_to_moderation_on_create(self):
-        """Anunțurile cu risc mare sunt ascunse temporar pentru review."""
+        """High-risk listings are temporarily hidden for review."""
         self.client.login(username='seller', password='SellerPass123!')
 
         response = self.client.post(
@@ -326,7 +326,7 @@ class ListingCRUDTestCase(TestCase):
 
     @override_settings(LISTING_RISK_REVIEW_THRESHOLD=70)
     def test_normal_listing_remains_public_on_create(self):
-        """Anunțurile normale rămân active după creare."""
+        """Normal listings stay active after creation."""
         self.client.login(username='seller', password='SellerPass123!')
 
         response = self.client.post(
@@ -349,7 +349,7 @@ class ListingCRUDTestCase(TestCase):
         self.assertFalse(listing.needs_moderation_review)
 
     def test_category_icon_is_escaped_in_listing_filter(self):
-        """Iconul categoriei nu este randat ca HTML raw în filtrul de listare."""
+        """The category icon is not rendered as raw HTML in the listing filter."""
         self.category.icon = '<script>alert(1)</script>'
         self.category.save(update_fields=['icon'])
 
@@ -361,7 +361,7 @@ class ListingCRUDTestCase(TestCase):
 
 
 class ListingImageValidationTestCase(TestCase):
-    """Teste pentru validarea imaginilor uploadate"""
+    """Tests for uploaded-image validation"""
 
     def setUp(self):
         self.client = Client()
@@ -373,22 +373,22 @@ class ListingImageValidationTestCase(TestCase):
         self.client.login(username='imgtest', password='ImgPass123!')
 
     def test_valid_image_passes(self):
-        """O imagine JPEG validă trece validarea"""
+        """A valid JPEG image passes validation"""
         from listings.forms import ListingImageForm
         img_file = create_test_image()
         form = ListingImageForm(files={'image': img_file})
         self.assertTrue(form.is_valid(), form.errors)
 
     def test_oversized_image_rejected(self):
-        """O imagine mai mare de 5MB este respinsă"""
+        """An image larger than 5MB is rejected"""
         from listings.forms import ListingImageForm
-        # Creează un fișier fals de 6MB
+        # Create a fake 6MB file
         big_file = SimpleUploadedFile('big.jpg', b'0' * (6 * 1024 * 1024), content_type='image/jpeg')
         form = ListingImageForm(files={'image': big_file})
         self.assertFalse(form.is_valid())
 
     def test_wrong_extension_rejected(self):
-        """Un fișier cu extensie nepermisă este respins"""
+        """A file with a disallowed extension is rejected"""
         from listings.forms import ListingImageForm
         fake_file = SimpleUploadedFile('malware.exe', b'MZ...fake', content_type='application/octet-stream')
         form = ListingImageForm(files={'image': fake_file})

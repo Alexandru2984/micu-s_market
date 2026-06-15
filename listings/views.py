@@ -380,7 +380,7 @@ def upload_images_view(request, slug):
         if formset.is_valid():
             for image_form in formset:
                 if image_form.cleaned_data and not image_form.cleaned_data.get('DELETE', False):
-                    if image_form.cleaned_data.get('image'):  # Doar dacă există imagine nouă
+                    if image_form.cleaned_data.get('image'):  # Only if there is a new image
                         image = image_form.save(commit=False)
                         image.listing = listing
                         image.save()
