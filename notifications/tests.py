@@ -168,7 +168,7 @@ class NotificationConsumerTestCase(TransactionTestCase):
         async def run():
             comm = self._communicator(self.user)
             await self._connect(comm)
-            await comm.receive_output(timeout=5)  # count inițial (0)
+            await comm.receive_output(timeout=5)  # initial count (0)
             await database_sync_to_async(Message.objects.create)(
                 conversation=self.conv, sender=self.other, receiver=self.user, content="nou",
             )

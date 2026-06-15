@@ -140,7 +140,7 @@ from django.forms import modelformset_factory
 ListingImageFormSet = modelformset_factory(
     ListingImage,
     form=ListingImageForm,
-    extra=3,  # 3 formulare goale în plus
+    extra=3,  # 3 extra empty forms
     max_num=10,  # Maximum 10 imagini
     can_delete=True,
     validate_min=False,  # Nu cere imagini obligatorii

@@ -324,7 +324,7 @@ def listing_update_view(request, slug):
         if form.is_valid() and formset.is_valid():
             listing = form.save()
             apply_listing_risk_review(listing, request.user, request=request)
-            formset.save() # Aceasta se va ocupa de salvarea/ștergerea imaginilor
+            formset.save() # This handles saving/deleting the images
 
             if listing.needs_moderation_review:
                 messages.warning(request, "Anunțul a fost trimis la moderare înainte de republicare.")

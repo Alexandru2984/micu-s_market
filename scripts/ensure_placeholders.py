@@ -5,7 +5,7 @@ from django.utils.text import slugify
 
 from PIL import Image, ImageDraw, ImageFont
 
-# ajustează dacă app-ul e altul
+# adjust if the app is different
 from listings.models import Listing, ListingImage
 
 
@@ -37,13 +37,13 @@ def img_field_is_valid(img_field):
 
 
 def listing_has_valid_image(listing):
-    # caută imagini în relații obișnuite
+    # look for images in the usual relations
     for attr in ("images", "photos", "pictures", "listingimage_set", "image_set"):
         if hasattr(listing, attr):
             for im in getattr(listing, attr).all():
                 if img_field_is_valid(getattr(im, "image", None)):
                     return True
-    # fallback pe câmp unic pe Listing (dacă există)
+    # fall back to a single field on Listing (if it exists)
     for field in ("image", "cover_image", "primary_image"):
         if hasattr(listing, field) and img_field_is_valid(getattr(listing, field)):
             return True
@@ -55,7 +55,7 @@ def make_img_bytes(title, subtitle=""):
     img = Image.new("RGB", (W, H), (230, 232, 236))
     d = ImageDraw.Draw(img)
 
-    # titlu mare centrat, scalat să încapă
+    # large centered title, scaled to fit
     f = get_font(96)
     while d.textlength(title, font=f) > W - 160 and getattr(f, "size", 96) > 36:
         f = get_font(getattr(f, "size", 96) - 6)
@@ -73,7 +73,7 @@ def make_img_bytes(title, subtitle=""):
         tw2 = d.textlength(subtitle, font=f2)
         d.text(((W - tw2) // 2, y + th + 20), subtitle, font=f2, fill=(90, 90, 90))
 
-    # watermark mic
+    # small watermark
     f3 = get_font(24)
     d.text((W - 240, H - 40), "Micu’s Market", font=f3, fill=(120, 124, 130))
 
@@ -91,8 +91,8 @@ def get_images_manager(listing):
 
 def mark_primary_on_image(listing, new_img_obj):
     """
-    Dacă modelul de imagine are un câmp boolean is_primary / is_main și
-    NU există deja o poză marcată, marchează placeholderul. NU atinge Listing.main_image (property).
+    If the image model has an is_primary / is_main boolean field and there is
+    NOT already a marked photo, mark the placeholder. Does NOT touch Listing.main_image (property).
     """
     rel = get_images_manager(listing)
     if rel is None:
@@ -130,10 +130,10 @@ def run():
             obj = ListingImage(listing=lst)
             obj.image.save(filename, ContentFile(data), save=True)
 
-            # Considerăm creat chiar dacă nu putem seta vreo marcă de "primary"
+            # Count it as created even if we cannot set any "primary" marker
             created += 1
 
-            # Best-effort: dacă modelul are un flag primary, îl setăm
+            # Best-effort: if the model has a primary flag, set it
             try:
                 mark_primary_on_image(lst, obj)
             except Exception:

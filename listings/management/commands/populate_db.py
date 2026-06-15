@@ -821,7 +821,7 @@ class Command(BaseCommand):
                 views_count=random.randint(10, 250),  # nosec B311
             )
 
-            # Descărcare imagine reală sau fallback pe text placeholder
+            # Download a real image or fall back to a text placeholder
             try:
                 keyword = get_image_keyword_for_listing(listing.title, category.name)
                 self.stdout.write(f"   📥 Descărcăm imagine reală pentru '{listing.title}' (keyword: {keyword})...")

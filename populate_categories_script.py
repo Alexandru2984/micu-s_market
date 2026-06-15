@@ -193,7 +193,7 @@ def populate_categories(clear_existing=False):
                 
                 sub_order += 1
             
-            print()  # Linie goală pentru separare
+            print()  # Empty line for separation
             order += 1
 
     # Statistici finale
