@@ -1,3 +1,4 @@
+import tempfile
 from io import StringIO
 from unittest.mock import patch
 
@@ -7,6 +8,8 @@ from django.urls import reverse
 
 from .checks import production_environment_checks
 from .views import bad_request_view, permission_denied_view, server_error_view
+
+_MANIFEST_STATIC_ROOT = tempfile.mkdtemp(prefix="mm-manifest-static-")
 
 
 class ProjectUrlSecurityTests(TestCase):
@@ -94,6 +97,40 @@ class ProjectUrlSecurityTests(TestCase):
         self.assertContains(response_400, 'Cerere invalidă', status_code=400)
         self.assertContains(response_403, 'Acces restricționat', status_code=403)
         self.assertContains(response_500, 'Eroare server', status_code=500)
+
+
+@override_settings(
+    STATIC_ROOT=_MANIFEST_STATIC_ROOT,
+    STORAGES={
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"},
+    },
+)
+class StaticManifestRenderTests(TestCase):
+    """Randează paginile cheie sub manifest storage (ca în producție) ca să prindă
+    referințe {% static '...' %} către fișiere inexistente — o clasă de bug care
+    altfel trece de teste (settings_test nu folosește manifest storage) și
+    produce 500 doar în producție."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        call_command("collectstatic", "--noinput", "--clear", verbosity=0)
+
+    def test_key_pages_render_with_manifest_static(self):
+        for name in [
+            "listings:home",
+            "pages:home",
+            "pages:about",
+            "pages:terms",
+            "pages:privacy",
+            "listings:list",
+            "account_login",
+            "account_signup",
+        ]:
+            url = reverse(name)
+            with self.subTest(url=url):
+                self.assertEqual(self.client.get(url).status_code, 200)
 
 
 class DoctorCommandTests(TestCase):
