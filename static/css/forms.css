@@ -41,7 +41,7 @@ select.form-control {
     margin-top: 0.25rem;
 }
 
-/* Form Actions - Butoanele de jos */
+/* Form Actions - bottom buttons */
 .form-actions {
     display: flex;
     align-items: center;
