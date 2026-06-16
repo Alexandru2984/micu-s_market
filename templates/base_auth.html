@@ -1,6 +1,6 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="{{ LANGUAGE_CODE|default:'ro' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -56,7 +56,7 @@
     
     <!-- Simple Footer -->
     <footer class="auth-simple-footer">
-        <p>&copy; 2025 Micu's Market. Toate drepturile rezervate.</p>
+        <p>&copy; 2025 Micu's Market. {% trans "Toate drepturile rezervate." %}</p>
     </footer>
 </body>
 </html>

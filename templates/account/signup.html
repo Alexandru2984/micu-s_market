@@ -1,7 +1,7 @@
 {% extends 'base_auth.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Înregistrare - Micu's Market{% endblock %}
+{% block title %}{% trans "Înregistrare" %} - Micu's Market{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/auth.css' %}">
@@ -11,8 +11,8 @@
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-header">
-            <h1><i class="fas fa-user-plus"></i> Cont nou</h1>
-            <p>Alătură-te comunității Micu's Market!</p>
+            <h1><i class="fas fa-user-plus"></i> {% trans "Cont nou" %}</h1>
+            <p>{% trans "Alătură-te comunității Micu's Market!" %}</p>
         </div>
         
         <form method="post" class="auth-form" action="{% url 'account_signup' %}">
@@ -35,10 +35,10 @@
             
             <div class="form-group">
                 <label for="id_password1">
-                    <i class="fas fa-lock"></i> Parolă
+                    <i class="fas fa-lock"></i> {% trans "Parolă" %}
                 </label>
                 <div style="position: relative;">
-                    <input type="password" name="password1" id="id_password1" class="form-control" placeholder="Minimum 8 caractere" required>
+                    <input type="password" name="password1" id="id_password1" class="form-control" placeholder="{% trans 'Minimum 8 caractere' %}" required>
                     <button type="button" onclick="togglePasswordVisibility('id_password1')" 
                             style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #718096; cursor: pointer;">
                         <i class="fas fa-eye password-toggle-icon"></i>
@@ -48,10 +48,10 @@
             
             <div class="form-group">
                 <label for="id_password2">
-                    <i class="fas fa-shield-alt"></i> Confirmă parola
+                    <i class="fas fa-shield-alt"></i> {% trans "Confirmă parola" %}
                 </label>
                 <div style="position: relative;">
-                    <input type="password" name="password2" id="id_password2" class="form-control" placeholder="Repetă parola" required>
+                    <input type="password" name="password2" id="id_password2" class="form-control" placeholder="{% trans 'Repetă parola' %}" required>
                     <button type="button" onclick="togglePasswordVisibility('id_password2')" 
                             style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #718096; cursor: pointer;">
                         <i class="fas fa-eye password-toggle-icon"></i>
@@ -62,23 +62,23 @@
             <div style="margin-bottom: 1rem; padding: 1rem; background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border-radius: 8px; font-size: 0.875rem; color: #4a5568; border-left: 4px solid #667eea;">
                 <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
                     <i class="fas fa-star" style="color: #667eea; margin-right: 0.5rem;"></i>
-                    <strong>Beneficiile contului:</strong>
+                    <strong>{% trans "Beneficiile contului:" %}</strong>
                 </div>
                 <ul style="margin: 0; padding-left: 1.5rem; line-height: 1.6;">
-                    <li>Publici anunțuri gratuit</li>
-                    <li>Chat direct cu vânzătorii</li>
-                    <li>Salvezi anunțuri favorite</li>
-                    <li>Review-uri și rating</li>
+                    <li>{% trans "Publici anunțuri gratuit" %}</li>
+                    <li>{% trans "Chat direct cu vânzătorii" %}</li>
+                    <li>{% trans "Salvezi anunțuri favorite" %}</li>
+                    <li>{% trans "Review-uri și rating" %}</li>
                 </ul>
             </div>
             
             <button type="submit" class="btn btn-primary btn-block">
-                <i class="fas fa-rocket"></i> Creează contul
+                <i class="fas fa-rocket"></i> {% trans "Creează contul" %}
             </button>
         </form>
-        
+
         <div class="auth-footer">
-            <p>Ai deja cont? <a href="{% url 'account_login' %}">Conectează-te</a></p>
+            <p>{% trans "Ai deja cont?" %} <a href="{% url 'account_login' %}">{% trans "Conectează-te" %}</a></p>
         </div>
     </div>
 </div>

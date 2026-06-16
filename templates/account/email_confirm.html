@@ -1,7 +1,7 @@
 {% extends 'base_auth.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Confirmă Email-ul - Micu's Market{% endblock %}
+{% block title %}{% trans "Confirmă Email-ul" %} - Micu's Market{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/auth.css' %}">
@@ -11,23 +11,23 @@
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-header">
-            <h1><i class="fas fa-envelope-open"></i> Confirmă email-ul</h1>
-            <p>Pentru a-ți activa contul, confirmă adresa de email.</p>
+            <h1><i class="fas fa-envelope-open"></i> {% trans "Confirmă email-ul" %}</h1>
+            <p>{% trans "Pentru a-ți activa contul, confirmă adresa de email." %}</p>
         </div>
         
         <form method="post" class="auth-form" action="{% url 'account_confirm_email' confirmation.key %}">
             {% csrf_token %}
             <div style="text-align: center; padding: 1rem;">
-                <p>Dă click pe butonul de mai jos pentru a confirma adresa de email <strong>{{ confirmation.email_address.email }}</strong></p>
+                <p>{% blocktrans with email=confirmation.email_address.email %}Dă click pe butonul de mai jos pentru a confirma adresa de email <strong>{{ email }}</strong>{% endblocktrans %}</p>
             </div>
             
             <button type="submit" class="btn btn-primary btn-block">
-                <i class="fas fa-check"></i> Confirmă email-ul
+                <i class="fas fa-check"></i> {% trans "Confirmă email-ul" %}
             </button>
         </form>
         
         <div class="auth-footer">
-            <p><a href="{% url 'account_login' %}">← Înapoi la conectare</a></p>
+            <p><a href="{% url 'account_login' %}">{% trans "← Înapoi la conectare" %}</a></p>
         </div>
     </div>
 </div>
