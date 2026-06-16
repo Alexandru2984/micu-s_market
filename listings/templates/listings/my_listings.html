@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Anunțurile mele - Micu's Market{% endblock %}
+{% block title %}{% trans "Anunțurile mele" %} - Micu's Market{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
@@ -10,12 +10,12 @@
         <div class="mb-8">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Anunțurile mele</h1>
-                    <p class="text-gray-600">Gestionează-ți anunțurile publicate</p>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">{% trans "Anunțurile mele" %}</h1>
+                    <p class="text-gray-600">{% trans "Gestionează-ți anunțurile publicate" %}</p>
                 </div>
                 <a href="{% url 'listings:create' %}" class="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
                     <i class="fas fa-plus"></i>
-                    Adaugă anunț nou
+                    {% trans "Adaugă anunț nou" %}
                 </a>
             </div>
         </div>
@@ -31,7 +31,7 @@
                             </div>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500">Total anunțuri</p>
+                            <p class="text-sm font-medium text-gray-500">{% trans "Total anunțuri" %}</p>
                             <p class="text-2xl font-bold text-gray-900">{{ page_obj.paginator.count }}</p>
                         </div>
                     </div>
@@ -45,7 +45,7 @@
                             </div>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500">Active</p>
+                            <p class="text-sm font-medium text-gray-500">{% trans "Active" %}</p>
                             <p class="text-2xl font-bold text-gray-900">
                                 {% for listing in page_obj %}{% if listing.status == 'active' %}{% if forloop.first %}1{% else %}{{ forloop.counter }}{% endif %}{% endif %}{% endfor %}
                             </p>
@@ -61,7 +61,7 @@
                             </div>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500">În așteptare</p>
+                            <p class="text-sm font-medium text-gray-500">{% trans "În așteptare" %}</p>
                             <p class="text-2xl font-bold text-gray-900">
                                 {% for listing in page_obj %}{% if listing.status == 'pending' %}{% if forloop.first %}1{% else %}{{ forloop.counter }}{% endif %}{% endif %}{% endfor %}
                             </p>
@@ -77,7 +77,7 @@
                             </div>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500">Total vizualizări</p>
+                            <p class="text-sm font-medium text-gray-500">{% trans "Total vizualizări" %}</p>
                             <p class="text-2xl font-bold text-gray-900">
                                 {% for listing in page_obj %}{{ listing.views_count|add:0 }}{% if not forloop.last %}+{% endif %}{% endfor %}
                             </p>
@@ -112,17 +112,17 @@
                                         {% if listing.status == 'active' %}
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                 <i class="fas fa-check-circle mr-1"></i>
-                                                Activ
+                                                {% trans "Activ" %}
                                             </span>
                                         {% elif listing.status == 'pending' %}
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                                 <i class="fas fa-clock mr-1"></i>
-                                                În așteptare
+                                                {% trans "În așteptare" %}
                                             </span>
                                         {% elif listing.status == 'expired' %}
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                                 <i class="fas fa-times-circle mr-1"></i>
-                                                Expirat
+                                                {% trans "Expirat" %}
                                             </span>
                                         {% endif %}
                                     </div>
@@ -142,7 +142,7 @@
                                         </span>
                                         <span class="flex items-center">
                                             <i class="fas fa-eye mr-1"></i>
-                                            {{ listing.views_count }} vizualizări
+                                            {% blocktrans count counter=listing.views_count %}{{ counter }} vizualizare{% plural %}{{ counter }} vizualizări{% endblocktrans %}
                                         </span>
                                         <span class="flex items-center">
                                             <i class="fas fa-calendar mr-1"></i>
@@ -154,19 +154,19 @@
                             
                             <!-- Actions -->
                             <div class="flex items-center space-x-2">
-                                <a href="{% url 'listings:detail' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Vezi anunțul">
+                                <a href="{% url 'listings:detail' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="{% trans 'Vezi anunțul' %}">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="{% url 'listings:update' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Editează">
+                                <a href="{% url 'listings:update' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="{% trans 'Editează' %}">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{% url 'listings:upload_images' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="Gestionează imagini">
+                                <a href="{% url 'listings:upload_images' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="{% trans 'Gestionează imagini' %}">
                                     <i class="fas fa-images"></i>
                                 </a>
-                                <a href="{% url 'billing:promote_listing' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Promovează">
+                                <a href="{% url 'billing:promote_listing' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="{% trans 'Promovează' %}">
                                     <i class="fas fa-bolt"></i>
                                 </a>
-                                <a href="{% url 'listings:delete' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Șterge">
+                                <a href="{% url 'listings:delete' slug=listing.slug %}" class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="{% trans 'Șterge' %}">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
                             </div>
@@ -179,8 +179,7 @@
                     <div class="border-t border-gray-200 px-6 py-4 bg-gray-50">
                         <div class="flex items-center justify-between">
                             <div class="text-sm text-gray-700">
-                                Afișez <span class="font-medium">{{ page_obj.start_index }}</span> - <span class="font-medium">{{ page_obj.end_index }}</span> 
-                                din <span class="font-medium">{{ page_obj.paginator.count }}</span> anunțuri
+                                {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=page_obj.paginator.count %}Afișez <span class="font-medium">{{ start }}</span> - <span class="font-medium">{{ end }}</span> din <span class="font-medium">{{ total }}</span> anunțuri{% endblocktrans %}
                             </div>
                             
                             <div class="flex items-center space-x-2">
@@ -191,7 +190,7 @@
                                 {% endif %}
                                 
                                 <span class="px-3 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg">
-                                    Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}
+                                    {% blocktrans with current=page_obj.number total=page_obj.paginator.num_pages %}Pagina {{ current }} din {{ total }}{% endblocktrans %}
                                 </span>
                                 
                                 {% if page_obj.has_next %}
@@ -211,11 +210,11 @@
                     <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                         <i class="fas fa-box-open text-4xl text-gray-400"></i>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Nu ai încă anunțuri</h3>
-                    <p class="text-gray-600 mb-8">Începe să vinzi produsele tale adăugând primul anunț.</p>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">{% trans "Nu ai încă anunțuri" %}</h3>
+                    <p class="text-gray-600 mb-8">{% trans "Începe să vinzi produsele tale adăugând primul anunț." %}</p>
                     <a href="{% url 'listings:create' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
                         <i class="fas fa-plus"></i>
-                        Adaugă primul anunț
+                        {% trans "Adaugă primul anunț" %}
                     </a>
                 </div>
             </div>

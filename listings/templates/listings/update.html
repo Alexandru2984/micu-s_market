@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}{{ title }} - Micu's Market{% endblock %}
 
@@ -15,16 +15,16 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ title }}</h1>
-                    <p class="text-gray-600">Modifică informațiile anunțului tău</p>
+                    <p class="text-gray-600">{% trans "Modifică informațiile anunțului tău" %}</p>
                 </div>
                 <div class="listing-header flex items-center gap-3">
                     <a href="{% url 'listings:detail' slug=listing.slug %}">
                         <i class="fas fa-eye"></i>
-                        Vezi anunțul
+                        {% trans "Vezi anunțul" %}
                     </a>
                     <a href="{% url 'listings:my_listings' %}" class="secondary">
                         <i class="fas fa-arrow-left"></i>
-                        Înapoi
+                        {% trans "Înapoi" %}
                     </a>
                 </div>
             </div>
@@ -37,7 +37,7 @@
                 
                 <!-- Basic Info Section -->
                 <div class="border-b border-gray-200 pb-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Informații generale</h2>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">{% trans "Informații generale" %}</h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Titlu -->
@@ -123,7 +123,7 @@
                         <div class="md:col-span-2">
                             <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
                                 {{ form.location.label }}
-                                <span class="text-gray-400">(opțional)</span>
+                                <span class="text-gray-400">{% trans "(opțional)" %}</span>
                             </label>
                             {{ form.location }}
                             {% if form.location.errors %}
@@ -154,7 +154,7 @@
                         <div>
                             <label for="{{ form.contact_phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
                                 {{ form.contact_phone.label }}
-                                <span class="text-gray-400">(opțional)</span>
+                                <span class="text-gray-400">{% trans "(opțional)" %}</span>
                             </label>
                             {{ form.contact_phone }}
                             {% if form.contact_phone.errors %}
@@ -187,7 +187,7 @@
 
                 <!-- Description Section -->
                 <div class="border-b border-gray-200 pb-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Descriere</h2>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">{% trans "Descriere" %}</h2>
                     
                     <div>
                         <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
@@ -203,7 +203,7 @@
                             </div>
                         {% endif %}
                         <p class="mt-2 text-sm text-gray-500">
-                            Descrie produsul sau serviciul în detaliu.
+                            {% trans "Descrie produsul sau serviciul în detaliu." %}
                         </p>
                     </div>
                 </div>
@@ -211,13 +211,13 @@
                 <!-- Images Section -->
                 <div class="pb-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center justify-between image-section-header">
-                        <span>Imagini</span>
+                        <span>{% trans "Imagini" %}</span>
                         <a href="{% url 'listings:upload_images' slug=listing.slug %}">
                             <i class="fas fa-plus"></i>
-                            Gestionează imagini separat
+                            {% trans "Gestionează imagini separat" %}
                         </a>
                     </h2>
-                    <p class="text-sm text-gray-600 mb-4">Modifică imaginile existente sau adaugă altele noi (maxim 5MB per imagine)</p>
+                    <p class="text-sm text-gray-600 mb-4">{% trans "Modifică imaginile existente sau adaugă altele noi (maxim 5MB per imagine)" %}</p>
                     
                     {{ formset.management_form }}
                     
@@ -232,7 +232,7 @@
                                         <img src="{{ form.instance.image.url }}" alt="{{ form.instance.alt_text }}" loading="lazy" decoding="async">
                                         <div class="current-image-label">
                                             <i class="fas fa-image"></i>
-                                            Imagine curentă
+                                            {% trans "Imagine curentă" %}
                                         </div>
                                     </div>
                                 {% endif %}
@@ -249,8 +249,8 @@
                                             <div class="file-input-display">
                                                 <i class="fas fa-cloud-upload-alt"></i>
                                                 <div class="file-input-text">
-                                                    <span class="main-text">Alege imagine</span>
-                                                    <span class="sub-text">JPG, PNG (max 5MB)</span>
+                                                    <span class="main-text">{% trans "Alege imagine" %}</span>
+                                                    <span class="sub-text">{% trans "JPG, PNG (max 5MB)" %}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -272,7 +272,7 @@
                                         <input type="text" name="{{ form.alt_text.name }}" 
                                                value="{{ form.alt_text.value|default:'' }}"
                                                class="alt-text-input"
-                                               placeholder="Descriere scurtă a imaginii"
+                                               placeholder="{% trans 'Descriere scurtă a imaginii' %}"
                                                {% if form.alt_text.field.required %}required{% endif %}>
                                         {% if form.alt_text.errors %}
                                             <div class="mt-1 text-sm text-red-600">
@@ -290,7 +290,7 @@
                                         <label class="delete-checkbox-wrapper">
                                             {{ form.DELETE }}
                                             <i class="fas fa-trash-alt"></i>
-                                            <span class="delete-text">Șterge această imagine</span>
+                                            <span class="delete-text">{% trans "Șterge această imagine" %}</span>
                                         </label>
                                     </div>
                                 {% endif %}
@@ -304,17 +304,17 @@
                     <div class="form-actions-left">
                         <a href="{% url 'listings:detail' slug=listing.slug %}" class="btn-cancel">
                             <i class="fas fa-times"></i>
-                            Anulează
+                            {% trans "Anulează" %}
                         </a>
                         <a href="{% url 'listings:delete' slug=listing.slug %}" class="btn-delete">
                             <i class="fas fa-trash-alt"></i>
-                            Șterge anunțul
+                            {% trans "Șterge anunțul" %}
                         </a>
                     </div>
-                    
+
                     <button type="submit" class="btn-save">
                         <i class="fas fa-save"></i>
-                        Salvează modificările
+                        {% trans "Salvează modificările" %}
                     </button>
                 </div>
             </form>

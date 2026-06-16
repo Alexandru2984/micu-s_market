@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Toate Anunțurile - Micu's Market{% endblock %}
-{% block meta_description %}{% if search_query %}Rezultate pentru {{ search_query }} pe Micu's Market: filtrează anunțuri după preț, oraș și categorie.{% elif current_category %}Anunțuri din categoria {{ current_category.name }} pe Micu's Market, cu filtre după preț și oraș.{% else %}Explorează toate anunțurile active de pe Micu's Market și filtrează rapid după categorie, oraș sau preț.{% endif %}{% endblock %}
-{% block og_title %}{% if search_query %}Rezultate pentru {{ search_query }}{% elif current_category %}{{ current_category.name }}{% else %}Toate anunțurile{% endif %} - Micu's Market{% endblock %}
-{% block og_description %}{% if search_query %}Anunțuri găsite pentru {{ search_query }} pe Micu's Market.{% elif current_category %}Anunțuri active din categoria {{ current_category.name }}.{% else %}Toate anunțurile active disponibile pe Micu's Market.{% endif %}{% endblock %}
-{% block twitter_title %}{% if search_query %}Rezultate pentru {{ search_query }}{% elif current_category %}{{ current_category.name }}{% else %}Toate anunțurile{% endif %} - Micu's Market{% endblock %}
-{% block twitter_description %}{% if search_query %}Anunțuri găsite pentru {{ search_query }} pe Micu's Market.{% elif current_category %}Anunțuri active din categoria {{ current_category.name }}.{% else %}Toate anunțurile active disponibile pe Micu's Market.{% endif %}{% endblock %}
+{% block title %}{% trans "Toate Anunțurile" %} - Micu's Market{% endblock %}
+{% block meta_description %}{% if search_query %}{% blocktrans %}Rezultate pentru {{ search_query }} pe Micu's Market: filtrează anunțuri după preț, oraș și categorie.{% endblocktrans %}{% elif current_category %}{% blocktrans with name=current_category.name %}Anunțuri din categoria {{ name }} pe Micu's Market, cu filtre după preț și oraș.{% endblocktrans %}{% else %}{% trans "Explorează toate anunțurile active de pe Micu's Market și filtrează rapid după categorie, oraș sau preț." %}{% endif %}{% endblock %}
+{% block og_title %}{% if search_query %}{% blocktrans %}Rezultate pentru {{ search_query }}{% endblocktrans %}{% elif current_category %}{{ current_category.name }}{% else %}{% trans "Toate anunțurile" %}{% endif %} - Micu's Market{% endblock %}
+{% block og_description %}{% if search_query %}{% blocktrans %}Anunțuri găsite pentru {{ search_query }} pe Micu's Market.{% endblocktrans %}{% elif current_category %}{% blocktrans with name=current_category.name %}Anunțuri active din categoria {{ name }}.{% endblocktrans %}{% else %}{% trans "Toate anunțurile active disponibile pe Micu's Market." %}{% endif %}{% endblock %}
+{% block twitter_title %}{% if search_query %}{% blocktrans %}Rezultate pentru {{ search_query }}{% endblocktrans %}{% elif current_category %}{{ current_category.name }}{% else %}{% trans "Toate anunțurile" %}{% endif %} - Micu's Market{% endblock %}
+{% block twitter_description %}{% if search_query %}{% blocktrans %}Anunțuri găsite pentru {{ search_query }} pe Micu's Market.{% endblocktrans %}{% elif current_category %}{% blocktrans with name=current_category.name %}Anunțuri active din categoria {{ name }}.{% endblocktrans %}{% else %}{% trans "Toate anunțurile active disponibile pe Micu's Market." %}{% endif %}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/listings.css' %}">
@@ -106,11 +106,11 @@
                 <li class="breadcrumb-item">
                     <a href="{% url 'listings:home' %}">
                         <i class="fas fa-home"></i>
-                        Acasă
+                        {% trans "Acasă" %}
                     </a>
                 </li>
                 <li class="breadcrumb-item">
-                    <a href="{% url 'listings:list' %}">Anunțuri</a>
+                    <a href="{% url 'listings:list' %}">{% trans "Anunțuri" %}</a>
                 </li>
                 {% if current_category %}
                     <li class="breadcrumb-item active">
@@ -120,12 +120,12 @@
                 {% elif search_query %}
                     <li class="breadcrumb-item active">
                         <i class="fas fa-search"></i>
-                        Căutare: "{{ search_query }}"
+                        {% trans "Căutare:" %} "{{ search_query }}"
                     </li>
                 {% else %}
                     <li class="breadcrumb-item active">
                         <i class="fas fa-list"></i>
-                        Toate anunțurile
+                        {% trans "Toate anunțurile" %}
                     </li>
                 {% endif %}
             </ol>
@@ -137,22 +137,22 @@
                 <h1>
                     <i class="fas fa-layer-group"></i>
                     {% if search_query %}
-                        Rezultate pentru "{{ search_query }}"
+                        {% blocktrans %}Rezultate pentru "{{ search_query }}"{% endblocktrans %}
                     {% elif current_category %}
                         {{ current_category.name }}
                     {% else %}
-                        Toate Anunțurile
+                        {% trans "Toate Anunțurile" %}
                     {% endif %}
                 </h1>
                 <div class="header-stats">
                     <span class="results-count">
                         <i class="fas fa-chart-bar"></i>
-                        <span data-listings-count>{{ page_obj.paginator.count }}</span> anunțuri găsite
+                        <span data-listings-count>{{ page_obj.paginator.count }}</span> {% trans "anunțuri găsite" %}
                     </span>
-                    {% if search_query or current_category or current_city %} 
+                    {% if search_query or current_category or current_city %}
                         <a href="{% url 'listings:list' %}" class="reset-filters">
                             <i class="fas fa-refresh"></i>
-                            Resetează filtrele
+                            {% trans "Resetează filtrele" %}
                         </a>
                     {% endif %}
                 </div>
@@ -161,13 +161,13 @@
             <div class="header-actions">
                 {% if user.is_authenticated %}
                     <a href="{% url 'listings:create' %}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> 
-                        Adaugă anunț
+                        <i class="fas fa-plus"></i>
+                        {% trans "Adaugă anunț" %}
                     </a>
                 {% else %}
                     <a href="{% url 'account_login' %}" class="btn btn-outline">
                         <i class="fas fa-sign-in-alt"></i>
-                        Conectează-te pentru a adăuga anunț
+                        {% trans "Conectează-te pentru a adăuga anunț" %}
                     </a>
                 {% endif %}
             </div>
@@ -179,7 +179,7 @@
                 <form method="get" class="quick-search-form">
                     <div class="search-input-group">
                         <i class="fas fa-search search-icon" id="searchIcon"></i>
-                        <input type="text" name="search" placeholder="Caută anunțuri..." 
+                        <input type="text" name="search" placeholder="{% trans 'Caută anunțuri...' %}"
                                value="{{ search_query }}" id="searchInput">
                         {% if current_category_slug %}
                             <input type="hidden" name="category" value="{{ current_category_slug }}">
@@ -193,13 +193,13 @@
                     </div>
                     <button type="submit" id="searchBtn">
                         <i class="fas fa-search"></i>
-                        Caută
+                        {% trans "Caută" %}
                     </button>
                 </form>
                 
                 {% if search_query or current_category or current_city %}
                     <div class="active-filters">
-                        <span class="filters-label">Filtre active:</span>
+                        <span class="filters-label">{% trans "Filtre active:" %}</span>
                         {% if search_query %}
                             <span class="filter-tag">
                                 <i class="fas fa-search"></i>
@@ -223,7 +223,7 @@
                         {% endif %}
                         <a href="{% url 'listings:list' %}" class="clear-all-filters">
                             <i class="fas fa-times"></i>
-                            Șterge toate
+                            {% trans "Șterge toate" %}
                         </a>
                     </div>
                 {% endif %}
@@ -236,7 +236,7 @@
             <aside class="filters-sidebar">
                 <div class="filters-card">
                     <div class="filters-header">
-                        <h3><i class="fas fa-sliders-h"></i> Filtrează rezultatele</h3>
+                        <h3><i class="fas fa-sliders-h"></i> {% trans "Filtrează rezultatele" %}</h3>
                     </div>
                     
                     <form method="get" class="filters-form" id="filtersForm">
@@ -244,11 +244,11 @@
                         <div class="filter-group">
                             <label for="search" class="filter-label">
                                 <i class="fas fa-search"></i>
-                                Caută în anunțuri
+                                {% trans "Caută în anunțuri" %}
                             </label>
                             <div class="input-wrapper">
-                                <input type="text" id="search" name="search" class="filter-input" 
-                                       placeholder="Ex: iPhone, Samsung, laptop..." value="{{ search_query }}">
+                                <input type="text" id="search" name="search" class="filter-input"
+                                       placeholder="{% trans 'Ex: iPhone, Samsung, laptop...' %}" value="{{ search_query }}">
                                 <div class="input-border"></div>
                             </div>
                         </div>
@@ -257,11 +257,11 @@
                         <div class="filter-group">
                             <label for="category" class="filter-label">
                                 <i class="fas fa-tags"></i>
-                                Categoria
+                                {% trans "Categoria" %}
                             </label>
                             <div class="select-wrapper">
                                 <select id="categoryDropdown" name="category">
-                                    <option value="">🏷️ Toate categoriile</option>
+                                    <option value="">🏷️ {% trans "Toate categoriile" %}</option>
                                     {% for category in categories %}
                                         <option value="{{ category.slug }}" 
                                             {% if current_category_slug == category.slug %}selected{% endif %}>
@@ -277,11 +277,11 @@
                         <div class="filter-group">
                             <label class="filter-label">
                                 <i class="fas fa-euro-sign"></i>
-                                Intervalul de preț
+                                {% trans "Intervalul de preț" %}
                             </label>
                             <div class="price-range">
                                 <div class="price-input-group">
-                                    <span class="price-label" style="font-size: 12px; color: #10b981; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">De la</span>
+                                    <span class="price-label" style="font-size: 12px; color: #10b981; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">{% trans "De la" %}</span>
                                     <input type="number" name="min_price" class="price-input" 
                                            placeholder="0" value="{{ min_price }}"
                                            style="padding: 12px 16px;
@@ -315,7 +315,7 @@
                                     <i class="fas fa-arrows-alt-h"></i>
                                 </div>
                                 <div class="price-input-group">
-                                    <span class="price-label" style="font-size: 12px; color: #10b981; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Până la</span>
+                                    <span class="price-label" style="font-size: 12px; color: #10b981; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">{% trans "Până la" %}</span>
                                     <input type="number" name="max_price" class="price-input" 
                                            placeholder="999999" value="{{ max_price }}"
                                            style="padding: 12px 16px;
@@ -339,11 +339,11 @@
                         <div class="filter-group">
                             <label for="city" class="filter-label">
                                 <i class="fas fa-map-marker-alt"></i>
-                                Orașul
+                                {% trans "Orașul" %}
                             </label>
                             <div class="input-wrapper">
-                                <input type="text" id="city" name="city" class="filter-input" 
-                                       placeholder="Ex: București, Cluj, Timișoara..." value="{{ current_city }}"
+                                <input type="text" id="city" name="city" class="filter-input"
+                                       placeholder="{% trans 'Ex: București, Cluj, Timișoara...' %}" value="{{ current_city }}"
                                        style="width: 100%;
                                               padding: 16px 20px;
                                               border: 3px solid #e5e7eb;
@@ -360,28 +360,28 @@
                             </div>
                         </div>
                         
-                        <!-- Sortarea -->
+                        <!-- Sorting -->
                         <div class="filter-group">
                             <label for="sort" class="filter-label">
                                 <i class="fas fa-sort"></i>
-                                Sortează după
+                                {% trans "Sortează după" %}
                             </label>
                             <div class="select-wrapper">
                                 <select id="sortDropdown" name="sort">
                                     <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>
-                                        🕒 Cele mai noi
+                                        🕒 {% trans "Cele mai noi" %}
                                     </option>
                                     <option value="created_at" {% if sort_by == 'created_at' %}selected{% endif %}>
-                                        ⏰ Cele mai vechi
+                                        ⏰ {% trans "Cele mai vechi" %}
                                     </option>
                                     <option value="price" {% if sort_by == 'price' %}selected{% endif %}>
-                                        💰 Preț crescător
+                                        💰 {% trans "Preț crescător" %}
                                     </option>
                                     <option value="-price" {% if sort_by == '-price' %}selected{% endif %}>
-                                        💸 Preț descrescător
+                                        💸 {% trans "Preț descrescător" %}
                                     </option>
                                     <option value="title" {% if sort_by == 'title' %}selected{% endif %}>
-                                        🔤 Titlu A-Z
+                                        🔤 {% trans "Titlu A-Z" %}
                                     </option>
                                 </select>
                                 <i class="fas fa-chevron-down select-arrow"></i>
@@ -391,14 +391,14 @@
                         <div class="filter-actions">
                             <button type="submit" id="filterBtn">
                                 <i class="fas fa-search"></i>
-                                <span>Filtrează</span>
+                                <span>{% trans "Filtrează" %}</span>
                                 <div class="btn-loader">
                                     <i class="fas fa-spinner fa-spin"></i>
                                 </div>
                             </button>
                             <a href="{% url 'listings:list' %}" id="resetBtn">
                                 <i class="fas fa-eraser"></i>
-                                <span>Resetează</span>
+                                <span>{% trans "Resetează" %}</span>
                             </a>
                         </div>
                     </form>
@@ -423,7 +423,7 @@
                                     
                                     {% if listing.is_promoted %}
                                         <div class="featured-badge">
-                                            <i class="fas fa-star"></i> Recomandat
+                                            <i class="fas fa-star"></i> {% trans "Recomandat" %}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -445,32 +445,32 @@
                         {% endfor %}
                     </div>
                     
-                    <!-- Paginare -->
+                    <!-- Pagination -->
                     {% if page_obj.has_other_pages %}
                         <div class="pagination" data-listings-pagination>
                             {% if page_obj.has_previous %}
                                 <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if current_category_slug %}&category={{ current_category_slug }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if current_city %}&city={{ current_city }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
                                    class="btn btn-outline">
-                                    <i class="fas fa-angle-double-left"></i> Prima
+                                    <i class="fas fa-angle-double-left"></i> {% trans "Prima" %}
                                 </a>
                                 <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if current_category_slug %}&category={{ current_category_slug }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if current_city %}&city={{ current_city }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
                                    class="btn btn-outline">
-                                    <i class="fas fa-chevron-left"></i> Anterior
+                                    <i class="fas fa-chevron-left"></i> {% trans "Anterior" %}
                                 </a>
                             {% endif %}
                             
                             <span class="page-info">
-                                Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}
+                                {% blocktrans with current=page_obj.number total=page_obj.paginator.num_pages %}Pagina {{ current }} din {{ total }}{% endblocktrans %}
                             </span>
                             
                             {% if page_obj.has_next %}
                                 <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if current_category_slug %}&category={{ current_category_slug }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if current_city %}&city={{ current_city }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
                                    class="btn btn-outline">
-                                    Următoarea <i class="fas fa-chevron-right"></i>
+                                    {% trans "Următoarea" %} <i class="fas fa-chevron-right"></i>
                                 </a>
                                 <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if current_category_slug %}&category={{ current_category_slug }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if current_city %}&city={{ current_city }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
                                    class="btn btn-outline">
-                                    Ultima <i class="fas fa-angle-double-right"></i>
+                                    {% trans "Ultima" %} <i class="fas fa-angle-double-right"></i>
                                 </a>
                             {% endif %}
                         </div>
@@ -480,24 +480,24 @@
                     <!-- Empty state -->
                     <div class="no-listings" data-listings-empty>
                         <i class="fas fa-search"></i>
-                        <h3>Nu am găsit anunțuri</h3>
+                        <h3>{% trans "Nu am găsit anunțuri" %}</h3>
                         <p>
                             {% if search_query or current_category or current_city %}
-                                Încearcă să modifici filtrele pentru a găsi mai multe rezultate.
+                                {% trans "Încearcă să modifici filtrele pentru a găsi mai multe rezultate." %}
                             {% else %}
-                                Nu există anunțuri disponibile momentan.
+                                {% trans "Nu există anunțuri disponibile momentan." %}
                             {% endif %}
                         </p>
                         
                         <div class="mt-3">
                             {% if search_query or current_category or current_city %}
                                 <a href="{% url 'listings:list' %}" class="btn btn-primary">
-                                    <i class="fas fa-refresh"></i> Vezi toate anunțurile
+                                    <i class="fas fa-refresh"></i> {% trans "Vezi toate anunțurile" %}
                                 </a>
                             {% endif %}
                             {% if user.is_authenticated %}
                                 <a href="{% url 'listings:create' %}" class="btn btn-outline">
-                                    <i class="fas fa-plus"></i> Adaugă primul anunț
+                                    <i class="fas fa-plus"></i> {% trans "Adaugă primul anunț" %}
                                 </a>
                             {% endif %}
                         </div>

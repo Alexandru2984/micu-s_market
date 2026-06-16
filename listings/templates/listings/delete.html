@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Șterge anunț - Micu's Market{% endblock %}
+{% block title %}{% trans "Șterge anunț" %} - Micu's Market{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/forms.css' %}">
@@ -17,8 +17,8 @@
                     <i class="fas fa-arrow-left"></i>
                 </a>
                 <div>
-                    <h1 class="text-3xl font-bold text-red-600 mb-2">Șterge anunț</h1>
-                    <p class="text-gray-600">Această acțiune nu poate fi anulată</p>
+                    <h1 class="text-3xl font-bold text-red-600 mb-2">{% trans "Șterge anunț" %}</h1>
+                    <p class="text-gray-600">{% trans "Această acțiune nu poate fi anulată" %}</p>
                 </div>
             </div>
         </div>
@@ -30,10 +30,10 @@
                     <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
                 </div>
                 <div class="ml-3">
-                    <h3 class="text-lg font-semibold text-red-800 mb-2">Atenție!</h3>
+                    <h3 class="text-lg font-semibold text-red-800 mb-2">{% trans "Atenție!" %}</h3>
                     <p class="text-red-700">
-                        Ești pe cale să ștergi definitiv acest anunț. Toate informațiile asociate, inclusiv imaginile, 
-                        vor fi șterse permanent și nu vor putea fi recuperate.
+                        {% blocktrans %}Ești pe cale să ștergi definitiv acest anunț. Toate informațiile asociate, inclusiv imaginile,
+                        vor fi șterse permanent și nu vor putea fi recuperate.{% endblocktrans %}
                     </p>
                 </div>
             </div>
@@ -43,7 +43,7 @@
         <div class="listing-preview-card mb-8">
             <div class="listing-preview-header">
                 <i class="fas fa-eye"></i>
-                <span>Anunț care va fi șters</span>
+                <span>{% trans "Anunț care va fi șters" %}</span>
             </div>
             
             <div class="listing-preview-content">
@@ -57,7 +57,7 @@
                     {% else %}
                         <div class="listing-no-image">
                             <i class="fas fa-image"></i>
-                            <span>Fără imagine</span>
+                            <span>{% trans "Fără imagine" %}</span>
                         </div>
                     {% endif %}
                 </div>
@@ -84,11 +84,11 @@
                         </div>
                         <div class="meta-item">
                             <i class="fas fa-eye"></i>
-                            <span>{{ listing.views_count }} vizualizări</span>
+                            <span>{% blocktrans count counter=listing.views_count %}{{ counter }} vizualizare{% plural %}{{ counter }} vizualizări{% endblocktrans %}</span>
                         </div>
                         <div class="meta-item">
                             <i class="fas fa-images"></i>
-                            <span>{{ listing.images.count }} imagini</span>
+                            <span>{% blocktrans count counter=listing.images.count %}{{ counter }} imagine{% plural %}{{ counter }} imagini{% endblocktrans %}</span>
                         </div>
                         <div class="meta-item">
                             <i class="fas fa-info-circle"></i>
@@ -99,7 +99,7 @@
                     <div class="listing-description">
                         <div class="description-label">
                             <i class="fas fa-align-left"></i>
-                            Descriere
+                            {% trans "Descriere" %}
                         </div>
                         <p class="description-text">
                             {{ listing.description|truncatewords:30 }}
@@ -125,13 +125,13 @@
                         </div>
                         <div class="ml-3">
                             <h3 class="text-sm font-medium text-yellow-800">
-                                Ce se va întâmpla:
+                                {% trans "Ce se va întâmpla:" %}
                             </h3>
                             <ul class="mt-2 text-sm text-yellow-700 list-disc list-inside space-y-1">
-                                <li>Anunțul va fi șters definitiv din baza de date</li>
-                                <li>Toate imaginile asociate vor fi șterse de pe server</li>
-                                <li>Linkurile către acest anunț nu vor mai funcționa</li>
-                                <li>Datele nu vor putea fi recuperate</li>
+                                <li>{% trans "Anunțul va fi șters definitiv din baza de date" %}</li>
+                                <li>{% trans "Toate imaginile asociate vor fi șterse de pe server" %}</li>
+                                <li>{% trans "Linkurile către acest anunț nu vor mai funcționa" %}</li>
+                                <li>{% trans "Datele nu vor putea fi recuperate" %}</li>
                             </ul>
                         </div>
                     </div>
@@ -142,9 +142,9 @@
                     <input type="checkbox" id="confirm-delete" name="confirm" required 
                            class="mt-1 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
                     <label for="confirm-delete" class="text-sm text-gray-700">
-                        <span class="font-medium">Confirm că vreau să șterg acest anunț definitiv.</span>
+                        <span class="font-medium">{% trans "Confirm că vreau să șterg acest anunț definitiv." %}</span>
                         <br>
-                        <span class="text-gray-500">Înțeleg că această acțiune nu poate fi anulată.</span>
+                        <span class="text-gray-500">{% trans "Înțeleg că această acțiune nu poate fi anulată." %}</span>
                     </label>
                 </div>
 
@@ -153,16 +153,16 @@
                     <div class="delete-actions-left">
                         <a href="{% url 'listings:detail' slug=listing.slug %}" class="btn-back">
                             <i class="fas fa-arrow-left"></i>
-                            Înapoi la anunț
+                            {% trans "Înapoi la anunț" %}
                         </a>
                         <a href="{% url 'listings:my_listings' %}" class="btn-cancel">
-                            Anulează
+                            {% trans "Anulează" %}
                         </a>
                     </div>
-                    
+
                     <button type="submit" id="delete-button" disabled class="btn-delete-final">
                         <i class="fas fa-trash-alt"></i>
-                        Șterge definitiv
+                        {% trans "Șterge definitiv" %}
                     </button>
                 </div>
             </form>
@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function openImageModal() {
     const previewImage = document.getElementById('preview-image');
-    if (!previewImage) return; // Nu face nimic dacă nu există imagine
+    if (!previewImage) return; // Do nothing if there is no image
     
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');

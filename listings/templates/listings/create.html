@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}{{ title }} - Micu's Market{% endblock %}
 
@@ -15,11 +15,11 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ title }}</h1>
-                    <p class="text-gray-600">Completează formularul pentru a publica anunțul tău</p>
+                    <p class="text-gray-600">{% trans "Completează formularul pentru a publica anunțul tău" %}</p>
                 </div>
                 <a href="{% url 'listings:my_listings' %}" class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
                     <i class="fas fa-arrow-left"></i>
-                    Înapoi la anunțurile mele
+                    {% trans "Înapoi la anunțurile mele" %}
                 </a>
             </div>
         </div>
@@ -31,7 +31,7 @@
                 
                 <!-- Basic Info Section -->
                 <div class="border-b border-gray-200 pb-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Informații generale</h2>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">{% trans "Informații generale" %}</h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Titlu -->
@@ -117,7 +117,7 @@
                         <div class="md:col-span-2">
                             <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
                                 {{ form.location.label }}
-                                <span class="text-gray-400">(opțional)</span>
+                                <span class="text-gray-400">{% trans "(opțional)" %}</span>
                             </label>
                             {{ form.location }}
                             {% if form.location.errors %}
@@ -148,7 +148,7 @@
                         <div>
                             <label for="{{ form.contact_phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
                                 {{ form.contact_phone.label }}
-                                <span class="text-gray-400">(opțional)</span>
+                                <span class="text-gray-400">{% trans "(opțional)" %}</span>
                             </label>
                             {{ form.contact_phone }}
                             {% if form.contact_phone.errors %}
@@ -181,7 +181,7 @@
 
                 <!-- Description Section -->
                 <div class="border-b border-gray-200 pb-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Descriere</h2>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">{% trans "Descriere" %}</h2>
                     
                     <div>
                         <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
@@ -197,24 +197,24 @@
                             </div>
                         {% endif %}
                         <p class="mt-2 text-sm text-gray-500">
-                            Descrie produsul sau serviciul în detaliu.
+                            {% trans "Descrie produsul sau serviciul în detaliu." %}
                         </p>
                     </div>
                 </div>
 
                 <!-- Images Section -->
                 <div class="pb-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Imagini</h2>
-                    <p class="text-sm text-gray-600 mb-4">Adaugă până la 10 imagini pentru anunțul tău (maxim 5MB per imagine)</p>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">{% trans "Imagini" %}</h2>
+                    <p class="text-sm text-gray-600 mb-4">{% trans "Adaugă până la 10 imagini pentru anunțul tău (maxim 5MB per imagine)" %}</p>
                     
                     <div class="space-y-4">
                         <div class="border border-gray-200 rounded-lg p-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Selectează imagini
+                                {% trans "Selectează imagini" %}
                             </label>
                             <input type="file" name="images" multiple accept="image/*" class="form-control" id="image-input">
                             <p class="text-xs text-gray-500 mt-1">
-                                Poți selecta multiple imagini odată
+                                {% trans "Poți selecta multiple imagini odată" %}
                             </p>
                         </div>
                         
@@ -225,12 +225,12 @@
                 <!-- Submit Buttons -->
                 <div class="flex items-center justify-between pt-6 border-t border-gray-200">
                     <a href="{% url 'listings:my_listings' %}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                        Anulează
+                        {% trans "Anulează" %}
                     </a>
-                    
+
                     <button type="submit" class="px-8 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
                         <i class="fas fa-save mr-2"></i>
-                        Publică anunțul
+                        {% trans "Publică anunțul" %}
                     </button>
                 </div>
             </form>

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}{{ title }} - Micu's Market{% endblock %}
 
@@ -11,16 +11,16 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ title }}</h1>
-                    <p class="text-gray-600">Gestionează imaginile pentru anunțul tău</p>
+                    <p class="text-gray-600">{% trans "Gestionează imaginile pentru anunțul tău" %}</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <a href="{% url 'listings:detail' slug=listing.slug %}" class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
                         <i class="fas fa-eye"></i>
-                        Vezi anunțul
+                        {% trans "Vezi anunțul" %}
                     </a>
                     <a href="{% url 'listings:update' slug=listing.slug %}" class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
                         <i class="fas fa-edit"></i>
-                        Editează anunțul
+                        {% trans "Editează anunțul" %}
                     </a>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                     <div class="flex items-center text-sm text-gray-500 space-x-4 mt-1">
                         <span>{{ listing.category.name }}</span>
                         <span>{{ listing.price|floatformat:0 }} RON</span>
-                        <span>{{ listing.images.count }} imagini actuale</span>
+                        <span>{% blocktrans count counter=listing.images.count %}{{ counter }} imagine actuală{% plural %}{{ counter }} imagini actuale{% endblocktrans %}</span>
                     </div>
                 </div>
             </div>
@@ -52,7 +52,7 @@
         <!-- Current Images -->
         {% if listing.images.exists %}
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">Imagini curente</h2>
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">{% trans "Imagini curente" %}</h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {% for image in listing.images.all %}
                         <div class="relative group">
@@ -66,7 +66,7 @@
                             </div>
                             {% if image == listing.main_image %}
                                 <div class="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
-                                    Principală
+                                    {% trans "Principală" %}
                                 </div>
                             {% endif %}
                         </div>
@@ -78,8 +78,8 @@
         <!-- Upload Form -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="p-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">Adaugă imagini noi</h2>
-                <p class="text-gray-600 mb-6">Poți adăuga până la 10 imagini în total. Formatul acceptat: JPG, PNG, WebP (max 5MB per imagine)</p>
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">{% trans "Adaugă imagini noi" %}</h2>
+                <p class="text-gray-600 mb-6">{% trans "Poți adăuga până la 10 imagini în total. Formatul acceptat: JPG, PNG, WebP (max 5MB per imagine)" %}</p>
                 
                 <form method="post" enctype="multipart/form-data" class="space-y-6">
                     {% csrf_token %}
@@ -122,7 +122,7 @@
                                                 </div>
                                             {% endif %}
                                             <p class="text-xs text-gray-500 mt-1">
-                                                Descriere scurtă pentru accesibilitate
+                                                {% trans "Descriere scurtă pentru accesibilitate" %}
                                             </p>
                                         </div>
                                     </div>
@@ -134,12 +134,12 @@
                     <!-- Submit Buttons -->
                     <div class="flex items-center justify-between pt-6 border-t border-gray-200">
                         <a href="{% url 'listings:detail' slug=listing.slug %}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                            Înapoi la anunț
+                            {% trans "Înapoi la anunț" %}
                         </a>
-                        
+
                         <button type="submit" class="px-8 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
                             <i class="fas fa-upload mr-2"></i>
-                            Încarcă imaginile
+                            {% trans "Încarcă imaginile" %}
                         </button>
                     </div>
                 </form>
@@ -150,24 +150,24 @@
         <div class="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
             <h3 class="text-lg font-semibold text-blue-900 mb-3">
                 <i class="fas fa-lightbulb mr-2"></i>
-                Sfaturi pentru imagini de calitate
+                {% trans "Sfaturi pentru imagini de calitate" %}
             </h3>
             <ul class="text-sm text-blue-800 space-y-2">
                 <li class="flex items-start">
                     <i class="fas fa-check text-blue-600 mr-2 mt-0.5"></i>
-                    Folosește imagini cu rezoluție mare și bună iluminare
+                    {% trans "Folosește imagini cu rezoluție mare și bună iluminare" %}
                 </li>
                 <li class="flex items-start">
                     <i class="fas fa-check text-blue-600 mr-2 mt-0.5"></i>
-                    Fotografiază produsul din mai multe unghiuri
+                    {% trans "Fotografiază produsul din mai multe unghiuri" %}
                 </li>
                 <li class="flex items-start">
                     <i class="fas fa-check text-blue-600 mr-2 mt-0.5"></i>
-                    Prima imagine va fi afișată ca imagine principală
+                    {% trans "Prima imagine va fi afișată ca imagine principală" %}
                 </li>
                 <li class="flex items-start">
                     <i class="fas fa-check text-blue-600 mr-2 mt-0.5"></i>
-                    Evită fundalurile aglomerate - preferă fundal simplu
+                    {% trans "Evită fundalurile aglomerate - preferă fundal simplu" %}
                 </li>
             </ul>
         </div>
@@ -184,8 +184,8 @@
 <script>
 function deleteImage(imageId) {
     if (confirm('Ești sigur că vrei să ștergi această imagine?')) {
-        // Aici ar trebui implementată logica AJAX pentru ștergerea imaginii
-        // Pentru moment, vom redirecta către pagina de editare
+        // The AJAX logic for deleting the image should be implemented here
+        // For now, we redirect to the edit page
         window.location.href = "{% url 'listings:update' slug=listing.slug %}";
     }
 }

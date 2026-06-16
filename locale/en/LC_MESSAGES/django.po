@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-16 03:04+0300\n"
+"POT-Creation-Date: 2026-06-16 09:52+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,157 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: listings/templates/listings/create.html:18
+msgid "Completează formularul pentru a publica anunțul tău"
+msgstr "Fill out the form to publish your listing"
+
+#: listings/templates/listings/create.html:22
+msgid "Înapoi la anunțurile mele"
+msgstr "Back to my listings"
+
+#: listings/templates/listings/create.html:34
+#: listings/templates/listings/update.html:40
+msgid "Informații generale"
+msgstr "General information"
+
+#: listings/templates/listings/create.html:120
+#: listings/templates/listings/create.html:151
+#: listings/templates/listings/update.html:126
+#: listings/templates/listings/update.html:157
+msgid "(opțional)"
+msgstr "(optional)"
+
+#: listings/templates/listings/create.html:184
+#: listings/templates/listings/delete.html:102
+#: listings/templates/listings/detail.html:188
+#: listings/templates/listings/update.html:190
+msgid "Descriere"
+msgstr "Description"
+
+#: listings/templates/listings/create.html:200
+#: listings/templates/listings/update.html:206
+msgid "Descrie produsul sau serviciul în detaliu."
+msgstr "Describe the product or service in detail."
+
+#: listings/templates/listings/create.html:207
+#: listings/templates/listings/update.html:214
+msgid "Imagini"
+msgstr "Images"
+
+#: listings/templates/listings/create.html:208
+msgid "Adaugă până la 10 imagini pentru anunțul tău (maxim 5MB per imagine)"
+msgstr "Add up to 10 images to your listing (max 5MB per image)"
+
+#: listings/templates/listings/create.html:213
+msgid "Selectează imagini"
+msgstr "Select images"
+
+#: listings/templates/listings/create.html:217
+msgid "Poți selecta multiple imagini odată"
+msgstr "You can select multiple images at once"
+
+#: listings/templates/listings/create.html:228
+#: listings/templates/listings/delete.html:159
+#: listings/templates/listings/update.html:307 templates/account/logout.html:30
+msgid "Anulează"
+msgstr "Cancel"
+
+#: listings/templates/listings/create.html:233
+#: listings/templates/listings/create_simple.html:160
+msgid "Publică anunțul"
+msgstr "Publish listing"
+
+#: listings/templates/listings/create_simple.html:3
+#: listings/templates/listings/create_simple.html:10
+#: listings/templates/listings/my_listings.html:18
+msgid "Adaugă anunț nou"
+msgstr "Add new listing"
+
+#: listings/templates/listings/create_simple.html:152
+msgid "Imagini (opțional)"
+msgstr "Images (optional)"
+
+#: listings/templates/listings/delete.html:4
+#: listings/templates/listings/delete.html:20
+msgid "Șterge anunț"
+msgstr "Delete listing"
+
+#: listings/templates/listings/delete.html:21
+msgid "Această acțiune nu poate fi anulată"
+msgstr "This action cannot be undone"
+
+#: listings/templates/listings/delete.html:33
+msgid "Atenție!"
+msgstr "Warning!"
+
+#: listings/templates/listings/delete.html:35
+msgid "Ești pe cale să ștergi definitiv acest anunț. Toate informațiile asociate, inclusiv imaginile,\n                        vor fi șterse permanent și nu vor putea fi recuperate."
+msgstr "You are about to permanently delete this listing. All associated information, including images, will be permanently deleted and cannot be recovered."
+
+#: listings/templates/listings/delete.html:46
+msgid "Anunț care va fi șters"
+msgstr "Listing to be deleted"
+
+#: listings/templates/listings/delete.html:60
+msgid "Fără imagine"
+msgstr "No image"
+
+#: listings/templates/listings/delete.html:87
+#: listings/templates/listings/home.html:74
+#: listings/templates/listings/home.html:103
+#: listings/templates/listings/my_listings.html:145
+#, python-format
+msgid "%(counter)s vizualizare"
+msgid_plural "%(counter)s vizualizări"
+msgstr[0] "%(counter)s view"
+msgstr[1] "%(counter)s views"
+
+#: listings/templates/listings/delete.html:91
+#, python-format
+msgid "%(counter)s imagine"
+msgid_plural "%(counter)s imagini"
+msgstr[0] "%(counter)s image"
+msgstr[1] "%(counter)s images"
+
+#: listings/templates/listings/delete.html:128
+msgid "Ce se va întâmpla:"
+msgstr "What will happen:"
+
+#: listings/templates/listings/delete.html:131
+msgid "Anunțul va fi șters definitiv din baza de date"
+msgstr "The listing will be permanently deleted from the database"
+
+#: listings/templates/listings/delete.html:132
+msgid "Toate imaginile asociate vor fi șterse de pe server"
+msgstr "All associated images will be deleted from the server"
+
+#: listings/templates/listings/delete.html:133
+msgid "Linkurile către acest anunț nu vor mai funcționa"
+msgstr "Links to this listing will no longer work"
+
+#: listings/templates/listings/delete.html:134
+msgid "Datele nu vor putea fi recuperate"
+msgstr "The data cannot be recovered"
+
+#: listings/templates/listings/delete.html:145
+msgid "Confirm că vreau să șterg acest anunț definitiv."
+msgstr "I confirm that I want to permanently delete this listing."
+
+#: listings/templates/listings/delete.html:147
+msgid "Înțeleg că această acțiune nu poate fi anulată."
+msgstr "I understand that this action cannot be undone."
+
+#: listings/templates/listings/delete.html:156
+#: listings/templates/listings/upload_images.html:137
+msgid "Înapoi la anunț"
+msgstr "Back to listing"
+
+#: listings/templates/listings/delete.html:165
+msgid "Șterge definitiv"
+msgstr "Delete permanently"
+
 #: listings/templates/listings/detail.html:55
+#: listings/templates/listings/list.html:426
 msgid "Recomandat"
 msgstr "Recommended"
 
@@ -77,6 +227,7 @@ msgid "Trimite mesaj"
 msgstr "Send message"
 
 #: listings/templates/listings/detail.html:141
+#: listings/templates/listings/upload_images.html:23
 msgid "Editează anunțul"
 msgstr "Edit listing"
 
@@ -109,10 +260,6 @@ msgstr "Send report"
 msgid "Autentifică-te pentru a raporta anunțul"
 msgstr "Log in to report the listing"
 
-#: listings/templates/listings/detail.html:188
-msgid "Descriere"
-msgstr "Description"
-
 #: listings/templates/listings/detail.html:196
 msgid "Vânzător"
 msgstr "Seller"
@@ -136,6 +283,7 @@ msgstr "rating"
 
 #: listings/templates/listings/detail.html:225
 #: listings/templates/listings/home.html:118
+#: listings/templates/listings/list.html:495
 msgid "Vezi toate anunțurile"
 msgstr "View all listings"
 
@@ -150,16 +298,12 @@ msgid "Micu's Market - Marketplace România"
 msgstr "Micu's Market - Romania Marketplace"
 
 #: listings/templates/listings/home.html:5
-msgid ""
-"Cumpără și vinde rapid pe Micu's Market: anunțuri locale, categorii populare "
-"și produse promovate din România."
+msgid "Cumpără și vinde rapid pe Micu's Market: anunțuri locale, categorii populare și produse promovate din România."
 msgstr "Buy and sell quickly on Micu's Market: local listings, popular categories and promoted products from Romania."
 
 #: listings/templates/listings/home.html:7
 #: listings/templates/listings/home.html:9
-msgid ""
-"Descoperă anunțuri locale, produse promovate și categorii populare pe Micu's "
-"Market."
+msgid "Descoperă anunțuri locale, produse promovate și categorii populare pe Micu's Market."
 msgstr "Discover local listings, promoted products and popular categories on Micu's Market."
 
 #: listings/templates/listings/home.html:15
@@ -175,6 +319,7 @@ msgid "Caută produse..."
 msgstr "Search for products..."
 
 #: listings/templates/listings/home.html:21
+#: listings/templates/listings/list.html:196
 msgid "Caută"
 msgstr "Search"
 
@@ -194,14 +339,6 @@ msgstr "Promoted Listings"
 msgid "Promovat"
 msgstr "Promoted"
 
-#: listings/templates/listings/home.html:74
-#: listings/templates/listings/home.html:103
-#, python-format
-msgid "%(counter)s vizualizare"
-msgid_plural "%(counter)s vizualizări"
-msgstr[0] "%(counter)s view"
-msgstr[1] "%(counter)s views"
-
 #: listings/templates/listings/home.html:85
 msgid "Anunțuri Recente"
 msgstr "Recent Listings"
@@ -219,6 +356,379 @@ msgstr "Be the first to post a listing!"
 msgid "Adaugă Anunț"
 msgstr "Add Listing"
 
+#: listings/templates/listings/list.html:4
+#: listings/templates/listings/list.html:144 templates/partials/footer.html:13
+msgid "Toate Anunțurile"
+msgstr "All Listings"
+
+#: listings/templates/listings/list.html:5
+#, python-format
+msgid "Rezultate pentru %(search_query)s pe Micu's Market: filtrează anunțuri după preț, oraș și categorie."
+msgstr "Results for %(search_query)s on Micu's Market: filter listings by price, city and category."
+
+#: listings/templates/listings/list.html:5
+#, python-format
+msgid "Anunțuri din categoria %(name)s pe Micu's Market, cu filtre după preț și oraș."
+msgstr "Listings in the %(name)s category on Micu's Market, with filters by price and city."
+
+#: listings/templates/listings/list.html:5
+msgid "Explorează toate anunțurile active de pe Micu's Market și filtrează rapid după categorie, oraș sau preț."
+msgstr "Explore all active listings on Micu's Market and quickly filter by category, city or price."
+
+#: listings/templates/listings/list.html:6
+#: listings/templates/listings/list.html:8
+#, python-format
+msgid "Rezultate pentru %(search_query)s"
+msgstr "Results for %(search_query)s"
+
+#: listings/templates/listings/list.html:6
+#: listings/templates/listings/list.html:8
+#: listings/templates/listings/list.html:128
+msgid "Toate anunțurile"
+msgstr "All listings"
+
+#: listings/templates/listings/list.html:7
+#: listings/templates/listings/list.html:9
+#, python-format
+msgid "Anunțuri găsite pentru %(search_query)s pe Micu's Market."
+msgstr "Listings found for %(search_query)s on Micu's Market."
+
+#: listings/templates/listings/list.html:7
+#: listings/templates/listings/list.html:9
+#, python-format
+msgid "Anunțuri active din categoria %(name)s."
+msgstr "Active listings in the %(name)s category."
+
+#: listings/templates/listings/list.html:7
+#: listings/templates/listings/list.html:9
+msgid "Toate anunțurile active disponibile pe Micu's Market."
+msgstr "All active listings available on Micu's Market."
+
+#: listings/templates/listings/list.html:109 templates/partials/header.html:12
+msgid "Acasă"
+msgstr "Home"
+
+#: listings/templates/listings/list.html:113 templates/partials/header.html:13
+msgid "Anunțuri"
+msgstr "Listings"
+
+#: listings/templates/listings/list.html:123
+msgid "Căutare:"
+msgstr "Search:"
+
+#: listings/templates/listings/list.html:140
+#, python-format
+msgid "Rezultate pentru \"%(search_query)s\""
+msgstr "Results for \"%(search_query)s\""
+
+#: listings/templates/listings/list.html:150
+msgid "anunțuri găsite"
+msgstr "listings found"
+
+#: listings/templates/listings/list.html:155
+msgid "Resetează filtrele"
+msgstr "Reset filters"
+
+#: listings/templates/listings/list.html:165
+msgid "Adaugă anunț"
+msgstr "Add listing"
+
+#: listings/templates/listings/list.html:170
+msgid "Conectează-te pentru a adăuga anunț"
+msgstr "Log in to add a listing"
+
+#: listings/templates/listings/list.html:182
+msgid "Caută anunțuri..."
+msgstr "Search listings..."
+
+#: listings/templates/listings/list.html:202
+msgid "Filtre active:"
+msgstr "Active filters:"
+
+#: listings/templates/listings/list.html:226
+msgid "Șterge toate"
+msgstr "Clear all"
+
+#: listings/templates/listings/list.html:239
+msgid "Filtrează rezultatele"
+msgstr "Filter results"
+
+#: listings/templates/listings/list.html:247
+msgid "Caută în anunțuri"
+msgstr "Search in listings"
+
+#: listings/templates/listings/list.html:251
+msgid "Ex: iPhone, Samsung, laptop..."
+msgstr "E.g.: iPhone, Samsung, laptop..."
+
+#: listings/templates/listings/list.html:260
+msgid "Categoria"
+msgstr "Category"
+
+#: listings/templates/listings/list.html:264
+msgid "Toate categoriile"
+msgstr "All categories"
+
+#: listings/templates/listings/list.html:280
+msgid "Intervalul de preț"
+msgstr "Price range"
+
+#: listings/templates/listings/list.html:284
+msgid "De la"
+msgstr "From"
+
+#: listings/templates/listings/list.html:318
+msgid "Până la"
+msgstr "To"
+
+#: listings/templates/listings/list.html:342
+msgid "Orașul"
+msgstr "City"
+
+#: listings/templates/listings/list.html:346
+msgid "Ex: București, Cluj, Timișoara..."
+msgstr "E.g.: Bucharest, Cluj, Timișoara..."
+
+#: listings/templates/listings/list.html:367
+msgid "Sortează după"
+msgstr "Sort by"
+
+#: listings/templates/listings/list.html:372
+msgid "Cele mai noi"
+msgstr "Newest"
+
+#: listings/templates/listings/list.html:375
+msgid "Cele mai vechi"
+msgstr "Oldest"
+
+#: listings/templates/listings/list.html:378
+msgid "Preț crescător"
+msgstr "Price ascending"
+
+#: listings/templates/listings/list.html:381
+msgid "Preț descrescător"
+msgstr "Price descending"
+
+#: listings/templates/listings/list.html:384
+msgid "Titlu A-Z"
+msgstr "Title A-Z"
+
+#: listings/templates/listings/list.html:394
+msgid "Filtrează"
+msgstr "Filter"
+
+#: listings/templates/listings/list.html:401
+msgid "Resetează"
+msgstr "Reset"
+
+#: listings/templates/listings/list.html:454
+msgid "Prima"
+msgstr "First"
+
+#: listings/templates/listings/list.html:458
+msgid "Anterior"
+msgstr "Previous"
+
+#: listings/templates/listings/list.html:463
+#: listings/templates/listings/my_listings.html:193
+#, python-format
+msgid "Pagina %(current)s din %(total)s"
+msgstr "Page %(current)s of %(total)s"
+
+#: listings/templates/listings/list.html:469
+msgid "Următoarea"
+msgstr "Next"
+
+#: listings/templates/listings/list.html:473
+msgid "Ultima"
+msgstr "Last"
+
+#: listings/templates/listings/list.html:483
+msgid "Nu am găsit anunțuri"
+msgstr "No listings found"
+
+#: listings/templates/listings/list.html:486
+msgid "Încearcă să modifici filtrele pentru a găsi mai multe rezultate."
+msgstr "Try adjusting the filters to find more results."
+
+#: listings/templates/listings/list.html:488
+msgid "Nu există anunțuri disponibile momentan."
+msgstr "There are no listings available at the moment."
+
+#: listings/templates/listings/list.html:500
+#: listings/templates/listings/my_listings.html:217
+#: templates/account/email_confirmed.html:39
+msgid "Adaugă primul anunț"
+msgstr "Add the first listing"
+
+#: listings/templates/listings/my_listings.html:4
+#: listings/templates/listings/my_listings.html:13
+msgid "Anunțurile mele"
+msgstr "My listings"
+
+#: listings/templates/listings/my_listings.html:14
+msgid "Gestionează-ți anunțurile publicate"
+msgstr "Manage your published listings"
+
+#: listings/templates/listings/my_listings.html:34
+msgid "Total anunțuri"
+msgstr "Total listings"
+
+#: listings/templates/listings/my_listings.html:48
+msgid "Active"
+msgstr "Active"
+
+#: listings/templates/listings/my_listings.html:64
+#: listings/templates/listings/my_listings.html:120
+msgid "În așteptare"
+msgstr "Pending"
+
+#: listings/templates/listings/my_listings.html:80
+msgid "Total vizualizări"
+msgstr "Total views"
+
+#: listings/templates/listings/my_listings.html:115
+msgid "Activ"
+msgstr "Active"
+
+#: listings/templates/listings/my_listings.html:125
+msgid "Expirat"
+msgstr "Expired"
+
+#: listings/templates/listings/my_listings.html:157
+#: listings/templates/listings/update.html:23
+#: listings/templates/listings/upload_images.html:19
+msgid "Vezi anunțul"
+msgstr "View listing"
+
+#: listings/templates/listings/my_listings.html:160
+msgid "Editează"
+msgstr "Edit"
+
+#: listings/templates/listings/my_listings.html:163
+msgid "Gestionează imagini"
+msgstr "Manage images"
+
+#: listings/templates/listings/my_listings.html:166
+msgid "Promovează"
+msgstr "Promote"
+
+#: listings/templates/listings/my_listings.html:169
+msgid "Șterge"
+msgstr "Delete"
+
+#: listings/templates/listings/my_listings.html:182
+#, python-format
+msgid "Afișez <span class=\"font-medium\">%(start)s</span> - <span class=\"font-medium\">%(end)s</span> din <span class=\"font-medium\">%(total)s</span> anunțuri"
+msgstr "Showing <span class=\"font-medium\">%(start)s</span> - <span class=\"font-medium\">%(end)s</span> of <span class=\"font-medium\">%(total)s</span> listings"
+
+#: listings/templates/listings/my_listings.html:213
+msgid "Nu ai încă anunțuri"
+msgstr "You don't have any listings yet"
+
+#: listings/templates/listings/my_listings.html:214
+msgid "Începe să vinzi produsele tale adăugând primul anunț."
+msgstr "Start selling your products by adding your first listing."
+
+#: listings/templates/listings/update.html:18
+msgid "Modifică informațiile anunțului tău"
+msgstr "Edit your listing's information"
+
+#: listings/templates/listings/update.html:27
+msgid "Înapoi"
+msgstr "Back"
+
+#: listings/templates/listings/update.html:217
+msgid "Gestionează imagini separat"
+msgstr "Manage images separately"
+
+#: listings/templates/listings/update.html:220
+msgid "Modifică imaginile existente sau adaugă altele noi (maxim 5MB per imagine)"
+msgstr "Edit the existing images or add new ones (max 5MB per image)"
+
+#: listings/templates/listings/update.html:235
+msgid "Imagine curentă"
+msgstr "Current image"
+
+#: listings/templates/listings/update.html:252
+msgid "Alege imagine"
+msgstr "Choose image"
+
+#: listings/templates/listings/update.html:253
+msgid "JPG, PNG (max 5MB)"
+msgstr "JPG, PNG (max 5MB)"
+
+#: listings/templates/listings/update.html:275
+msgid "Descriere scurtă a imaginii"
+msgstr "Short description of the image"
+
+#: listings/templates/listings/update.html:293
+msgid "Șterge această imagine"
+msgstr "Delete this image"
+
+#: listings/templates/listings/update.html:311
+msgid "Șterge anunțul"
+msgstr "Delete listing"
+
+#: listings/templates/listings/update.html:317
+msgid "Salvează modificările"
+msgstr "Save changes"
+
+#: listings/templates/listings/upload_images.html:14
+msgid "Gestionează imaginile pentru anunțul tău"
+msgstr "Manage the images for your listing"
+
+#: listings/templates/listings/upload_images.html:46
+#, python-format
+msgid "%(counter)s imagine actuală"
+msgid_plural "%(counter)s imagini actuale"
+msgstr[0] "%(counter)s current image"
+msgstr[1] "%(counter)s current images"
+
+#: listings/templates/listings/upload_images.html:55
+msgid "Imagini curente"
+msgstr "Current images"
+
+#: listings/templates/listings/upload_images.html:69
+msgid "Principală"
+msgstr "Main"
+
+#: listings/templates/listings/upload_images.html:81
+msgid "Adaugă imagini noi"
+msgstr "Add new images"
+
+#: listings/templates/listings/upload_images.html:82
+msgid "Poți adăuga până la 10 imagini în total. Formatul acceptat: JPG, PNG, WebP (max 5MB per imagine)"
+msgstr "You can add up to 10 images in total. Accepted formats: JPG, PNG, WebP (max 5MB per image)"
+
+#: listings/templates/listings/upload_images.html:125
+msgid "Descriere scurtă pentru accesibilitate"
+msgstr "Short description for accessibility"
+
+#: listings/templates/listings/upload_images.html:142
+msgid "Încarcă imaginile"
+msgstr "Upload images"
+
+#: listings/templates/listings/upload_images.html:153
+msgid "Sfaturi pentru imagini de calitate"
+msgstr "Tips for quality images"
+
+#: listings/templates/listings/upload_images.html:158
+msgid "Folosește imagini cu rezoluție mare și bună iluminare"
+msgstr "Use high-resolution images with good lighting"
+
+#: listings/templates/listings/upload_images.html:162
+msgid "Fotografiază produsul din mai multe unghiuri"
+msgstr "Photograph the product from multiple angles"
+
+#: listings/templates/listings/upload_images.html:166
+msgid "Prima imagine va fi afișată ca imagine principală"
+msgstr "The first image will be shown as the main image"
+
+#: listings/templates/listings/upload_images.html:170
+msgid "Evită fundalurile aglomerate - preferă fundal simplu"
+msgstr "Avoid cluttered backgrounds - prefer a simple background"
+
 #: templates/account/email_confirm.html:4
 msgid "Confirmă Email-ul"
 msgstr "Confirm Email"
@@ -234,9 +744,7 @@ msgstr "To activate your account, confirm your email address."
 
 #: templates/account/email_confirm.html:21
 #, python-format
-msgid ""
-"Dă click pe butonul de mai jos pentru a confirma adresa de email "
-"<strong>%(email)s</strong>"
+msgid "Dă click pe butonul de mai jos pentru a confirma adresa de email <strong>%(email)s</strong>"
 msgstr "Click the button below to confirm the email address <strong>%(email)s</strong>"
 
 #: templates/account/email_confirm.html:30
@@ -254,9 +762,7 @@ msgid "Contul tău a fost confirmat cu succes! 🎉"
 msgstr "Your account has been confirmed successfully! 🎉"
 
 #: templates/account/email_confirmed.html:22
-msgid ""
-"Bine ai venit în comunitatea <strong>Micu's Market</strong>!\n"
-"                    Poți începe acum să vinzi și să cumperi produse."
+msgid "Bine ai venit în comunitatea <strong>Micu's Market</strong>!\n                    Poți începe acum să vinzi și să cumperi produse."
 msgstr "Welcome to the <strong>Micu's Market</strong> community! You can now start selling and buying products."
 
 #: templates/account/email_confirmed.html:27
@@ -282,10 +788,6 @@ msgstr "Save favorite listings"
 #: templates/account/email_confirmed.html:33
 msgid "Comunică cu alți utilizatori"
 msgstr "Communicate with other users"
-
-#: templates/account/email_confirmed.html:39
-msgid "Adaugă primul anunț"
-msgstr "Add the first listing"
 
 #: templates/account/email_confirmed.html:42
 msgid "Explorează anunțuri"
@@ -358,10 +860,6 @@ msgstr "You will be logged out of your Micu's Market account."
 #: templates/account/logout.html:27
 msgid "Da, ieși din cont"
 msgstr "Yes, log out"
-
-#: templates/account/logout.html:30
-msgid "Anulează"
-msgstr "Cancel"
 
 #: templates/account/password_reset.html:4
 msgid "Resetare Parolă"
@@ -519,10 +1017,7 @@ msgid "Email trimis cu succes!"
 msgstr "Email sent successfully!"
 
 #: templates/account/verification_sent.html:26
-msgid ""
-"Am trimis un link de confirmare la adresa ta de email.<br>\n"
-"                        Deschide email-ul și dă click pe link pentru a-ți "
-"activa contul."
+msgid "Am trimis un link de confirmare la adresa ta de email.<br>\n                        Deschide email-ul și dă click pe link pentru a-ți activa contul."
 msgstr "We've sent a confirmation link to your email address.<br> Open the email and click the link to activate your account."
 
 #: templates/account/verification_sent.html:33
@@ -538,9 +1033,7 @@ msgid "Înapoi la Micu's Market"
 msgstr "Back to Micu's Market"
 
 #: templates/base.html:8
-msgid ""
-"Micu's Market este marketplace-ul pentru anunțuri locale, cumpărături sigure "
-"și vânzări rapide în România."
+msgid "Micu's Market este marketplace-ul pentru anunțuri locale, cumpărături sigure și vânzări rapide în România."
 msgstr "Micu's Market is the marketplace for local listings, safe shopping and quick sales in Romania."
 
 #: templates/base.html:13 templates/base.html:19
@@ -549,10 +1042,7 @@ msgstr "Local listings, verified sellers and quick shopping in Romania."
 
 #: templates/base.html:74
 #, python-format
-msgid ""
-"Folosim cookie-uri esențiale pentru autentificare, securitate și preferințe. "
-"Detalii în\n"
-"            <a href=\"%(privacy_url)s\">politica de confidențialitate</a>."
+msgid "Folosim cookie-uri esențiale pentru autentificare, securitate și preferințe. Detalii în\n            <a href=\"%(privacy_url)s\">politica de confidențialitate</a>."
 msgstr "We use essential cookies for authentication, security and preferences. Details in <a href=\"%(privacy_url)s\">the privacy policy</a>."
 
 #: templates/base.html:77
@@ -564,17 +1054,12 @@ msgid "Toate drepturile rezervate."
 msgstr "All rights reserved."
 
 #: templates/partials/footer.html:7
-msgid ""
-"Marketplace-ul tău de încredere pentru cumpărături și vânzări în România."
+msgid "Marketplace-ul tău de încredere pentru cumpărături și vânzări în România."
 msgstr "Your trusted marketplace for buying and selling in Romania."
 
 #: templates/partials/footer.html:11
 msgid "Linkuri Rapide"
 msgstr "Quick Links"
-
-#: templates/partials/footer.html:13
-msgid "Toate Anunțurile"
-msgstr "All Listings"
 
 #: templates/partials/footer.html:15
 msgid "Despre mine"
@@ -655,15 +1140,11 @@ msgstr "We're still working on this section"
 
 #: templates/partials/footer.html:110 templates/partials/footer.html:128
 #: templates/partials/footer.html:146 templates/partials/footer.html:164
-msgid ""
-"Site-ul nostru nu este încă oficial lansat. Suntem în proces de dezvoltare "
-"și îmbunătățire continuă."
+msgid "Site-ul nostru nu este încă oficial lansat. Suntem în proces de dezvoltare și îmbunătățire continuă."
 msgstr "Our site is not officially launched yet. We are in the process of continuous development and improvement."
 
 #: templates/partials/footer.html:111
-msgid ""
-"Te rugăm să revii mai târziu pentru informații complete despre echipa și "
-"misiunea noastră."
+msgid "Te rugăm să revii mai târziu pentru informații complete despre echipa și misiunea noastră."
 msgstr "Please come back later for complete information about our team and mission."
 
 #: templates/partials/footer.html:129
@@ -671,8 +1152,7 @@ msgid "Termenii și condițiile vor fi disponibili înainte de lansarea oficial�
 msgstr "The terms and conditions will be available before the official launch."
 
 #: templates/partials/footer.html:147
-msgid ""
-"Politica de confidențialitate va fi disponibilă înainte de lansarea oficială."
+msgid "Politica de confidențialitate va fi disponibilă înainte de lansarea oficială."
 msgstr "The privacy policy will be available before the official launch."
 
 #: templates/partials/footer.html:165
@@ -680,18 +1160,8 @@ msgid "Secțiunea de ajutor va fi disponibilă înainte de lansarea oficială."
 msgstr "The help section will be available before the official launch."
 
 #: templates/partials/footer.html:166
-msgid ""
-"Pentru întrebări urgente, te rugăm să ne contactezi prin <a href=\"#\" data-"
-"modal=\"contact-modal\">pagina de contact</a>."
+msgid "Pentru întrebări urgente, te rugăm să ne contactezi prin <a href=\"#\" data-modal=\"contact-modal\">pagina de contact</a>."
 msgstr "For urgent questions, please contact us through the <a href=\"#\" data-modal=\"contact-modal\">contact page</a>."
-
-#: templates/partials/header.html:12
-msgid "Acasă"
-msgstr "Home"
-
-#: templates/partials/header.html:13
-msgid "Anunțuri"
-msgstr "Listings"
 
 #: templates/partials/header.html:14
 msgid "Comută tema"
