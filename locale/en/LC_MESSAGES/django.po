@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-15 23:16+0300\n"
+"POT-Creation-Date: 2026-06-16 03:04+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,207 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: listings/templates/listings/detail.html:55
+msgid "Recomandat"
+msgstr "Recommended"
+
+#: listings/templates/listings/detail.html:75
+msgid "Nu sunt disponibile imagini"
+msgstr "No images available"
+
+#: listings/templates/listings/detail.html:87
+msgid "Negociabil"
+msgstr "Negotiable"
+
+#: listings/templates/listings/detail.html:95
+msgid "Categorie:"
+msgstr "Category:"
+
+#: listings/templates/listings/detail.html:101
+msgid "Locație:"
+msgstr "Location:"
+
+#: listings/templates/listings/detail.html:107
+msgid "Stare:"
+msgstr "Condition:"
+
+#: listings/templates/listings/detail.html:109
+msgid "Nou"
+msgstr "New"
+
+#: listings/templates/listings/detail.html:110
+msgid "Ca nou"
+msgstr "Like new"
+
+#: listings/templates/listings/detail.html:111
+msgid "Bună"
+msgstr "Good"
+
+#: listings/templates/listings/detail.html:112
+msgid "Acceptabilă"
+msgstr "Acceptable"
+
+#: listings/templates/listings/detail.html:113
+msgid "Folosit"
+msgstr "Used"
+
+#: listings/templates/listings/detail.html:119
+msgid "Publicat:"
+msgstr "Published:"
+
+#: listings/templates/listings/detail.html:125
+msgid "Vizualizări:"
+msgstr "Views:"
+
+#: listings/templates/listings/detail.html:136
+#: listings/templates/listings/detail.html:145
+#: listings/templates/listings/detail.html:220
+msgid "Trimite mesaj"
+msgstr "Send message"
+
+#: listings/templates/listings/detail.html:141
+msgid "Editează anunțul"
+msgstr "Edit listing"
+
+#: listings/templates/listings/detail.html:152
+msgid "Elimină din favorite"
+msgstr "Remove from favorites"
+
+#: listings/templates/listings/detail.html:152
+#: listings/templates/listings/detail.html:154
+msgid "Adaugă la favorite"
+msgstr "Add to favorites"
+
+#: listings/templates/listings/detail.html:154
+msgid "În favorite"
+msgstr "In favorites"
+
+#: listings/templates/listings/detail.html:158
+msgid "Partajează"
+msgstr "Share"
+
+#: listings/templates/listings/detail.html:165
+msgid "Raportează anunțul"
+msgstr "Report listing"
+
+#: listings/templates/listings/detail.html:173
+msgid "Trimite raport"
+msgstr "Send report"
+
+#: listings/templates/listings/detail.html:179
+msgid "Autentifică-te pentru a raporta anunțul"
+msgstr "Log in to report the listing"
+
+#: listings/templates/listings/detail.html:188
+msgid "Descriere"
+msgstr "Description"
+
+#: listings/templates/listings/detail.html:196
+msgid "Vânzător"
+msgstr "Seller"
+
+#: listings/templates/listings/detail.html:209
+#, python-format
+msgid "Membru din %(since)s"
+msgstr "Member since %(since)s"
+
+#: listings/templates/listings/detail.html:211
+#: listings/templates/listings/home.html:43
+#, python-format
+msgid "%(counter)s anunț"
+msgid_plural "%(counter)s anunțuri"
+msgstr[0] "%(counter)s listing"
+msgstr[1] "%(counter)s listings"
+
+#: listings/templates/listings/detail.html:212
+msgid "rating"
+msgstr "rating"
+
+#: listings/templates/listings/detail.html:225
+#: listings/templates/listings/home.html:118
+msgid "Vezi toate anunțurile"
+msgstr "View all listings"
+
+#: listings/templates/listings/detail.html:237
+msgid "Anunțuri similare"
+msgstr "Similar listings"
+
+#: listings/templates/listings/home.html:4
+#: listings/templates/listings/home.html:6
+#: listings/templates/listings/home.html:8
+msgid "Micu's Market - Marketplace România"
+msgstr "Micu's Market - Romania Marketplace"
+
+#: listings/templates/listings/home.html:5
+msgid ""
+"Cumpără și vinde rapid pe Micu's Market: anunțuri locale, categorii populare "
+"și produse promovate din România."
+msgstr "Buy and sell quickly on Micu's Market: local listings, popular categories and promoted products from Romania."
+
+#: listings/templates/listings/home.html:7
+#: listings/templates/listings/home.html:9
+msgid ""
+"Descoperă anunțuri locale, produse promovate și categorii populare pe Micu's "
+"Market."
+msgstr "Discover local listings, promoted products and popular categories on Micu's Market."
+
+#: listings/templates/listings/home.html:15
+msgid "Bine ai venit la Micu's Market!"
+msgstr "Welcome to Micu's Market!"
+
+#: listings/templates/listings/home.html:16
+msgid "Marketplace-ul tău de încredere pentru cumpărături și vânzări"
+msgstr "Your trusted marketplace for buying and selling"
+
+#: listings/templates/listings/home.html:20
+msgid "Caută produse..."
+msgstr "Search for products..."
+
+#: listings/templates/listings/home.html:21
+msgid "Caută"
+msgstr "Search"
+
+#: listings/templates/listings/home.html:28
+msgid "Categorii Populare"
+msgstr "Popular Categories"
+
+#: listings/templates/listings/home.html:47
+msgid "Nu există categorii încă."
+msgstr "No categories yet."
+
+#: listings/templates/listings/home.html:55
+msgid "Anunțuri Promovate"
+msgstr "Promoted Listings"
+
+#: listings/templates/listings/home.html:65
+msgid "Promovat"
+msgstr "Promoted"
+
+#: listings/templates/listings/home.html:74
+#: listings/templates/listings/home.html:103
+#, python-format
+msgid "%(counter)s vizualizare"
+msgid_plural "%(counter)s vizualizări"
+msgstr[0] "%(counter)s view"
+msgstr[1] "%(counter)s views"
+
+#: listings/templates/listings/home.html:85
+msgid "Anunțuri Recente"
+msgstr "Recent Listings"
+
+#: listings/templates/listings/home.html:109
+msgid "Nu există anunțuri încă"
+msgstr "No listings yet"
+
+#: listings/templates/listings/home.html:110
+msgid "Fii primul care postează un anunț!"
+msgstr "Be the first to post a listing!"
+
+#: listings/templates/listings/home.html:111 templates/partials/footer.html:14
+#: templates/partials/header.html:18 templates/partials/header.html:55
+msgid "Adaugă Anunț"
+msgstr "Add Listing"
 
 #: templates/account/email_confirm.html:4
 msgid "Confirmă Email-ul"
@@ -374,11 +575,6 @@ msgstr "Quick Links"
 #: templates/partials/footer.html:13
 msgid "Toate Anunțurile"
 msgstr "All Listings"
-
-#: templates/partials/footer.html:14 templates/partials/header.html:18
-#: templates/partials/header.html:55
-msgid "Adaugă Anunț"
-msgstr "Add Listing"
 
 #: templates/partials/footer.html:15
 msgid "Despre mine"

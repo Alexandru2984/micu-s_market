@@ -1,31 +1,31 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Micu's Market - Marketplace România{% endblock %}
-{% block meta_description %}Cumpără și vinde rapid pe Micu's Market: anunțuri locale, categorii populare și produse promovate din România.{% endblock %}
-{% block og_title %}Micu's Market - Marketplace România{% endblock %}
-{% block og_description %}Descoperă anunțuri locale, produse promovate și categorii populare pe Micu's Market.{% endblock %}
-{% block twitter_title %}Micu's Market - Marketplace România{% endblock %}
-{% block twitter_description %}Descoperă anunțuri locale, produse promovate și categorii populare pe Micu's Market.{% endblock %}
+{% block title %}{% trans "Micu's Market - Marketplace România" %}{% endblock %}
+{% block meta_description %}{% trans "Cumpără și vinde rapid pe Micu's Market: anunțuri locale, categorii populare și produse promovate din România." %}{% endblock %}
+{% block og_title %}{% trans "Micu's Market - Marketplace România" %}{% endblock %}
+{% block og_description %}{% trans "Descoperă anunțuri locale, produse promovate și categorii populare pe Micu's Market." %}{% endblock %}
+{% block twitter_title %}{% trans "Micu's Market - Marketplace România" %}{% endblock %}
+{% block twitter_description %}{% trans "Descoperă anunțuri locale, produse promovate și categorii populare pe Micu's Market." %}{% endblock %}
 
 {% block content %}
 <div class="container">
     <!-- Hero Section -->
     <section class="hero-section">
-        <h1>Bine ai venit la Micu's Market!</h1>
-        <p>Marketplace-ul tău de încredere pentru cumpărături și vânzări</p>
-        
+        <h1>{% trans "Bine ai venit la Micu's Market!" %}</h1>
+        <p>{% trans "Marketplace-ul tău de încredere pentru cumpărături și vânzări" %}</p>
+
         <div class="search-box">
             <form method="GET" action="{% url 'listings:list' %}">
-                <input type="text" name="search" class="search-input" placeholder="Caută produse..." value="{{ request.GET.search }}">
-                <button type="submit" class="search-button">Caută</button>
+                <input type="text" name="search" class="search-input" placeholder="{% trans 'Caută produse...' %}" value="{{ request.GET.search }}">
+                <button type="submit" class="search-button">{% trans "Caută" %}</button>
             </form>
         </div>
     </section>
 
     <!-- Main Categories -->
     <section class="categories-section">
-        <h2>Categorii Populare</h2>
+        <h2>{% trans "Categorii Populare" %}</h2>
         <div class="categories-grid">
             {% for category in categories %}
             <a href="{% url 'listings:list' %}?category={{ category.slug }}" class="category-card">
@@ -40,11 +40,11 @@
                 {% endif %}
                 <div class="category-name">{{ category.name }}</div>
                 {% if category.active_listings_count %}
-                    <div class="category-count">{{ category.active_listings_count }} anunțuri</div>
+                    <div class="category-count">{% blocktrans count counter=category.active_listings_count %}{{ counter }} anunț{% plural %}{{ counter }} anunțuri{% endblocktrans %}</div>
                 {% endif %}
             </a>
             {% empty %}
-            <p>Nu există categorii încă.</p>
+            <p>{% trans "Nu există categorii încă." %}</p>
             {% endfor %}
         </div>
     </section>
@@ -52,7 +52,7 @@
     <!-- Promoted Listings -->
     {% if featured_listings %}
     <section class="featured-section">
-        <h2>Anunțuri Promovate</h2>
+        <h2>{% trans "Anunțuri Promovate" %}</h2>
         <div class="listings-grid">
             {% for listing in featured_listings %}
             <a href="{% url 'listings:detail' listing.slug %}" class="listing-card featured">
@@ -62,7 +62,7 @@
                     {% else %}
                         <div class="no-image">📷</div>
                     {% endif %}
-                    <span class="featured-badge">Promovat</span>
+                    <span class="featured-badge">{% trans "Promovat" %}</span>
                 </div>
                 
                 <div class="listing-info">
@@ -70,8 +70,8 @@
                     <p class="price">{{ listing.price }} Lei</p>
                     <p class="location">{{ listing.city }}, {{ listing.county }}</p>
                     <p class="meta">
-                        {{ listing.created_at|date:"d M Y" }} • 
-                        {{ listing.views_count }} vizualizări
+                        {{ listing.created_at|date:"d M Y" }} •
+                        {% blocktrans count counter=listing.views_count %}{{ counter }} vizualizare{% plural %}{{ counter }} vizualizări{% endblocktrans %}
                     </p>
                 </div>
             </a>
@@ -82,7 +82,7 @@
 
     <!-- Recent Listings -->
     <section class="recent-section">
-        <h2>Anunțuri Recente</h2>
+        <h2>{% trans "Anunțuri Recente" %}</h2>
         <div class="listings-grid">
             {% for listing in recent_listings %}
             <a href="{% url 'listings:detail' listing.slug %}" class="listing-card">
@@ -99,23 +99,23 @@
                     <p class="price">{{ listing.price }} Lei</p>
                     <p class="location">{{ listing.city }}, {{ listing.county }}</p>
                     <p class="meta">
-                        {{ listing.created_at|date:"d M Y" }} • 
-                        {{ listing.views_count }} vizualizări
+                        {{ listing.created_at|date:"d M Y" }} •
+                        {% blocktrans count counter=listing.views_count %}{{ counter }} vizualizare{% plural %}{{ counter }} vizualizări{% endblocktrans %}
                     </p>
                 </div>
             </a>
             {% empty %}
             <div class="empty-state">
-                <h3>Nu există anunțuri încă</h3>
-                <p>Fii primul care postează un anunț!</p>
-                <a href="{% url 'listings:create' %}" class="btn btn-primary">Adaugă Anunț</a>
+                <h3>{% trans "Nu există anunțuri încă" %}</h3>
+                <p>{% trans "Fii primul care postează un anunț!" %}</p>
+                <a href="{% url 'listings:create' %}" class="btn btn-primary">{% trans "Adaugă Anunț" %}</a>
             </div>
             {% endfor %}
         </div>
         
         {% if recent_listings %}
         <div class="view-all">
-            <a href="{% url 'listings:list' %}" class="btn btn-outline">Vezi toate anunțurile</a>
+            <a href="{% url 'listings:list' %}" class="btn btn-outline">{% trans "Vezi toate anunțurile" %}</a>
         </div>
         {% endif %}
     </section>

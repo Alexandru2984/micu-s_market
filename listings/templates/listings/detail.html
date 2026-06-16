@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% csrf_token %}
 
@@ -52,7 +52,7 @@
                         <img id="mainImage" src="{{ listing.main_image.url }}" alt="{{ listing.title }}" loading="eager" decoding="async" fetchpriority="high">
                         {% if listing.is_promoted %}
                             <div class="featured-badge">
-                                <i class="fas fa-star"></i> Recomandat
+                                <i class="fas fa-star"></i> {% trans "Recomandat" %}
                             </div>
                         {% endif %}
                     </div>
@@ -72,7 +72,7 @@
                 {% else %}
                     <div class="no-images">
                         <i class="fas fa-image"></i>
-                        <p>Nu sunt disponibile imagini</p>
+                        <p>{% trans "Nu sunt disponibile imagini" %}</p>
                     </div>
                 {% endif %}
             </div>
@@ -84,7 +84,7 @@
                     <div class="listing-meta">
                         <span class="price">{{ listing.price }} RON</span>
                         {% if listing.negotiable %}
-                            <span class="negotiable">Negociabil</span>
+                            <span class="negotiable">{% trans "Negociabil" %}</span>
                         {% endif %}
                     </div>
                 </div>
@@ -92,37 +92,37 @@
                 <div class="listing-details">
                     <div class="detail-item">
                         <i class="fas fa-folder"></i>
-                        <span>Categorie:</span>
+                        <span>{% trans "Categorie:" %}</span>
                         <strong>{{ listing.category.name }}</strong>
                     </div>
                     
                     <div class="detail-item">
                         <i class="fas fa-map-marker-alt"></i>
-                        <span>Locație:</span>
+                        <span>{% trans "Locație:" %}</span>
                         <strong>{{ listing.city }}, {{ listing.county }}</strong>
                     </div>
                     
                     <div class="detail-item">
                         <i class="fas fa-certificate"></i>
-                        <span>Stare:</span>
+                        <span>{% trans "Stare:" %}</span>
                         <strong>
-                            {% if listing.condition == 'new' %}Nou
-                            {% elif listing.condition == 'like_new' %}Ca nou
-                            {% elif listing.condition == 'good' %}Bună
-                            {% elif listing.condition == 'fair' %}Acceptabilă
-                            {% else %}Folosit{% endif %}
+                            {% if listing.condition == 'new' %}{% trans "Nou" %}
+                            {% elif listing.condition == 'like_new' %}{% trans "Ca nou" %}
+                            {% elif listing.condition == 'good' %}{% trans "Bună" %}
+                            {% elif listing.condition == 'fair' %}{% trans "Acceptabilă" %}
+                            {% else %}{% trans "Folosit" %}{% endif %}
                         </strong>
                     </div>
                     
                     <div class="detail-item">
                         <i class="fas fa-calendar"></i>
-                        <span>Publicat:</span>
+                        <span>{% trans "Publicat:" %}</span>
                         <strong>{{ listing.created_at|date:"d F Y" }}</strong>
                     </div>
                     
                     <div class="detail-item">
                         <i class="fas fa-eye"></i>
-                        <span>Vizualizări:</span>
+                        <span>{% trans "Vizualizări:" %}</span>
                         <strong>{{ listing.views_count }}</strong>
                     </div>
                 </div>
@@ -133,36 +133,36 @@
                         <form method="post" action="{% url 'chat:start_conversation' listing.slug %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-envelope"></i> Trimite mesaj
+                                <i class="fas fa-envelope"></i> {% trans "Trimite mesaj" %}
                             </button>
                         </form>
                     {% elif user == listing.owner %}
                         <a href="{% url 'listings:update' listing.slug %}" class="btn btn-primary">
-                            <i class="fas fa-edit"></i> Editează anunțul
+                            <i class="fas fa-edit"></i> {% trans "Editează anunțul" %}
                         </a>
                     {% else %}
                         <a href="{% url 'accounts:login' %}" class="btn btn-primary">
-                            <i class="fas fa-envelope"></i> Trimite mesaj
+                            <i class="fas fa-envelope"></i> {% trans "Trimite mesaj" %}
                         </a>
                     {% endif %}
                     
                     {% if user.is_authenticated and user != listing.owner %}
                         <button id="favorite-detail-btn" class="{% if is_favorited %}favorited{% endif %}" 
                                 data-listing="{{ listing.id }}" 
-                                title="{% if is_favorited %}Elimină din favorite{% else %}Adaugă la favorite{% endif %}">
-                            <i class="{% if is_favorited %}fas{% else %}far{% endif %} fa-heart"></i> 
-                            <span>{% if is_favorited %}În favorite{% else %}Adaugă la favorite{% endif %}</span>
+                                title="{% if is_favorited %}{% trans 'Elimină din favorite' %}{% else %}{% trans 'Adaugă la favorite' %}{% endif %}">
+                            <i class="{% if is_favorited %}fas{% else %}far{% endif %} fa-heart"></i>
+                            <span>{% if is_favorited %}{% trans "În favorite" %}{% else %}{% trans "Adaugă la favorite" %}{% endif %}</span>
                         </button>
                     {% endif %}
                     <button class="btn btn-secondary share-btn">
-                        <i class="fas fa-share-alt"></i> Partajează
+                        <i class="fas fa-share-alt"></i> {% trans "Partajează" %}
                     </button>
                 </div>
 
                 <div class="report-panel">
                     {% if user.is_authenticated and user != listing.owner %}
                         <details>
-                            <summary><i class="fas fa-flag"></i> Raportează anunțul</summary>
+                            <summary><i class="fas fa-flag"></i> {% trans "Raportează anunțul" %}</summary>
                             <form method="post" action="{% url 'listings:report' listing.slug %}" class="report-form">
                                 {% csrf_token %}
                                 {{ report_form.reason.label_tag }}
@@ -170,13 +170,13 @@
                                 {{ report_form.details.label_tag }}
                                 {{ report_form.details }}
                                 <button type="submit" class="btn btn-outline">
-                                    <i class="fas fa-paper-plane"></i> Trimite raport
+                                    <i class="fas fa-paper-plane"></i> {% trans "Trimite raport" %}
                                 </button>
                             </form>
                         </details>
                     {% elif not user.is_authenticated %}
                         <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="report-login">
-                            <i class="fas fa-flag"></i> Autentifică-te pentru a raporta anunțul
+                            <i class="fas fa-flag"></i> {% trans "Autentifică-te pentru a raporta anunțul" %}
                         </a>
                     {% endif %}
                 </div>
@@ -185,7 +185,7 @@
         
         <!-- Description -->
         <div class="description-section">
-            <h2><i class="fas fa-info-circle"></i> Descriere</h2>
+            <h2><i class="fas fa-info-circle"></i> {% trans "Descriere" %}</h2>
             <div class="description-content">
                 {{ listing.description|linebreaks }}
             </div>
@@ -193,7 +193,7 @@
         
         <!-- Seller Info -->
         <div class="seller-section">
-            <h2><i class="fas fa-user"></i> Vânzător</h2>
+            <h2><i class="fas fa-user"></i> {% trans "Vânzător" %}</h2>
             <div class="seller-info">
                 <div class="seller-avatar">
                     {% if listing.owner.userprofile.avatar %}
@@ -206,10 +206,10 @@
                 </div>
                 <div class="seller-details">
                     <h3>{{ listing.owner.get_full_name|default:listing.owner.username }}</h3>
-                    <p class="member-since">Membru din {{ listing.owner.date_joined|date:"F Y" }}</p>
+                    <p class="member-since">{% blocktrans with since=listing.owner.date_joined|date:"F Y" %}Membru din {{ since }}{% endblocktrans %}</p>
                     <div class="seller-stats">
-                        <span><i class="fas fa-clipboard-list"></i> {{ listing.owner.userprofile.total_listings }} anunțuri</span>
-                        <span><i class="fas fa-star"></i> {{ listing.owner.userprofile.rating|floatformat:1 }} rating</span>
+                        <span><i class="fas fa-clipboard-list"></i> {% blocktrans count counter=listing.owner.userprofile.total_listings|default:0 %}{{ counter }} anunț{% plural %}{{ counter }} anunțuri{% endblocktrans %}</span>
+                        <span><i class="fas fa-star"></i> {{ listing.owner.userprofile.rating|floatformat:1 }} {% trans "rating" %}</span>
                     </div>
                 </div>
                 <div class="seller-actions">
@@ -217,12 +217,12 @@
                         <form method="post" action="{% url 'chat:start_conversation' listing.slug %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-outline">
-                                <i class="fas fa-envelope"></i> Trimite mesaj
+                                <i class="fas fa-envelope"></i> {% trans "Trimite mesaj" %}
                             </button>
                         </form>
                     {% endif %}
                     <a href="{% url 'listings:list' %}?seller={{ listing.owner.username }}" class="btn btn-outline">
-                        <i class="fas fa-list"></i> Vezi toate anunțurile
+                        <i class="fas fa-list"></i> {% trans "Vezi toate anunțurile" %}
                     </a>
                 </div>
             </div>
@@ -234,7 +234,7 @@
 {% if similar_listings %}
 <section class="similar-listings">
     <div class="container">
-        <h2><i class="fas fa-th"></i> Anunțuri similare</h2>
+        <h2><i class="fas fa-th"></i> {% trans "Anunțuri similare" %}</h2>
         <div class="listings-grid">
             {% for similar in similar_listings %}
             <a href="{% url 'listings:detail' similar.slug %}" class="listing-card">
@@ -266,7 +266,7 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/listings.css' %}">
 <style>
-/* Design elegant pentru butonul de favorite - NU MAI PĂTRATE! */
+/* Elegant design for the favorite button - NO MORE SQUARES! */
 #favorite-detail-btn {
     background: transparent;
     border: none;
