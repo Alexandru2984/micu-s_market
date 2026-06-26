@@ -12,10 +12,10 @@ GET /pages/healthz
 Expected healthy response:
 
 ```json
-{"status": "ok", "database": "ok"}
+{"status": "ok", "database": "ok", "cache": "ok"}
 ```
 
-Use this endpoint from uptime monitoring and internal deployment checks. It verifies that Django can reach PostgreSQL.
+Use this endpoint from uptime monitoring and internal deployment checks. It verifies that Django can reach PostgreSQL and the configured cache.
 
 ## PostgreSQL backup
 
@@ -83,6 +83,8 @@ Smoke checks only:
 ```bash
 APP_BASE_URL=https://market.micutu.com scripts/smoke_check.sh
 ```
+
+Smoke checks verify `/healthz`, the homepage, the public listings API, security headers, and that private chat media paths are not served directly.
 
 Load test from a non-production shell:
 
