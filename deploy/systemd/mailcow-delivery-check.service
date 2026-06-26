@@ -1,0 +1,13 @@
+[Unit]
+Description=Check Mailcow outbound delivery health
+After=docker.service mailcow-netfilter-egress-fix.service
+Wants=docker.service mailcow-netfilter-egress-fix.service
+
+[Service]
+Type=oneshot
+ExecStart=/home/micu/Micu_market/scripts/check_mailcow_delivery.sh
+
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=read-only
+PrivateTmp=true

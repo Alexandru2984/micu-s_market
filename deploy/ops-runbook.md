@@ -156,6 +156,18 @@ sudo docker exec mailcowdockerized-postfix-mailcow-1 postqueue -p
 
 The service keeps the Mailcow `MAILCOW` iptables chain idempotently seeded with an `ESTABLISHED,RELATED` accept rule. Without it, outbound SMTP connections can send SYN packets but drop the returning SYN-ACK packets before they reach Postfix.
 
+Install the delivery health check:
+
+```bash
+sudo cp /home/micu/Micu_market/deploy/systemd/mailcow-delivery-check.* /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now mailcow-delivery-check.timer
+sudo systemctl start mailcow-delivery-check.service
+sudo systemctl status mailcow-delivery-check.service --no-pager
+```
+
+The delivery check fails when the Mailcow egress iptables rule is missing, the Postfix queue grows beyond `MAILCOW_QUEUE_MAX_MESSAGES` (default `20`), the deferred queue grows beyond `MAILCOW_DEFERRED_MAX_MESSAGES` (default `5`), or the Postfix container cannot receive a `220` SMTP banner from the configured probe host.
+
 Queue a background job manually:
 
 ```bash
