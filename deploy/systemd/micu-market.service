@@ -10,6 +10,7 @@ UMask=0007
 WorkingDirectory=/home/micu/Micu_market
 EnvironmentFile=/home/micu/Micu_market/.env
 Environment=DJANGO_SETTINGS_MODULE=Micu_market.settings_production
+ExecStartPre=/bin/rm -f /home/micu/Micu_market/gunicorn.sock
 ExecStart=/home/micu/Micu_market/venv/bin/gunicorn -c /home/micu/Micu_market/gunicorn.conf.py Micu_market.asgi:application
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=always

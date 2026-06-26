@@ -194,7 +194,7 @@ RATELIMIT_USE_CACHE = os.getenv("RATELIMIT_USE_CACHE", "default")
 # Channels (WebSocket) — Redis layer so group_send works across uvicorn workers.
 # Dedicated Redis DB (/2) to avoid clashing with cache/ratelimit. For dev without
 # Redis, the in-memory layer can be forced with CHANNELS_IN_MEMORY=1.
-CHANNELS_REDIS_URL = os.getenv("CHANNELS_REDIS_URL", os.getenv("REDIS_URL", "redis://127.0.0.1:6379/2"))
+CHANNELS_REDIS_URL = os.getenv("CHANNELS_REDIS_URL", "redis://127.0.0.1:6379/2")
 if os.getenv("CHANNELS_IN_MEMORY") == "1":
     CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 else:
