@@ -1,49 +1,49 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Insights vânzător - Micu's Market{% endblock %}
+{% block title %}{% trans "Insights vânzător" %} - Micu's Market{% endblock %}
 
 {% block content %}
 <section class="seller-insights">
     <div class="container">
         <div class="insights-header">
-            <h1>Insights vânzător</h1>
+            <h1>{% trans "Insights vânzător" %}</h1>
             <a href="{% url 'listings:create' %}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Adaugă anunț
+                <i class="fas fa-plus"></i> {% trans "Adaugă anunț" %}
             </a>
         </div>
 
         <div class="insights-stats">
             <div class="stat-card">
-                <span>Total anunțuri</span>
+                <span>{% trans "Total anunțuri" %}</span>
                 <strong>{{ stats.total_listings }}</strong>
             </div>
             <div class="stat-card">
-                <span>Active</span>
+                <span>{% trans "Active" %}</span>
                 <strong>{{ stats.active_listings }}</strong>
             </div>
             <div class="stat-card">
-                <span>Vândute</span>
+                <span>{% trans "Vândute" %}</span>
                 <strong>{{ stats.sold_listings }}</strong>
             </div>
             <div class="stat-card">
-                <span>Vizualizări</span>
+                <span>{% trans "Vizualizări" %}</span>
                 <strong>{{ stats.total_views }}</strong>
             </div>
             <div class="stat-card">
-                <span>Favorite primite</span>
+                <span>{% trans "Favorite primite" %}</span>
                 <strong>{{ stats.total_favorites }}</strong>
             </div>
             <div class="stat-card">
-                <span>Promovări active</span>
+                <span>{% trans "Promovări active" %}</span>
                 <strong>{{ stats.active_promotions }}</strong>
             </div>
         </div>
 
         <div class="insights-section">
             <div class="section-heading">
-                <h2>Top anunțuri</h2>
-                <a href="{% url 'listings:my_listings' %}">Vezi toate</a>
+                <h2>{% trans "Top anunțuri" %}</h2>
+                <a href="{% url 'listings:my_listings' %}">{% trans "Vezi toate" %}</a>
             </div>
 
             {% if top_listings %}
@@ -51,12 +51,12 @@
                     <table class="insights-table">
                         <thead>
                             <tr>
-                                <th>Anunț</th>
-                                <th>Status</th>
-                                <th>Vizualizări</th>
-                                <th>Favorite</th>
-                                <th>Rapoarte</th>
-                                <th>Promovat</th>
+                                <th>{% trans "Anunț" %}</th>
+                                <th>{% trans "Status" %}</th>
+                                <th>{% trans "Vizualizări" %}</th>
+                                <th>{% trans "Favorite" %}</th>
+                                <th>{% trans "Rapoarte" %}</th>
+                                <th>{% trans "Promovat" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -72,9 +72,9 @@
                                     <td>{{ listing.report_count }}</td>
                                     <td>
                                         {% if listing.is_promoted %}
-                                            <span class="status-pill active">Activ</span>
+                                            <span class="status-pill active">{% trans "Activ" %}</span>
                                         {% else %}
-                                            <span class="status-pill">Nu</span>
+                                            <span class="status-pill">{% trans "Nu" %}</span>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -85,15 +85,15 @@
             {% else %}
                 <div class="empty-state">
                     <i class="fas fa-chart-line"></i>
-                    <h3>Nu ai încă date de analizat</h3>
-                    <p>Publică primul anunț pentru a vedea performanța lui aici.</p>
+                    <h3>{% trans "Nu ai încă date de analizat" %}</h3>
+                    <p>{% trans "Publică primul anunț pentru a vedea performanța lui aici." %}</p>
                 </div>
             {% endif %}
         </div>
 
         <div class="insights-section">
             <div class="section-heading">
-                <h2>Rapoarte active</h2>
+                <h2>{% trans "Rapoarte active" %}</h2>
             </div>
 
             {% if open_reports %}
@@ -109,7 +109,7 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <p class="muted-text">Nu există rapoarte active pentru anunțurile tale.</p>
+                <p class="muted-text">{% trans "Nu există rapoarte active pentru anunțurile tale." %}</p>
             {% endif %}
         </div>
     </div>

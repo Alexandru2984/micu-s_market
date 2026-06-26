@@ -1,24 +1,24 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Anunțurile mele favorite - Micu's Market{% endblock %}
+{% block title %}{% trans "Anunțurile mele favorite" %} - Micu's Market{% endblock %}
 
 {% block content %}
 <!-- Page Header -->
 <section class="page-header">
     <div class="container">
         <div class="header-content">
-            <h1><i class="fas fa-heart"></i> Anunțurile mele favorite</h1>
+            <h1><i class="fas fa-heart"></i> {% trans "Anunțurile mele favorite" %}</h1>
             {% if total_favorites %}
-                <p class="subtitle">{{ total_favorites }} anunțuri în lista ta de favorite</p>
+                <p class="subtitle">{% blocktrans count counter=total_favorites %}{{ counter }} anunț în lista ta de favorite{% plural %}{{ counter }} anunțuri în lista ta de favorite{% endblocktrans %}</p>
             {% else %}
-                <p class="subtitle">Nu ai încă anunțuri în lista de favorite</p>
+                <p class="subtitle">{% trans "Nu ai încă anunțuri în lista de favorite" %}</p>
             {% endif %}
         </div>
-        
+
         <div class="header-actions">
             <a href="{% url 'listings:list' %}" class="btn btn-primary">
-                <i class="fas fa-search"></i> Căută anunțuri
+                <i class="fas fa-search"></i> {% trans "Caută anunțuri" %}
             </a>
         </div>
     </div>
@@ -44,7 +44,7 @@
                             
                             {% if listing.is_promoted %}
                                 <div class="featured-badge">
-                                    <i class="fas fa-star"></i> Recomandat
+                                    <i class="fas fa-star"></i> {% trans "Recomandat" %}
                                 </div>
                             {% endif %}
                         </div>
@@ -65,7 +65,7 @@
                             <div class="listing-footer">
                                 <span class="date">
                                     <i class="fas fa-calendar"></i>
-                                    Adăugat la favorite: {{ favorite.created_at|date:"d.m.Y" }}
+                                    {% blocktrans with added=favorite.created_at|date:"d.m.Y" %}Adăugat la favorite: {{ added }}{% endblocktrans %}
                                 </span>
                                 <span class="views">
                                     <i class="fas fa-eye"></i> {{ listing.views_count }}
@@ -76,7 +76,7 @@
                     
                     <!-- Action Buttons -->
                     <div class="listing-actions">
-                        <button class="remove-favorite-btn" data-favorite-id="{{ favorite.id }}" title="Elimină din favorite">
+                        <button class="remove-favorite-btn" data-favorite-id="{{ favorite.id }}" title="{% trans 'Elimină din favorite' %}">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -90,32 +90,32 @@
             <div class="pagination">
                 {% if page_obj.has_previous %}
                     <a href="?page={{ page_obj.previous_page_number }}" class="page-btn">
-                        <i class="fas fa-chevron-left"></i> Anterior
+                        <i class="fas fa-chevron-left"></i> {% trans "Anterior" %}
                     </a>
                 {% endif %}
-                
+
                 <span class="page-info">
-                    Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}
+                    {% blocktrans with current=page_obj.number total=page_obj.paginator.num_pages %}Pagina {{ current }} din {{ total }}{% endblocktrans %}
                 </span>
-                
+
                 {% if page_obj.has_next %}
                     <a href="?page={{ page_obj.next_page_number }}" class="page-btn">
-                        Următorul <i class="fas fa-chevron-right"></i>
+                        {% trans "Următorul" %} <i class="fas fa-chevron-right"></i>
                     </a>
                 {% endif %}
             </div>
             {% endif %}
-            
+
         {% else %}
             <!-- No Favorites -->
             <div class="no-favorites">
                 <div class="no-favorites-content">
                     <i class="fas fa-heart-broken"></i>
-                    <h3>Nu ai anunțuri în lista de favorite</h3>
-                    <p>Când vei găsi anunțuri interesante, le poți adăuga la favorite pentru a le accesa mai ușor.</p>
+                    <h3>{% trans "Nu ai anunțuri în lista de favorite" %}</h3>
+                    <p>{% trans "Când vei găsi anunțuri interesante, le poți adăuga la favorite pentru a le accesa mai ușor." %}</p>
                     <div class="no-favorites-actions">
                         <a href="{% url 'listings:list' %}" class="btn btn-primary">
-                            <i class="fas fa-search"></i> Explorează anunțurile
+                            <i class="fas fa-search"></i> {% trans "Explorează anunțurile" %}
                         </a>
                     </div>
                 </div>

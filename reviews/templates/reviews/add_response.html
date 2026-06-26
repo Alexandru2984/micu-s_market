@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Răspunde la review - Micu's Market{% endblock %}
+{% block title %}{% trans "Răspunde la review" %} - Micu's Market{% endblock %}
 
 {% block content %}
 <div class="add-response-container">
@@ -10,8 +10,8 @@
             <!-- Review original -->
             <div class="original-review">
                 <div class="review-header">
-                    <h2><i class="fas fa-reply"></i> Răspunde la review</h2>
-                    <p class="subtitle">Răspunde la review-ul primit pentru a clarifica sau mulțumi</p>
+                    <h2><i class="fas fa-reply"></i> {% trans "Răspunde la review" %}</h2>
+                    <p class="subtitle">{% trans "Răspunde la review-ul primit pentru a clarifica sau mulțumi" %}</p>
                 </div>
                 
                 <div class="review-content">
@@ -41,9 +41,9 @@
                                 <span class="review-date">{{ review.created_at|date:"d.m.Y" }}</span>
                                 <span class="transaction-type">
                                     {% if review.transaction_type == 'purchase' %}
-                                        <i class="fas fa-shopping-cart"></i> Cumpărare
+                                        <i class="fas fa-shopping-cart"></i> {% trans "Cumpărare" %}
                                     {% else %}
-                                        <i class="fas fa-tag"></i> Vânzare
+                                        <i class="fas fa-tag"></i> {% trans "Vânzare" %}
                                     {% endif %}
                                 </span>
                             </div>
@@ -59,7 +59,7 @@
                         {% if review.listing %}
                             <div class="related-listing">
                                 <i class="fas fa-tag"></i>
-                                <span>Pentru anunțul: </span>
+                                <span>{% trans "Pentru anunțul:" %} </span>
                                 <a href="{% url 'listings:detail' review.listing.slug %}">{{ review.listing.title }}</a>
                             </div>
                         {% endif %}
@@ -69,7 +69,7 @@
             
             <!-- Response form -->
             <div class="response-form-section">
-                <h3><i class="fas fa-pen"></i> Răspunsul tău</h3>
+                <h3><i class="fas fa-pen"></i> {% trans "Răspunsul tău" %}</h3>
                 
                 <form method="post" class="response-form">
                     {% csrf_token %}
@@ -86,7 +86,7 @@
                     {% endif %}
                     
                     <div class="form-group">
-                        <label for="{{ form.response_text.id_for_label }}" class="required">Răspunsul tău</label>
+                        <label for="{{ form.response_text.id_for_label }}" class="required">{% trans "Răspunsul tău" %}</label>
                         {{ form.response_text }}
                         {% if form.response_text.errors %}
                             <div class="field-errors">
@@ -96,20 +96,20 @@
                             </div>
                         {% endif %}
                         <div class="field-help">
-                            Oferă un răspuns constructiv și profesional. Poți mulțumi pentru feedback sau clarifica anumite aspecte.
+                            {% trans "Oferă un răspuns constructiv și profesional. Poți mulțumi pentru feedback sau clarifica anumite aspecte." %}
                         </div>
                         <div class="char-count">
-                            <span id="charCount">0</span> / 1000 caractere
+                            <span id="charCount">0</span> / 1000 {% trans "caractere" %}
                         </div>
                     </div>
                     
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-reply"></i> Publică răspunsul
+                            <i class="fas fa-reply"></i> {% trans "Publică răspunsul" %}
                         </button>
-                        
+
                         <a href="{% url 'reviews:user_reviews' user.username %}" class="btn btn-secondary btn-lg">
-                            <i class="fas fa-times"></i> Anulează
+                            <i class="fas fa-times"></i> {% trans "Anulează" %}
                         </a>
                     </div>
                 </form>
@@ -118,14 +118,14 @@
         
         <!-- Tips for responses -->
         <div class="tips-card">
-            <h3><i class="fas fa-lightbulb"></i> Sfaturi pentru răspunsuri eficiente</h3>
+            <h3><i class="fas fa-lightbulb"></i> {% trans "Sfaturi pentru răspunsuri eficiente" %}</h3>
             <ul>
-                <li>Mulțumește pentru feedback-ul primit, chiar dacă este negativ</li>
-                <li>Răspunde într-o manieră profesională și respectuoasă</li>
-                <li>Clarifica orice neînțelegeri sau probleme menționate</li>
-                <li>Oferă soluții pentru problemele ridicate</li>
-                <li>Evită răspunsurile defensive sau conflictuale</li>
-                <li>Arată că îți pasă de experiența utilizatorilor</li>
+                <li>{% trans "Mulțumește pentru feedback-ul primit, chiar dacă este negativ" %}</li>
+                <li>{% trans "Răspunde într-o manieră profesională și respectuoasă" %}</li>
+                <li>{% trans "Clarifica orice neînțelegeri sau probleme menționate" %}</li>
+                <li>{% trans "Oferă soluții pentru problemele ridicate" %}</li>
+                <li>{% trans "Evită răspunsurile defensive sau conflictuale" %}</li>
+                <li>{% trans "Arată că îți pasă de experiența utilizatorilor" %}</li>
             </ul>
         </div>
     </div>
@@ -253,7 +253,7 @@
     text-decoration: underline;
 }
 
-/* Formular răspuns */
+/* Response form */
 .response-form-section {
     padding: 2rem;
 }

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-16 09:52+0300\n"
+"POT-Creation-Date: 2026-06-17 00:21+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,118 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: chat/templates/chat/conversation.html:5
+#, python-format
+msgid "Conversație cu %(name)s"
+msgstr ""
+
+#: chat/templates/chat/conversation.html:22
+#, fuzzy
+#| msgid "Înapoi la anunț"
+msgid "Înapoi la mesaje"
+msgstr "Back to listing"
+
+#: chat/templates/chat/conversation.html:45
+#: listings/templates/listings/my_listings.html:157
+#: listings/templates/listings/update.html:23
+#: listings/templates/listings/upload_images.html:19
+msgid "Vezi anunțul"
+msgstr "View listing"
+
+#: chat/templates/chat/conversation.html:53
+msgid "Începe conversația trimițând primul mesaj."
+msgstr ""
+
+#: chat/templates/chat/conversation.html:89
+msgid "scrie…"
+msgstr ""
+
+#: chat/templates/chat/conversation.html:97
+msgid "Reconectare…"
+msgstr ""
+
+#: chat/templates/chat/conversation.html:101
+msgid "Atașează un fișier"
+msgstr ""
+
+#: chat/templates/chat/conversation.html:107
+#, fuzzy
+#| msgid "Trimite mesaj"
+msgid "Scrie un mesaj…"
+msgstr "Send message"
+
+#: chat/templates/chat/conversation.html:108
+#, fuzzy
+#| msgid "Trimite mesaj"
+msgid "Trimite"
+msgstr "Send message"
+
+#: chat/templates/chat/inbox.html:4 templates/partials/header.html:20
+msgid "Mesaje"
+msgstr "Messages"
+
+#: chat/templates/chat/inbox.html:10
+#, fuzzy
+#| msgid "Mesajele Mele"
+msgid "Mesajele mele"
+msgstr "My Messages"
+
+#: chat/templates/chat/inbox.html:12
+#, fuzzy, python-format
+#| msgid "%(counter)s imagine"
+#| msgid_plural "%(counter)s imagini"
+msgid "%(counter)s necitit"
+msgid_plural "%(counter)s necitite"
+msgstr[0] "%(counter)s image"
+msgstr[1] "%(counter)s images"
+
+#: chat/templates/chat/inbox.html:39
+#, python-format
+msgid "%(elapsed)s în urmă"
+msgstr ""
+
+#: chat/templates/chat/inbox.html:54
+msgid "Tu:"
+msgstr ""
+
+#: chat/templates/chat/inbox.html:79 listings/templates/listings/list.html:458
+#: reviews/templates/reviews/my_reviews.html:181
+#: templates/favorites/list.html:93
+msgid "Anterior"
+msgstr "Previous"
+
+#: chat/templates/chat/inbox.html:84 listings/templates/listings/list.html:463
+#: listings/templates/listings/my_listings.html:193
+#: reviews/templates/reviews/my_reviews.html:186
+#: templates/favorites/list.html:98
+#, python-format
+msgid "Pagina %(current)s din %(total)s"
+msgstr "Page %(current)s of %(total)s"
+
+#: chat/templates/chat/inbox.html:89
+#: reviews/templates/reviews/my_reviews.html:191
+#: templates/favorites/list.html:103
+#, fuzzy
+#| msgid "Următoarea"
+msgid "Următorul"
+msgstr "Next"
+
+#: chat/templates/chat/inbox.html:99
+#, fuzzy
+#| msgid "Nu ai încă anunțuri"
+msgid "Nu ai încă conversații"
+msgstr "You don't have any listings yet"
+
+#: chat/templates/chat/inbox.html:100
+msgid "Când vei trimite sau primi mesaje, acestea vor apărea aici."
+msgstr ""
+
+#: chat/templates/chat/inbox.html:102 templates/favorites/list.html:118
+#, fuzzy
+#| msgid "Explorează anunțuri"
+msgid "Explorează anunțurile"
+msgstr "Explore listings"
 
 #: listings/templates/listings/create.html:18
 msgid "Completează formularul pentru a publica anunțul tău"
@@ -69,7 +181,9 @@ msgstr "You can select multiple images at once"
 
 #: listings/templates/listings/create.html:228
 #: listings/templates/listings/delete.html:159
-#: listings/templates/listings/update.html:307 templates/account/logout.html:30
+#: listings/templates/listings/update.html:307
+#: reviews/templates/reviews/add_response.html:112
+#: reviews/templates/reviews/create.html:168 templates/account/logout.html:30
 msgid "Anulează"
 msgstr "Cancel"
 
@@ -102,8 +216,15 @@ msgid "Atenție!"
 msgstr "Warning!"
 
 #: listings/templates/listings/delete.html:35
-msgid "Ești pe cale să ștergi definitiv acest anunț. Toate informațiile asociate, inclusiv imaginile,\n                        vor fi șterse permanent și nu vor putea fi recuperate."
-msgstr "You are about to permanently delete this listing. All associated information, including images, will be permanently deleted and cannot be recovered."
+msgid ""
+"Ești pe cale să ștergi definitiv acest anunț. Toate informațiile asociate, "
+"inclusiv imaginile,\n"
+"                        vor fi șterse permanent și nu vor putea fi "
+"recuperate."
+msgstr ""
+"You are about to permanently delete this listing. All associated "
+"information, including images, will be permanently deleted and cannot be "
+"recovered."
 
 #: listings/templates/listings/delete.html:46
 msgid "Anunț care va fi șters"
@@ -168,7 +289,7 @@ msgid "Șterge definitiv"
 msgstr "Delete permanently"
 
 #: listings/templates/listings/detail.html:55
-#: listings/templates/listings/list.html:426
+#: listings/templates/listings/list.html:426 templates/favorites/list.html:47
 msgid "Recomandat"
 msgstr "Recommended"
 
@@ -231,7 +352,7 @@ msgstr "Send message"
 msgid "Editează anunțul"
 msgstr "Edit listing"
 
-#: listings/templates/listings/detail.html:152
+#: listings/templates/listings/detail.html:152 templates/favorites/list.html:79
 msgid "Elimină din favorite"
 msgstr "Remove from favorites"
 
@@ -298,13 +419,21 @@ msgid "Micu's Market - Marketplace România"
 msgstr "Micu's Market - Romania Marketplace"
 
 #: listings/templates/listings/home.html:5
-msgid "Cumpără și vinde rapid pe Micu's Market: anunțuri locale, categorii populare și produse promovate din România."
-msgstr "Buy and sell quickly on Micu's Market: local listings, popular categories and promoted products from Romania."
+msgid ""
+"Cumpără și vinde rapid pe Micu's Market: anunțuri locale, categorii populare "
+"și produse promovate din România."
+msgstr ""
+"Buy and sell quickly on Micu's Market: local listings, popular categories "
+"and promoted products from Romania."
 
 #: listings/templates/listings/home.html:7
 #: listings/templates/listings/home.html:9
-msgid "Descoperă anunțuri locale, produse promovate și categorii populare pe Micu's Market."
-msgstr "Discover local listings, promoted products and popular categories on Micu's Market."
+msgid ""
+"Descoperă anunțuri locale, produse promovate și categorii populare pe Micu's "
+"Market."
+msgstr ""
+"Discover local listings, promoted products and popular categories on Micu's "
+"Market."
 
 #: listings/templates/listings/home.html:15
 msgid "Bine ai venit la Micu's Market!"
@@ -363,17 +492,29 @@ msgstr "All Listings"
 
 #: listings/templates/listings/list.html:5
 #, python-format
-msgid "Rezultate pentru %(search_query)s pe Micu's Market: filtrează anunțuri după preț, oraș și categorie."
-msgstr "Results for %(search_query)s on Micu's Market: filter listings by price, city and category."
+msgid ""
+"Rezultate pentru %(search_query)s pe Micu's Market: filtrează anunțuri după "
+"preț, oraș și categorie."
+msgstr ""
+"Results for %(search_query)s on Micu's Market: filter listings by price, "
+"city and category."
 
 #: listings/templates/listings/list.html:5
 #, python-format
-msgid "Anunțuri din categoria %(name)s pe Micu's Market, cu filtre după preț și oraș."
-msgstr "Listings in the %(name)s category on Micu's Market, with filters by price and city."
+msgid ""
+"Anunțuri din categoria %(name)s pe Micu's Market, cu filtre după preț și "
+"oraș."
+msgstr ""
+"Listings in the %(name)s category on Micu's Market, with filters by price "
+"and city."
 
 #: listings/templates/listings/list.html:5
-msgid "Explorează toate anunțurile active de pe Micu's Market și filtrează rapid după categorie, oraș sau preț."
-msgstr "Explore all active listings on Micu's Market and quickly filter by category, city or price."
+msgid ""
+"Explorează toate anunțurile active de pe Micu's Market și filtrează rapid "
+"după categorie, oraș sau preț."
+msgstr ""
+"Explore all active listings on Micu's Market and quickly filter by category, "
+"city or price."
 
 #: listings/templates/listings/list.html:6
 #: listings/templates/listings/list.html:8
@@ -514,26 +655,18 @@ msgid "Titlu A-Z"
 msgstr "Title A-Z"
 
 #: listings/templates/listings/list.html:394
+#: reviews/templates/reviews/my_reviews.html:59
 msgid "Filtrează"
 msgstr "Filter"
 
 #: listings/templates/listings/list.html:401
+#: reviews/templates/reviews/my_reviews.html:62
 msgid "Resetează"
 msgstr "Reset"
 
 #: listings/templates/listings/list.html:454
 msgid "Prima"
 msgstr "First"
-
-#: listings/templates/listings/list.html:458
-msgid "Anterior"
-msgstr "Previous"
-
-#: listings/templates/listings/list.html:463
-#: listings/templates/listings/my_listings.html:193
-#, python-format
-msgid "Pagina %(current)s din %(total)s"
-msgstr "Page %(current)s of %(total)s"
 
 #: listings/templates/listings/list.html:469
 msgid "Următoarea"
@@ -595,13 +728,8 @@ msgstr "Active"
 msgid "Expirat"
 msgstr "Expired"
 
-#: listings/templates/listings/my_listings.html:157
-#: listings/templates/listings/update.html:23
-#: listings/templates/listings/upload_images.html:19
-msgid "Vezi anunțul"
-msgstr "View listing"
-
 #: listings/templates/listings/my_listings.html:160
+#: reviews/templates/reviews/my_reviews.html:115
 msgid "Editează"
 msgstr "Edit"
 
@@ -614,13 +742,20 @@ msgid "Promovează"
 msgstr "Promote"
 
 #: listings/templates/listings/my_listings.html:169
+#: reviews/templates/reviews/my_reviews.html:120
 msgid "Șterge"
 msgstr "Delete"
 
 #: listings/templates/listings/my_listings.html:182
 #, python-format
-msgid "Afișez <span class=\"font-medium\">%(start)s</span> - <span class=\"font-medium\">%(end)s</span> din <span class=\"font-medium\">%(total)s</span> anunțuri"
-msgstr "Showing <span class=\"font-medium\">%(start)s</span> - <span class=\"font-medium\">%(end)s</span> of <span class=\"font-medium\">%(total)s</span> listings"
+msgid ""
+"Afișez <span class=\"font-medium\">%(start)s</span> - <span class=\"font-"
+"medium\">%(end)s</span> din <span class=\"font-medium\">%(total)s</span> "
+"anunțuri"
+msgstr ""
+"Showing <span class=\"font-medium\">%(start)s</span> - <span class=\"font-"
+"medium\">%(end)s</span> of <span class=\"font-medium\">%(total)s</span> "
+"listings"
 
 #: listings/templates/listings/my_listings.html:213
 msgid "Nu ai încă anunțuri"
@@ -635,6 +770,8 @@ msgid "Modifică informațiile anunțului tău"
 msgstr "Edit your listing's information"
 
 #: listings/templates/listings/update.html:27
+#: reviews/templates/reviews/user_reviews.html:47
+#: reviews/templates/reviews/user_reviews.html:49
 msgid "Înapoi"
 msgstr "Back"
 
@@ -643,7 +780,8 @@ msgid "Gestionează imagini separat"
 msgstr "Manage images separately"
 
 #: listings/templates/listings/update.html:220
-msgid "Modifică imaginile existente sau adaugă altele noi (maxim 5MB per imagine)"
+msgid ""
+"Modifică imaginile existente sau adaugă altele noi (maxim 5MB per imagine)"
 msgstr "Edit the existing images or add new ones (max 5MB per image)"
 
 #: listings/templates/listings/update.html:235
@@ -698,8 +836,12 @@ msgid "Adaugă imagini noi"
 msgstr "Add new images"
 
 #: listings/templates/listings/upload_images.html:82
-msgid "Poți adăuga până la 10 imagini în total. Formatul acceptat: JPG, PNG, WebP (max 5MB per imagine)"
-msgstr "You can add up to 10 images in total. Accepted formats: JPG, PNG, WebP (max 5MB per image)"
+msgid ""
+"Poți adăuga până la 10 imagini în total. Formatul acceptat: JPG, PNG, WebP "
+"(max 5MB per imagine)"
+msgstr ""
+"You can add up to 10 images in total. Accepted formats: JPG, PNG, WebP (max "
+"5MB per image)"
 
 #: listings/templates/listings/upload_images.html:125
 msgid "Descriere scurtă pentru accesibilitate"
@@ -729,6 +871,361 @@ msgstr "The first image will be shown as the main image"
 msgid "Evită fundalurile aglomerate - preferă fundal simplu"
 msgstr "Avoid cluttered backgrounds - prefer a simple background"
 
+#: reviews/templates/reviews/add_response.html:4
+#: reviews/templates/reviews/add_response.html:13
+msgid "Răspunde la review"
+msgstr ""
+
+#: reviews/templates/reviews/add_response.html:14
+msgid "Răspunde la review-ul primit pentru a clarifica sau mulțumi"
+msgstr ""
+
+#: reviews/templates/reviews/add_response.html:44
+#: reviews/templates/reviews/my_reviews.html:47
+#: reviews/templates/reviews/my_reviews.html:104
+msgid "Cumpărare"
+msgstr ""
+
+#: reviews/templates/reviews/add_response.html:46
+#: reviews/templates/reviews/my_reviews.html:48
+#: reviews/templates/reviews/my_reviews.html:106
+#, fuzzy
+#| msgid "Vânzător"
+msgid "Vânzare"
+msgstr "Seller"
+
+#: reviews/templates/reviews/add_response.html:62
+#: reviews/templates/reviews/my_reviews.html:135
+#, fuzzy
+#| msgid "Vezi anunțul"
+msgid "Pentru anunțul:"
+msgstr "View listing"
+
+#: reviews/templates/reviews/add_response.html:72
+#: reviews/templates/reviews/add_response.html:89
+msgid "Răspunsul tău"
+msgstr ""
+
+#: reviews/templates/reviews/add_response.html:99
+msgid ""
+"Oferă un răspuns constructiv și profesional. Poți mulțumi pentru feedback "
+"sau clarifica anumite aspecte."
+msgstr ""
+
+#: reviews/templates/reviews/add_response.html:102
+#, fuzzy
+#| msgid "Minimum 8 caractere"
+msgid "caractere"
+msgstr "Minimum 8 characters"
+
+#: reviews/templates/reviews/add_response.html:108
+#, fuzzy
+#| msgid "Publică anunțul"
+msgid "Publică răspunsul"
+msgstr "Publish listing"
+
+#: reviews/templates/reviews/add_response.html:121
+#, fuzzy
+#| msgid "Sfaturi pentru imagini de calitate"
+msgid "Sfaturi pentru răspunsuri eficiente"
+msgstr "Tips for quality images"
+
+#: reviews/templates/reviews/add_response.html:123
+msgid "Mulțumește pentru feedback-ul primit, chiar dacă este negativ"
+msgstr ""
+
+#: reviews/templates/reviews/add_response.html:124
+msgid "Răspunde într-o manieră profesională și respectuoasă"
+msgstr ""
+
+#: reviews/templates/reviews/add_response.html:125
+msgid "Clarifica orice neînțelegeri sau probleme menționate"
+msgstr ""
+
+#: reviews/templates/reviews/add_response.html:126
+msgid "Oferă soluții pentru problemele ridicate"
+msgstr ""
+
+#: reviews/templates/reviews/add_response.html:127
+msgid "Evită răspunsurile defensive sau conflictuale"
+msgstr ""
+
+#: reviews/templates/reviews/add_response.html:128
+msgid "Arată că îți pasă de experiența utilizatorilor"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:6
+#: reviews/templates/reviews/create.html:31
+#, python-format
+msgid "Editează review pentru %(name)s"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:8
+#: reviews/templates/reviews/create.html:33
+#, python-format
+msgid "Lasă un review pentru %(name)s"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:36
+msgid "Împărtășește experiența ta cu comunitatea"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:41
+#, fuzzy
+#| msgid "Înapoi la anunț"
+msgid "Înapoi la review-uri"
+msgstr "Back to listing"
+
+#: reviews/templates/reviews/create.html:60
+msgid "Rating general"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:62
+msgid "Nota acordată"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:80
+msgid "Foarte rău"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:81
+msgid "Rău"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:82
+msgid "Ok"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:83
+#, fuzzy
+#| msgid "Bună"
+msgid "Bun"
+msgstr "Good"
+
+#: reviews/templates/reviews/create.html:84
+msgid "Excelent"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:91
+msgid "Detalii review"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:94
+#, fuzzy
+#| msgid "(opțional)"
+msgid "Titlu (opțional)"
+msgstr "(optional)"
+
+#: reviews/templates/reviews/create.html:104
+msgid "Oferă un titlu scurt pentru review-ul tău"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:109
+msgid "Comentariul tău"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:119
+msgid ""
+"Descrie experiența ta cu acest utilizator. Fii constructiv și respectuos."
+msgstr ""
+
+#: reviews/templates/reviews/create.html:125
+msgid "Context tranzacție"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:129
+msgid "Tip tranzacție"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:141
+#, fuzzy
+#| msgid "Imagini (opțional)"
+msgid "Anunț asociat (opțional)"
+msgstr "Images (optional)"
+
+#: reviews/templates/reviews/create.html:151
+msgid "Selectează anunțul pentru care lași acest review"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:161
+msgid "Actualizează review-ul"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:163
+#, fuzzy
+#| msgid "Publică anunțul"
+msgid "Publică review-ul"
+msgstr "Publish listing"
+
+#: reviews/templates/reviews/create.html:176
+msgid "Guidelines pentru review-uri"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:178
+msgid "Fii sincer și constructiv în feedback-ul tău"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:179
+msgid "Concentrează-te pe experiența ta cu utilizatorul"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:180
+msgid "Evită limbajul ofensator sau discriminatoriu"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:181
+msgid "Menționează aspecte concrete despre comunicare, livrare, calitate"
+msgstr ""
+
+#: reviews/templates/reviews/create.html:182
+msgid "Review-urile pot fi editate sau șterse oricând"
+msgstr ""
+
+#: reviews/templates/reviews/my_reviews.html:4
+#: reviews/templates/reviews/my_reviews.html:12
+#, fuzzy
+#| msgid "Review-urile Mele"
+msgid "Review-urile mele"
+msgstr "My Reviews"
+
+#: reviews/templates/reviews/my_reviews.html:13
+msgid "Gestionează toate review-urile pe care le-ai lăsat"
+msgstr ""
+
+#: reviews/templates/reviews/my_reviews.html:19
+#, fuzzy
+#| msgid "Total vizualizări"
+msgid "Total review-uri"
+msgstr "Total views"
+
+#: reviews/templates/reviews/my_reviews.html:23
+msgid "Rating mediu dat"
+msgstr ""
+
+#: reviews/templates/reviews/my_reviews.html:32
+#, fuzzy
+#| msgid "rating"
+msgid "Rating:"
+msgstr "rating"
+
+#: reviews/templates/reviews/my_reviews.html:34
+#: reviews/templates/reviews/my_reviews.html:46
+msgid "Toate"
+msgstr ""
+
+#: reviews/templates/reviews/my_reviews.html:35
+msgid "5 stele"
+msgstr ""
+
+#: reviews/templates/reviews/my_reviews.html:36
+msgid "4 stele"
+msgstr ""
+
+#: reviews/templates/reviews/my_reviews.html:37
+msgid "3 stele"
+msgstr ""
+
+#: reviews/templates/reviews/my_reviews.html:38
+msgid "2 stele"
+msgstr ""
+
+#: reviews/templates/reviews/my_reviews.html:39
+msgid "1 stea"
+msgstr ""
+
+#: reviews/templates/reviews/my_reviews.html:44
+msgid "Tip tranzacție:"
+msgstr ""
+
+#: reviews/templates/reviews/my_reviews.html:53
+#, fuzzy
+#| msgid "Caută în anunțuri"
+msgid "Caută în review-uri:"
+msgstr "Search in listings"
+
+#: reviews/templates/reviews/my_reviews.html:54
+msgid "Caută utilizatori sau conținut..."
+msgstr ""
+
+#: reviews/templates/reviews/my_reviews.html:119
+#, fuzzy
+#| msgid "Ești sigur că vrei să te deconectezi?"
+msgid "Ești sigur că vrei să ștergi acest review?"
+msgstr "Are you sure you want to log out?"
+
+#: reviews/templates/reviews/my_reviews.html:146
+#, python-format
+msgid "Răspunsul lui %(name)s"
+msgstr ""
+
+#: reviews/templates/reviews/my_reviews.html:157
+msgid "Aprobat"
+msgstr ""
+
+#: reviews/templates/reviews/my_reviews.html:161
+#, fuzzy
+#| msgid "În așteptare"
+msgid "În așteptarea aprobării"
+msgstr "Pending"
+
+#: reviews/templates/reviews/my_reviews.html:168
+#, python-format
+msgid "Actualizat la %(updated)s"
+msgstr ""
+
+#: reviews/templates/reviews/my_reviews.html:201
+#, fuzzy
+#| msgid "Nu ai încă anunțuri"
+msgid "Nu ai lăsat încă review-uri"
+msgstr "You don't have any listings yet"
+
+#: reviews/templates/reviews/my_reviews.html:202
+msgid ""
+"Începe să evaluezi experiențele tale cu ceilalți utilizatori pentru a ajuta "
+"comunitatea."
+msgstr ""
+
+#: reviews/templates/reviews/my_reviews.html:204
+#: templates/account/email_confirmed.html:42
+msgid "Explorează anunțuri"
+msgstr "Explore listings"
+
+#: reviews/templates/reviews/user_reviews.html:4
+#, python-format
+msgid "Recenzii — %(name)s"
+msgstr ""
+
+#: reviews/templates/reviews/user_reviews.html:13
+#, python-format
+msgid "Recenzii pentru %(name)s"
+msgstr ""
+
+#: reviews/templates/reviews/user_reviews.html:15
+#, python-format
+msgid "<strong>%(avg)s</strong>/5 din %(counter)s recenzie"
+msgid_plural "<strong>%(avg)s</strong>/5 din %(counter)s recenzii"
+msgstr[0] ""
+msgstr[1] ""
+
+#: reviews/templates/reviews/user_reviews.html:22
+msgid "Utilizator"
+msgstr ""
+
+#: reviews/templates/reviews/user_reviews.html:39
+msgid "Încă nu sunt recenzii pentru acest utilizator."
+msgstr ""
+
+#: reviews/templates/reviews/user_reviews.html:53
+#, fuzzy, python-format
+#| msgid "Pagina %(current)s din %(total)s"
+msgid "Pagina %(current)s / %(total)s"
+msgstr "Page %(current)s of %(total)s"
+
+#: reviews/templates/reviews/user_reviews.html:57
+#: reviews/templates/reviews/user_reviews.html:59
+msgid "Înainte"
+msgstr ""
+
 #: templates/account/email_confirm.html:4
 msgid "Confirmă Email-ul"
 msgstr "Confirm Email"
@@ -744,8 +1241,12 @@ msgstr "To activate your account, confirm your email address."
 
 #: templates/account/email_confirm.html:21
 #, python-format
-msgid "Dă click pe butonul de mai jos pentru a confirma adresa de email <strong>%(email)s</strong>"
-msgstr "Click the button below to confirm the email address <strong>%(email)s</strong>"
+msgid ""
+"Dă click pe butonul de mai jos pentru a confirma adresa de email "
+"<strong>%(email)s</strong>"
+msgstr ""
+"Click the button below to confirm the email address <strong>%(email)s</"
+"strong>"
 
 #: templates/account/email_confirm.html:30
 #: templates/account/password_reset.html:39
@@ -762,8 +1263,12 @@ msgid "Contul tău a fost confirmat cu succes! 🎉"
 msgstr "Your account has been confirmed successfully! 🎉"
 
 #: templates/account/email_confirmed.html:22
-msgid "Bine ai venit în comunitatea <strong>Micu's Market</strong>!\n                    Poți începe acum să vinzi și să cumperi produse."
-msgstr "Welcome to the <strong>Micu's Market</strong> community! You can now start selling and buying products."
+msgid ""
+"Bine ai venit în comunitatea <strong>Micu's Market</strong>!\n"
+"                    Poți începe acum să vinzi și să cumperi produse."
+msgstr ""
+"Welcome to the <strong>Micu's Market</strong> community! You can now start "
+"selling and buying products."
 
 #: templates/account/email_confirmed.html:27
 msgid "Ce poți face acum:"
@@ -788,10 +1293,6 @@ msgstr "Save favorite listings"
 #: templates/account/email_confirmed.html:33
 msgid "Comunică cu alți utilizatori"
 msgstr "Communicate with other users"
-
-#: templates/account/email_confirmed.html:42
-msgid "Explorează anunțuri"
-msgstr "Explore listings"
 
 #: templates/account/email_confirmed.html:45
 msgid "Completează profilul"
@@ -1017,8 +1518,13 @@ msgid "Email trimis cu succes!"
 msgstr "Email sent successfully!"
 
 #: templates/account/verification_sent.html:26
-msgid "Am trimis un link de confirmare la adresa ta de email.<br>\n                        Deschide email-ul și dă click pe link pentru a-ți activa contul."
-msgstr "We've sent a confirmation link to your email address.<br> Open the email and click the link to activate your account."
+msgid ""
+"Am trimis un link de confirmare la adresa ta de email.<br>\n"
+"                        Deschide email-ul și dă click pe link pentru a-ți "
+"activa contul."
+msgstr ""
+"We've sent a confirmation link to your email address.<br> Open the email and "
+"click the link to activate your account."
 
 #: templates/account/verification_sent.html:33
 msgid "Nu vezi email-ul?"
@@ -1033,8 +1539,12 @@ msgid "Înapoi la Micu's Market"
 msgstr "Back to Micu's Market"
 
 #: templates/base.html:8
-msgid "Micu's Market este marketplace-ul pentru anunțuri locale, cumpărături sigure și vânzări rapide în România."
-msgstr "Micu's Market is the marketplace for local listings, safe shopping and quick sales in Romania."
+msgid ""
+"Micu's Market este marketplace-ul pentru anunțuri locale, cumpărături sigure "
+"și vânzări rapide în România."
+msgstr ""
+"Micu's Market is the marketplace for local listings, safe shopping and quick "
+"sales in Romania."
 
 #: templates/base.html:13 templates/base.html:19
 msgid "Anunțuri locale, vânzători verificați și cumpărături rapide în România."
@@ -1042,8 +1552,13 @@ msgstr "Local listings, verified sellers and quick shopping in Romania."
 
 #: templates/base.html:74
 #, python-format
-msgid "Folosim cookie-uri esențiale pentru autentificare, securitate și preferințe. Detalii în\n            <a href=\"%(privacy_url)s\">politica de confidențialitate</a>."
-msgstr "We use essential cookies for authentication, security and preferences. Details in <a href=\"%(privacy_url)s\">the privacy policy</a>."
+msgid ""
+"Folosim cookie-uri esențiale pentru autentificare, securitate și preferințe. "
+"Detalii în\n"
+"            <a href=\"%(privacy_url)s\">politica de confidențialitate</a>."
+msgstr ""
+"We use essential cookies for authentication, security and preferences. "
+"Details in <a href=\"%(privacy_url)s\">the privacy policy</a>."
 
 #: templates/base.html:77
 msgid "Accept"
@@ -1053,8 +1568,52 @@ msgstr "Accept"
 msgid "Toate drepturile rezervate."
 msgstr "All rights reserved."
 
+#: templates/favorites/list.html:4 templates/favorites/list.html:11
+#, fuzzy
+#| msgid "Anunțurile Mele Favorite"
+msgid "Anunțurile mele favorite"
+msgstr "My Favorite Listings"
+
+#: templates/favorites/list.html:13
+#, python-format
+msgid "%(counter)s anunț în lista ta de favorite"
+msgid_plural "%(counter)s anunțuri în lista ta de favorite"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/favorites/list.html:15
+#, fuzzy
+#| msgid "Nu ai încă anunțuri"
+msgid "Nu ai încă anunțuri în lista de favorite"
+msgstr "You don't have any listings yet"
+
+#: templates/favorites/list.html:21
+#, fuzzy
+#| msgid "Caută anunțuri..."
+msgid "Caută anunțuri"
+msgstr "Search listings..."
+
+#: templates/favorites/list.html:68
+#, fuzzy, python-format
+#| msgid "Adaugă la favorite"
+msgid "Adăugat la favorite: %(added)s"
+msgstr "Add to favorites"
+
+#: templates/favorites/list.html:114
+#, fuzzy
+#| msgid "Salvezi anunțuri favorite"
+msgid "Nu ai anunțuri în lista de favorite"
+msgstr "Save favorite listings"
+
+#: templates/favorites/list.html:115
+msgid ""
+"Când vei găsi anunțuri interesante, le poți adăuga la favorite pentru a le "
+"accesa mai ușor."
+msgstr ""
+
 #: templates/partials/footer.html:7
-msgid "Marketplace-ul tău de încredere pentru cumpărături și vânzări în România."
+msgid ""
+"Marketplace-ul tău de încredere pentru cumpărături și vânzări în România."
 msgstr "Your trusted marketplace for buying and selling in Romania."
 
 #: templates/partials/footer.html:11
@@ -1140,19 +1699,27 @@ msgstr "We're still working on this section"
 
 #: templates/partials/footer.html:110 templates/partials/footer.html:128
 #: templates/partials/footer.html:146 templates/partials/footer.html:164
-msgid "Site-ul nostru nu este încă oficial lansat. Suntem în proces de dezvoltare și îmbunătățire continuă."
-msgstr "Our site is not officially launched yet. We are in the process of continuous development and improvement."
+msgid ""
+"Site-ul nostru nu este încă oficial lansat. Suntem în proces de dezvoltare "
+"și îmbunătățire continuă."
+msgstr ""
+"Our site is not officially launched yet. We are in the process of continuous "
+"development and improvement."
 
 #: templates/partials/footer.html:111
-msgid "Te rugăm să revii mai târziu pentru informații complete despre echipa și misiunea noastră."
-msgstr "Please come back later for complete information about our team and mission."
+msgid ""
+"Te rugăm să revii mai târziu pentru informații complete despre echipa și "
+"misiunea noastră."
+msgstr ""
+"Please come back later for complete information about our team and mission."
 
 #: templates/partials/footer.html:129
 msgid "Termenii și condițiile vor fi disponibili înainte de lansarea oficială."
 msgstr "The terms and conditions will be available before the official launch."
 
 #: templates/partials/footer.html:147
-msgid "Politica de confidențialitate va fi disponibilă înainte de lansarea oficială."
+msgid ""
+"Politica de confidențialitate va fi disponibilă înainte de lansarea oficială."
 msgstr "The privacy policy will be available before the official launch."
 
 #: templates/partials/footer.html:165
@@ -1160,16 +1727,16 @@ msgid "Secțiunea de ajutor va fi disponibilă înainte de lansarea oficială."
 msgstr "The help section will be available before the official launch."
 
 #: templates/partials/footer.html:166
-msgid "Pentru întrebări urgente, te rugăm să ne contactezi prin <a href=\"#\" data-modal=\"contact-modal\">pagina de contact</a>."
-msgstr "For urgent questions, please contact us through the <a href=\"#\" data-modal=\"contact-modal\">contact page</a>."
+msgid ""
+"Pentru întrebări urgente, te rugăm să ne contactezi prin <a href=\"#\" data-"
+"modal=\"contact-modal\">pagina de contact</a>."
+msgstr ""
+"For urgent questions, please contact us through the <a href=\"#\" data-"
+"modal=\"contact-modal\">contact page</a>."
 
 #: templates/partials/header.html:14
 msgid "Comută tema"
 msgstr "Toggle theme"
-
-#: templates/partials/header.html:20
-msgid "Mesaje"
-msgstr "Messages"
 
 #: templates/partials/header.html:23 templates/partials/header.html:49
 msgid "Anunțurile Mele"

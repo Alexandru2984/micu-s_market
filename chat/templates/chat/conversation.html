@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}
-    Conversație cu {{ other_participant.get_full_name|default:other_participant.username }} - Micu's Market
+    {% blocktrans with name=other_participant.get_full_name|default:other_participant.username %}Conversație cu {{ name }}{% endblocktrans %} - Micu's Market
 {% endblock %}
 
 {% block meta_robots %}noindex,nofollow{% endblock %}
@@ -19,7 +19,7 @@
      data-current-user="{{ request.user.username }}">
 
     <div class="chat-conversation__header">
-        <a href="{% url 'chat:inbox' %}" class="chat-conversation__back" title="Înapoi la mesaje" aria-label="Înapoi la mesaje">
+        <a href="{% url 'chat:inbox' %}" class="chat-conversation__back" title="{% trans 'Înapoi la mesaje' %}" aria-label="{% trans 'Înapoi la mesaje' %}">
             <i class="fas fa-arrow-left"></i>
         </a>
 
@@ -42,7 +42,7 @@
         </div>
 
         <a href="{% url 'listings:detail' listing.slug %}" class="chat-conversation__view">
-            <i class="fas fa-eye"></i> <span>Vezi anunțul</span>
+            <i class="fas fa-eye"></i> <span>{% trans "Vezi anunțul" %}</span>
         </a>
     </div>
 
@@ -50,7 +50,7 @@
         {% if not page_obj %}
             <div class="chat-conversation__empty">
                 <i class="fas fa-comments"></i>
-                <p>Începe conversația trimițând primul mesaj.</p>
+                <p>{% trans "Începe conversația trimițând primul mesaj." %}</p>
             </div>
         {% endif %}
         {% for message in page_obj reversed %}
@@ -86,7 +86,7 @@
 
         <div class="chat-typing" id="chatTyping" hidden>
             <span class="chat-typing__dots"><span></span><span></span><span></span></span>
-            scrie…
+            {% trans "scrie…" %}
         </div>
     </div>
 
@@ -94,18 +94,18 @@
           action="{% url 'chat:send_message' conversation.pk %}" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="chat-conn-status" id="chatConnStatus" hidden>
-            <i class="fas fa-rotate"></i> Reconectare…
+            <i class="fas fa-rotate"></i> {% trans "Reconectare…" %}
         </div>
         <div class="chat-composer__preview" id="chatPreview"></div>
         <div class="chat-composer__row">
-            <label class="chat-composer__attach" for="chatFile" title="Atașează un fișier">
+            <label class="chat-composer__attach" for="chatFile" title="{% trans 'Atașează un fișier' %}">
                 <i class="fas fa-paperclip"></i>
             </label>
             <input type="file" id="chatFile" name="attachments" multiple
                    accept="image/*,.pdf,.doc,.docx,.txt,.xls,.xlsx" hidden>
             <textarea class="chat-composer__input" id="chatInput" name="content"
-                      placeholder="Scrie un mesaj…" rows="1" maxlength="5000"></textarea>
-            <button type="submit" class="chat-composer__send" id="chatSend" title="Trimite" aria-label="Trimite">
+                      placeholder="{% trans 'Scrie un mesaj…' %}" rows="1" maxlength="5000"></textarea>
+            <button type="submit" class="chat-composer__send" id="chatSend" title="{% trans 'Trimite' %}" aria-label="{% trans 'Trimite' %}">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>

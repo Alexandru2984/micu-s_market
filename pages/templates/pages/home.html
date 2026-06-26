@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Acasa{% endblock %}
+{% block title %}{% trans "Acasă" %}{% endblock %}
 
 {% block content %}
-  <!-- Categorii Section -->
+  <!-- Categories Section -->
   <section class="categories-section">
-    <h2>Explorează categoriile</h2>
+    <h2>{% trans "Explorează categoriile" %}</h2>
     <div class="categories-grid">
       {% for category in categories %}
         <a href="{{ category.get_absolute_url }}" class="category-card">
@@ -18,14 +18,14 @@
           <span>{{ category.name }}</span>
         </a>
       {% empty %}
-        <p>Nu există categorii disponibile.</p>
+        <p>{% trans "Nu există categorii disponibile." %}</p>
       {% endfor %}
     </div>
   </section>
 
   <!-- Latest Listings Section -->
   <section class="listings-section">
-    <h2>Ultimele anunturi</h2>
+    <h2>{% trans "Ultimele anunțuri" %}</h2>
     <div class="grid">
       {% for item in listings %}
         <article class="card">
@@ -41,7 +41,7 @@
           {% if item.description %}<p class="muted">{{ item.description|truncatechars:80 }}</p>{% endif %}
         </article>
       {% empty %}
-        <p>Nu exista anunturi inca.</p>
+        <p>{% trans "Nu există anunțuri încă." %}</p>
       {% endfor %}
     </div>
   </section>

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}
     {% if review %}
-        Editează review pentru {{ reviewed_user.get_full_name|default:reviewed_user.username }} - Micu's Market
+        {% blocktrans with name=reviewed_user.get_full_name|default:reviewed_user.username %}Editează review pentru {{ name }}{% endblocktrans %} - Micu's Market
     {% else %}
-        Lasă un review pentru {{ reviewed_user.get_full_name|default:reviewed_user.username }} - Micu's Market
+        {% blocktrans with name=reviewed_user.get_full_name|default:reviewed_user.username %}Lasă un review pentru {{ name }}{% endblocktrans %} - Micu's Market
     {% endif %}
 {% endblock %}
 
@@ -28,17 +28,17 @@
                     <div class="user-details">
                         <h1>
                             {% if review %}
-                                Editează review pentru {{ reviewed_user.get_full_name|default:reviewed_user.username }}
+                                {% blocktrans with name=reviewed_user.get_full_name|default:reviewed_user.username %}Editează review pentru {{ name }}{% endblocktrans %}
                             {% else %}
-                                Lasă un review pentru {{ reviewed_user.get_full_name|default:reviewed_user.username }}
+                                {% blocktrans with name=reviewed_user.get_full_name|default:reviewed_user.username %}Lasă un review pentru {{ name }}{% endblocktrans %}
                             {% endif %}
                         </h1>
-                        <p class="subtitle">Împărtășește experiența ta cu comunitatea</p>
+                        <p class="subtitle">{% trans "Împărtășește experiența ta cu comunitatea" %}</p>
                     </div>
                 </div>
-                
+
                 <a href="{% url 'reviews:user_reviews' reviewed_user.username %}" class="btn btn-outline">
-                    <i class="fas fa-arrow-left"></i> Înapoi la review-uri
+                    <i class="fas fa-arrow-left"></i> {% trans "Înapoi la review-uri" %}
                 </a>
             </div>
             
@@ -57,9 +57,9 @@
                 {% endif %}
                 
                 <div class="form-section">
-                    <h3>Rating general</h3>
+                    <h3>{% trans "Rating general" %}</h3>
                     <div class="form-group">
-                        <label for="{{ form.rating.id_for_label }}" class="required">Nota acordată</label>
+                        <label for="{{ form.rating.id_for_label }}" class="required">{% trans "Nota acordată" %}</label>
                         <div class="rating-input">
                             {{ form.rating }}
                             {% if form.rating.errors %}
@@ -77,21 +77,21 @@
                                 <span data-value="5"><i class="far fa-star"></i></span>
                             </div>
                             <div class="rating-labels">
-                                <span data-rating="1">Foarte rău</span>
-                                <span data-rating="2">Rău</span>
-                                <span data-rating="3">Ok</span>
-                                <span data-rating="4">Bun</span>
-                                <span data-rating="5">Excelent</span>
+                                <span data-rating="1">{% trans "Foarte rău" %}</span>
+                                <span data-rating="2">{% trans "Rău" %}</span>
+                                <span data-rating="3">{% trans "Ok" %}</span>
+                                <span data-rating="4">{% trans "Bun" %}</span>
+                                <span data-rating="5">{% trans "Excelent" %}</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="form-section">
-                    <h3>Detalii review</h3>
-                    
+                    <h3>{% trans "Detalii review" %}</h3>
+
                     <div class="form-group">
-                        <label for="{{ form.title.id_for_label }}">Titlu (opțional)</label>
+                        <label for="{{ form.title.id_for_label }}">{% trans "Titlu (opțional)" %}</label>
                         {{ form.title }}
                         {% if form.title.errors %}
                             <div class="field-errors">
@@ -101,12 +101,12 @@
                             </div>
                         {% endif %}
                         <div class="field-help">
-                            Oferă un titlu scurt pentru review-ul tău
+                            {% trans "Oferă un titlu scurt pentru review-ul tău" %}
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
-                        <label for="{{ form.comment.id_for_label }}" class="required">Comentariul tău</label>
+                        <label for="{{ form.comment.id_for_label }}" class="required">{% trans "Comentariul tău" %}</label>
                         {{ form.comment }}
                         {% if form.comment.errors %}
                             <div class="field-errors">
@@ -116,17 +116,17 @@
                             </div>
                         {% endif %}
                         <div class="field-help">
-                            Descrie experiența ta cu acest utilizator. Fii constructiv și respectuos.
+                            {% trans "Descrie experiența ta cu acest utilizator. Fii constructiv și respectuos." %}
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="form-section">
-                    <h3>Context tranzacție</h3>
-                    
+                    <h3>{% trans "Context tranzacție" %}</h3>
+
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="{{ form.transaction_type.id_for_label }}" class="required">Tip tranzacție</label>
+                            <label for="{{ form.transaction_type.id_for_label }}" class="required">{% trans "Tip tranzacție" %}</label>
                             {{ form.transaction_type }}
                             {% if form.transaction_type.errors %}
                                 <div class="field-errors">
@@ -138,7 +138,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="{{ form.listing.id_for_label }}">Anunț asociat (opțional)</label>
+                            <label for="{{ form.listing.id_for_label }}">{% trans "Anunț asociat (opțional)" %}</label>
                             {{ form.listing }}
                             {% if form.listing.errors %}
                                 <div class="field-errors">
@@ -148,7 +148,7 @@
                                 </div>
                             {% endif %}
                             <div class="field-help">
-                                Selectează anunțul pentru care lași acest review
+                                {% trans "Selectează anunțul pentru care lași acest review" %}
                             </div>
                         </div>
                     </div>
@@ -158,28 +158,28 @@
                     <button type="submit" class="btn btn-primary btn-lg">
                         <i class="fas fa-star"></i>
                         {% if review %}
-                            Actualizează review-ul
+                            {% trans "Actualizează review-ul" %}
                         {% else %}
-                            Publică review-ul
+                            {% trans "Publică review-ul" %}
                         {% endif %}
                     </button>
-                    
+
                     <a href="{% url 'reviews:user_reviews' reviewed_user.username %}" class="btn btn-secondary btn-lg">
-                        <i class="fas fa-times"></i> Anulează
+                        <i class="fas fa-times"></i> {% trans "Anulează" %}
                     </a>
                 </div>
             </form>
         </div>
-        
+
         <!-- Guidelines -->
         <div class="guidelines-card">
-            <h3><i class="fas fa-info-circle"></i> Guidelines pentru review-uri</h3>
+            <h3><i class="fas fa-info-circle"></i> {% trans "Guidelines pentru review-uri" %}</h3>
             <ul>
-                <li>Fii sincer și constructiv în feedback-ul tău</li>
-                <li>Concentrează-te pe experiența ta cu utilizatorul</li>
-                <li>Evită limbajul ofensator sau discriminatoriu</li>
-                <li>Menționează aspecte concrete despre comunicare, livrare, calitate</li>
-                <li>Review-urile pot fi editate sau șterse oricând</li>
+                <li>{% trans "Fii sincer și constructiv în feedback-ul tău" %}</li>
+                <li>{% trans "Concentrează-te pe experiența ta cu utilizatorul" %}</li>
+                <li>{% trans "Evită limbajul ofensator sau discriminatoriu" %}</li>
+                <li>{% trans "Menționează aspecte concrete despre comunicare, livrare, calitate" %}</li>
+                <li>{% trans "Review-urile pot fi editate sau șterse oricând" %}</li>
             </ul>
         </div>
     </div>

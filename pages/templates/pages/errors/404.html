@@ -1,15 +1,16 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Pagina nu există - Micu's Market{% endblock %}
-{% block meta_description %}Pagina căutată nu există sau a fost mutată.{% endblock %}
+{% block title %}{% trans "Pagina nu există" %} - Micu's Market{% endblock %}
+{% block meta_description %}{% trans "Pagina căutată nu există sau a fost mutată." %}{% endblock %}
 {% block meta_robots %}noindex,nofollow{% endblock %}
 
 {% block content %}
 <div class="container">
     <section class="empty-state">
-        <h1>Pagina nu există</h1>
-        <p>Linkul poate fi greșit sau pagina a fost mutată.</p>
-        <a href="{% url 'listings:list' %}" class="btn btn-primary">Vezi anunțuri</a>
+        <h1>{% trans "Pagina nu există" %}</h1>
+        <p>{% trans "Linkul poate fi greșit sau pagina a fost mutată." %}</p>
+        <a href="{% url 'listings:list' %}" class="btn btn-primary">{% trans "Vezi anunțuri" %}</a>
     </section>
 </div>
 {% endblock %}

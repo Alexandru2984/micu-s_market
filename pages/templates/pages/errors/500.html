@@ -1,15 +1,16 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Eroare server - Micu's Market{% endblock %}
-{% block meta_description %}A apărut o eroare internă.{% endblock %}
+{% block title %}{% trans "Eroare server" %} - Micu's Market{% endblock %}
+{% block meta_description %}{% trans "A apărut o eroare internă." %}{% endblock %}
 {% block meta_robots %}noindex,nofollow{% endblock %}
 
 {% block content %}
 <div class="container">
     <section class="empty-state">
-        <h1>Eroare server</h1>
-        <p>A apărut o problemă internă. Echipa poate investiga incidentul din jurnalele aplicației.</p>
-        <a href="{% url 'listings:home' %}" class="btn btn-primary">Înapoi acasă</a>
+        <h1>{% trans "Eroare server" %}</h1>
+        <p>{% trans "A apărut o problemă internă. Echipa poate investiga incidentul din jurnalele aplicației." %}</p>
+        <a href="{% url 'listings:home' %}" class="btn btn-primary">{% trans "Înapoi acasă" %}</a>
     </section>
 </div>
 {% endblock %}
