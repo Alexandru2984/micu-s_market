@@ -71,3 +71,42 @@ class PromotionOrder(models.Model):
         self.applied_at = now
         self.save(update_fields=["status", "applied_at"])
         return True
+
+
+class PaymentWebhookEvent(models.Model):
+    STATUS_CHOICES = [
+        ("received", "Primit"),
+        ("processed", "Procesat"),
+        ("ignored", "Ignorat"),
+        ("failed", "Eșuat"),
+    ]
+
+    provider = models.CharField(max_length=50, default="generic", verbose_name="Provider")
+    event_id = models.CharField(max_length=120, verbose_name="ID eveniment")
+    order = models.ForeignKey(
+        PromotionOrder,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="webhook_events",
+        verbose_name="Comandă",
+    )
+    payload = models.JSONField(default=dict, blank=True, verbose_name="Payload")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="received", verbose_name="Status")
+    processed_at = models.DateTimeField(null=True, blank=True, verbose_name="Procesat la")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creat la")
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Eveniment webhook plată"
+        verbose_name_plural = "Evenimente webhook plăți"
+        constraints = [
+            models.UniqueConstraint(fields=["provider", "event_id"], name="billing_payment_event_once"),
+        ]
+        indexes = [
+            models.Index(fields=["provider", "event_id"]),
+            models.Index(fields=["status", "-created_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.provider}:{self.event_id}"

@@ -1,11 +1,16 @@
+import hashlib
+import hmac
+import json
+import time
+
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from categories.models import Category
 from listings.models import Listing
 
-from .models import PromotionOrder, PromotionPlan
+from .models import PaymentWebhookEvent, PromotionOrder, PromotionPlan
 
 User = get_user_model()
 
@@ -101,3 +106,109 @@ class PromotionOrderTestCase(TestCase):
         self.assertTrue(self.listing.is_promoted)
         self.assertEqual(order.status, "applied")
         self.assertIsNotNone(order.paid_at)
+
+    def _signed_webhook_headers(self, body, secret="test-webhook-secret", timestamp=None):
+        timestamp = str(timestamp or int(time.time()))
+        signature = hmac.new(
+            secret.encode("utf-8"),
+            timestamp.encode("utf-8") + b"." + body,
+            hashlib.sha256,
+        ).hexdigest()
+        return {
+            "HTTP_X_MICU_TIMESTAMP": timestamp,
+            "HTTP_X_MICU_SIGNATURE": f"sha256={signature}",
+        }
+
+    @override_settings(BILLING_WEBHOOK_SECRET="test-webhook-secret")
+    def test_promotion_webhook_rejects_invalid_signature(self):
+        order = PromotionOrder.objects.create(
+            listing=self.listing,
+            user=self.owner,
+            plan=self.plan,
+            amount=self.plan.price,
+            currency=self.plan.currency,
+        )
+        body = json.dumps({"event_id": "evt_bad", "order_id": order.pk, "status": "paid"}).encode("utf-8")
+
+        response = self.client.post(
+            reverse("billing:promotion_webhook"),
+            data=body,
+            content_type="application/json",
+            HTTP_X_MICU_TIMESTAMP=str(int(time.time())),
+            HTTP_X_MICU_SIGNATURE="sha256=wrong",
+        )
+
+        self.assertEqual(response.status_code, 403)
+        order.refresh_from_db()
+        self.listing.refresh_from_db()
+        self.assertEqual(order.status, "pending")
+        self.assertFalse(self.listing.is_promoted)
+
+    @override_settings(BILLING_WEBHOOK_SECRET="test-webhook-secret")
+    def test_signed_paid_webhook_applies_promotion(self):
+        order = PromotionOrder.objects.create(
+            listing=self.listing,
+            user=self.owner,
+            plan=self.plan,
+            amount=self.plan.price,
+            currency=self.plan.currency,
+        )
+        body = json.dumps(
+            {
+                "provider": "manual-test",
+                "event_id": "evt_paid",
+                "order_id": order.pk,
+                "status": "paid",
+                "external_reference": "pay_123",
+            }
+        ).encode("utf-8")
+
+        response = self.client.post(
+            reverse("billing:promotion_webhook"),
+            data=body,
+            content_type="application/json",
+            **self._signed_webhook_headers(body),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        order.refresh_from_db()
+        self.listing.refresh_from_db()
+        self.assertEqual(order.status, "applied")
+        self.assertEqual(order.external_reference, "pay_123")
+        self.assertTrue(self.listing.is_promoted)
+        self.assertEqual(PaymentWebhookEvent.objects.filter(event_id="evt_paid").count(), 1)
+
+    @override_settings(BILLING_WEBHOOK_SECRET="test-webhook-secret")
+    def test_duplicate_webhook_event_is_idempotent(self):
+        order = PromotionOrder.objects.create(
+            listing=self.listing,
+            user=self.owner,
+            plan=self.plan,
+            amount=self.plan.price,
+            currency=self.plan.currency,
+        )
+        body = json.dumps({"event_id": "evt_once", "order_id": order.pk, "status": "paid"}).encode("utf-8")
+        headers = self._signed_webhook_headers(body)
+
+        first = self.client.post(
+            reverse("billing:promotion_webhook"),
+            data=body,
+            content_type="application/json",
+            **headers,
+        )
+        self.listing.refresh_from_db()
+        first_until = self.listing.featured_until
+
+        second = self.client.post(
+            reverse("billing:promotion_webhook"),
+            data=body,
+            content_type="application/json",
+            **headers,
+        )
+        self.listing.refresh_from_db()
+
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(second.status_code, 200)
+        self.assertTrue(second.json()["duplicate"])
+        self.assertEqual(self.listing.featured_until, first_until)
+        self.assertEqual(PaymentWebhookEvent.objects.filter(event_id="evt_once").count(), 1)

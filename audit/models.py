@@ -12,6 +12,8 @@ class AuditEvent(models.Model):
         ("listing.moderation_requested", "Anunț trimis la moderare"),
         ("listing.promotion_started", "Promovare anunț pornită"),
         ("listing.promotion_stopped", "Promovare anunț oprită"),
+        ("billing.webhook_paid", "Webhook plată confirmată"),
+        ("billing.webhook_cancelled", "Webhook plată anulată"),
         ("profile.verification_requested", "Cerere verificare profil"),
         ("profile.verification_approved", "Verificare profil aprobată"),
         ("profile.verification_rejected", "Verificare profil respinsă"),

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import PromotionOrder, PromotionPlan
+from .models import PaymentWebhookEvent, PromotionOrder, PromotionPlan
 
 
 @admin.register(PromotionPlan)
@@ -23,3 +23,11 @@ class PromotionOrderAdmin(admin.ModelAdmin):
         for order in queryset:
             order.mark_paid()
             order.apply_promotion()
+
+
+@admin.register(PaymentWebhookEvent)
+class PaymentWebhookEventAdmin(admin.ModelAdmin):
+    list_display = ("provider", "event_id", "order", "status", "processed_at", "created_at")
+    list_filter = ("provider", "status", "created_at")
+    search_fields = ("event_id", "order__listing__title", "order__user__username")
+    readonly_fields = ("provider", "event_id", "order", "payload", "status", "processed_at", "created_at")
