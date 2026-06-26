@@ -5,6 +5,9 @@ from PIL import Image as PilImage
 
 MAX_ATTACHMENT_SIZE = 10 * 1024 * 1024
 MAX_ATTACHMENTS_PER_MESSAGE = 5
+MAX_OFFICE_ARCHIVE_FILES = 1000
+MAX_OFFICE_UNCOMPRESSED_SIZE = 50 * 1024 * 1024
+MAX_OFFICE_MEMBER_SIZE = 20 * 1024 * 1024
 
 IMAGE_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"}
 DOCUMENT_EXTENSIONS = {"pdf", "doc", "docx", "txt", "xls", "xlsx"}
@@ -108,7 +111,17 @@ def _is_valid_office_zip(uploaded_file, ext):
     try:
         uploaded_file.seek(0)
         with zipfile.ZipFile(uploaded_file) as archive:
-            names = set(archive.namelist())
+            infos = archive.infolist()
+            if len(infos) > MAX_OFFICE_ARCHIVE_FILES:
+                return False
+            if sum(info.file_size for info in infos) > MAX_OFFICE_UNCOMPRESSED_SIZE:
+                return False
+            if any(info.file_size > MAX_OFFICE_MEMBER_SIZE for info in infos):
+                return False
+
+            names = {info.filename for info in infos}
+            if any(_is_unsafe_zip_name(name) for name in names):
+                return False
             if "[Content_Types].xml" not in names:
                 return False
             prefix = "word/" if ext == "docx" else "xl/"
@@ -117,3 +130,7 @@ def _is_valid_office_zip(uploaded_file, ext):
         return False
     finally:
         uploaded_file.seek(0)
+
+
+def _is_unsafe_zip_name(name):
+    return name.startswith(("/", "\\")) or ".." in name.replace("\\", "/").split("/")

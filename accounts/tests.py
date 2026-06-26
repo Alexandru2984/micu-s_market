@@ -1,13 +1,25 @@
 """
 Tests for the authentication and profiles system
 """
-from django.test import TestCase, Client
+from io import BytesIO
+
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from PIL import Image as PilImage
 from .forms import CustomUserCreationForm, UserProfileForm
 from .models import UserReport
 
 User = get_user_model()
+
+
+def create_test_avatar(filename='avatar.jpg', size=(900, 900), color=(0, 128, 255)):
+    buffer = BytesIO()
+    image = PilImage.new('RGB', size, color)
+    image.save(buffer, format='JPEG')
+    buffer.seek(0)
+    return SimpleUploadedFile(filename, buffer.read(), content_type='image/jpeg')
 
 
 class AuthViewsTestCase(TestCase):
@@ -220,3 +232,15 @@ class UserProfileModelTestCase(TestCase):
         self.assertFalse(profile.is_verified)
         self.assertEqual(profile.verification_status, 'rejected')
         self.assertEqual(profile.verification_note, 'Date insuficiente.')
+
+    @override_settings(STORAGES={"default": {"BACKEND": "django.core.files.storage.InMemoryStorage"}})
+    def test_avatar_resize_does_not_require_local_path(self):
+        """Avatar optimization works with storages that do not expose .path."""
+        profile = self.user.profile
+        profile.avatar = create_test_avatar()
+        profile.save()
+
+        with profile.avatar.open('rb') as stored:
+            optimized = PilImage.open(stored)
+            self.assertLessEqual(optimized.width, 300)
+            self.assertLessEqual(optimized.height, 300)

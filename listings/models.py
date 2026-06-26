@@ -3,8 +3,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
-from PIL import Image
-import os
+from Micu_market.images import optimize_image_field
 
 User = get_user_model()
 
@@ -123,15 +122,12 @@ class ListingImage(models.Model):
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        
-        # Resize the image for optimization
+
         if self.image:
-            img_path = self.image.path
-            with Image.open(img_path) as img:
-                # Keep the aspect ratio, but no larger than 800x800
-                if img.height > 800 or img.width > 800:
-                    img.thumbnail((800, 800), Image.Resampling.LANCZOS)
-                    img.save(img_path, optimize=True, quality=85)
+            optimized_name = optimize_image_field(self.image, (800, 800), quality=85)
+            if optimized_name and optimized_name != self.image.name:
+                self.image.name = optimized_name
+                type(self).objects.filter(pk=self.pk).update(image=optimized_name)
 
 
 class ListingReport(models.Model):

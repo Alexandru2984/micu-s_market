@@ -2,8 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
-from PIL import Image
-import os
+from Micu_market.images import optimize_image_field
 
 User = get_user_model()
 
@@ -51,13 +50,11 @@ class UserProfile(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        # Resize the avatar
         if self.avatar:
-            img_path = self.avatar.path
-            with Image.open(img_path) as img:
-                if img.height > 300 or img.width > 300:
-                    img.thumbnail((300, 300), Image.Resampling.LANCZOS)
-                    img.save(img_path, optimize=True, quality=90)
+            optimized_name = optimize_image_field(self.avatar, (300, 300), quality=90)
+            if optimized_name and optimized_name != self.avatar.name:
+                self.avatar.name = optimized_name
+                type(self).objects.filter(pk=self.pk).update(avatar=optimized_name)
     
     def get_absolute_url(self):
         return reverse('accounts:profile', kwargs={'username': self.user.username})

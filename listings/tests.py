@@ -15,7 +15,7 @@ import tempfile
 from datetime import timedelta
 from PIL import Image as PilImage
 
-from .models import Listing, ListingReport
+from .models import Listing, ListingImage, ListingReport
 from categories.models import Category
 from notifications.models import Notification
 
@@ -393,6 +393,30 @@ class ListingImageValidationTestCase(TestCase):
         fake_file = SimpleUploadedFile('malware.exe', b'MZ...fake', content_type='application/octet-stream')
         form = ListingImageForm(files={'image': fake_file})
         self.assertFalse(form.is_valid())
+
+    @override_settings(STORAGES={"default": {"BACKEND": "django.core.files.storage.InMemoryStorage"}})
+    def test_listing_image_resize_does_not_require_local_path(self):
+        """Image optimization works with storages that do not expose .path."""
+        category = Category.objects.create(name='Storage Cat', slug='storage-cat', is_active=True)
+        listing = Listing.objects.create(
+            title='Storage listing',
+            description='Test',
+            price=100,
+            owner=self.user,
+            category=category,
+            city='Cluj',
+            status='active',
+        )
+
+        listing_image = ListingImage.objects.create(
+            listing=listing,
+            image=create_test_image(filename='large.jpg', size=(1200, 900)),
+        )
+
+        with listing_image.image.open('rb') as stored:
+            optimized = PilImage.open(stored)
+            self.assertLessEqual(optimized.width, 800)
+            self.assertLessEqual(optimized.height, 800)
 
 
 class MediaCleanupCommandTestCase(TestCase):

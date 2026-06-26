@@ -3,6 +3,8 @@ Teste pentru sistemul de chat — conversații și mesaje
 """
 import json
 import tempfile
+import zipfile
+from io import BytesIO
 
 from asgiref.sync import async_to_sync
 from asgiref.testing import ApplicationCommunicator
@@ -14,6 +16,7 @@ from django.contrib.auth import get_user_model
 
 from .consumers import ChatConsumer
 from .models import Conversation, Message, MessageAttachment
+from .validators import is_allowed_chat_attachment
 from listings.models import Listing
 from categories.models import Category
 from notifications.models import Notification
@@ -267,6 +270,24 @@ class ChatConversationTestCase(TestCase):
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(MessageAttachment.objects.count(), 0)
                 self.assertEqual(response.json()['message']['attachments'], [])
+
+    def test_office_attachment_with_too_many_zip_members_is_rejected(self):
+        """Office archives with excessive member counts are rejected."""
+        buffer = BytesIO()
+        with zipfile.ZipFile(buffer, "w") as archive:
+            archive.writestr("[Content_Types].xml", "<Types></Types>")
+            archive.writestr("word/document.xml", "<document></document>")
+            for index in range(1001):
+                archive.writestr(f"word/extra-{index}.xml", "")
+        buffer.seek(0)
+
+        uploaded = SimpleUploadedFile(
+            "many-files.docx",
+            buffer.read(),
+            content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        )
+
+        self.assertFalse(is_allowed_chat_attachment(uploaded))
 
     def test_attachment_download_allowed_for_participant(self):
         """Conversation participants can download the attachments."""
