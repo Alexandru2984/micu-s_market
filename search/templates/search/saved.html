@@ -1,11 +1,83 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>search/saved</title>
-</head>
-<body>
-    <h1>search/saved</h1>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Căutări salvate - Micu's Market{% endblock %}
+
+{% block content %}
+<section class="container" style="padding: 2rem 0;">
+    <h1>Căutări salvate</h1>
+
+    <form method="post" style="display: grid; gap: 1rem; max-width: 720px; margin: 1.5rem 0;">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div>
+            <label for="{{ form.name.id_for_label }}">Nume</label>
+            {{ form.name }}
+            {{ form.name.errors }}
+        </div>
+        <div>
+            <label for="{{ form.search_query.id_for_label }}">Termen</label>
+            {{ form.search_query }}
+            {{ form.search_query.errors }}
+        </div>
+        <div style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+            <div>
+                <label for="{{ form.category.id_for_label }}">Categorie</label>
+                {{ form.category }}
+            </div>
+            <div>
+                <label for="{{ form.city.id_for_label }}">Oraș</label>
+                {{ form.city }}
+            </div>
+            <div>
+                <label for="{{ form.county.id_for_label }}">Județ</label>
+                {{ form.county }}
+            </div>
+        </div>
+        <div style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+            <div>
+                <label for="{{ form.min_price.id_for_label }}">Preț minim</label>
+                {{ form.min_price }}
+            </div>
+            <div>
+                <label for="{{ form.max_price.id_for_label }}">Preț maxim</label>
+                {{ form.max_price }}
+            </div>
+        </div>
+        <label style="display: flex; gap: .5rem; align-items: center;">
+            {{ form.email_notifications }}
+            <span>Primește notificări email</span>
+        </label>
+        <button type="submit" class="btn btn-primary">Salvează căutarea</button>
+    </form>
+
+    <div style="display: grid; gap: 1rem;">
+        {% for item in saved_searches %}
+            <article style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem;">
+                <h2 style="font-size: 1.1rem; margin: 0 0 .5rem;">{{ item.name }}</h2>
+                <p style="margin: 0 0 .75rem; color: #64748b;">
+                    {% if item.search_query %}{{ item.search_query }}{% endif %}
+                    {% if item.category %} · {{ item.category.name }}{% endif %}
+                    {% if item.city %} · {{ item.city }}{% endif %}
+                    {% if item.min_price %} · de la {{ item.min_price }}{% endif %}
+                    {% if item.max_price %} · până la {{ item.max_price }}{% endif %}
+                </p>
+                <div style="display: flex; flex-wrap: wrap; gap: .5rem;">
+                    <a class="btn btn-primary" href="{% url 'search:run_saved_search' item.pk %}">Rulează</a>
+                    <form method="post" action="{% url 'search:toggle_saved_search' item.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary">
+                            {% if item.is_active %}Dezactivează{% else %}Activează{% endif %}
+                        </button>
+                    </form>
+                    <form method="post" action="{% url 'search:delete_saved_search' item.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Șterge</button>
+                    </form>
+                </div>
+            </article>
+        {% empty %}
+            <p>Nu ai căutări salvate încă.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
