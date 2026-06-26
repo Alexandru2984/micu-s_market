@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from .models import Review
 from listings.models import Listing
 from categories.models import Category
+from chat.models import Conversation
 
 User = get_user_model()
 
@@ -56,6 +57,11 @@ class ReviewSecurityTestCase(TestCase):
             status='active',
         )
 
+    def _create_conversation(self, listing=None):
+        conversation = Conversation.objects.create(listing=listing or self.listing)
+        conversation.participants.add(self.reviewer, self.reviewed)
+        return conversation
+
     def test_cannot_review_yourself(self):
         """A user cannot leave a review for themselves"""
         self.client.login(username='reviewer', password='ReviewPass123!')
@@ -98,6 +104,46 @@ class ReviewSecurityTestCase(TestCase):
         self.assertEqual(
             Review.objects.filter(reviewer=self.reviewer, reviewed_user=self.reviewed).count(),
             1
+        )
+
+    def test_review_requires_prior_conversation(self):
+        """A user cannot review another user without a relevant marketplace interaction."""
+        self.client.login(username='reviewer', password='ReviewPass123!')
+        response = self.client.post(
+            reverse('reviews:create_review', kwargs={'username': self.reviewed.username}),
+            {
+                'title': 'Fără conversație',
+                'comment': 'Nu ar trebui acceptat.',
+                'transaction_type': 'purchase',
+                'rating': 5,
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Review.objects.filter(reviewer=self.reviewer, reviewed_user=self.reviewed).exists())
+
+    def test_review_allowed_after_relevant_conversation(self):
+        """A conversation between reviewer and reviewed user unlocks a review."""
+        self._create_conversation()
+        self.client.login(username='reviewer', password='ReviewPass123!')
+        response = self.client.post(
+            reverse('reviews:create_review', kwargs={'username': self.reviewed.username}) +
+            f'?listing={self.listing.slug}',
+            {
+                'title': 'Conversație validă',
+                'comment': 'Tranzacție ok.',
+                'transaction_type': 'purchase',
+                'rating': 5,
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            Review.objects.filter(
+                reviewer=self.reviewer,
+                reviewed_user=self.reviewed,
+                listing=self.listing,
+            ).exists()
         )
 
     def test_review_listing_must_belong_to_reviewed_user(self):

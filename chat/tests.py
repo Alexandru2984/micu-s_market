@@ -1,6 +1,7 @@
 """
 Teste pentru sistemul de chat — conversații și mesaje
 """
+import asyncio
 import json
 import tempfile
 import zipfile
@@ -9,6 +10,7 @@ from io import BytesIO
 from asgiref.sync import async_to_sync
 from asgiref.testing import ApplicationCommunicator
 from django.contrib.auth.models import AnonymousUser
+from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, TransactionTestCase, Client, override_settings
 from django.urls import reverse
@@ -344,6 +346,7 @@ class ChatConsumerTestCase(TransactionTestCase):
     """Tests for the WebSocket consumer (real-time chat)."""
 
     def setUp(self):
+        cache.clear()
         self.buyer = User.objects.create_user(username='ws_buyer', email='wsb@example.com', password='WsBuyer123!')
         self.seller = User.objects.create_user(username='ws_seller', email='wss@example.com', password='WsSeller123!')
         self.outsider = User.objects.create_user(username='ws_out', email='wso@example.com', password='WsOut123!')
@@ -416,3 +419,41 @@ class ChatConsumerTestCase(TransactionTestCase):
         # Persisted in the DB + notification for the recipient.
         self.assertTrue(Message.objects.filter(conversation=self.conv, content="salut prin websocket").exists())
         self.assertTrue(Notification.objects.filter(recipient=self.seller, notification_type="new_message").exists())
+
+    @override_settings(CHAT_WS_MESSAGE_RATE_PER_MINUTE=1)
+    def test_websocket_message_rate_limit_is_enforced_across_connection(self):
+        async def run():
+            comm = self._communicator(self.buyer)
+            self.assertTrue(await self._connect(comm))
+            await comm.send_input(
+                {"type": "websocket.receive", "text": json.dumps({"type": "message", "content": "primul mesaj"})}
+            )
+
+            first_received = None
+            for _ in range(5):
+                out = await comm.receive_output(timeout=5)
+                payload = json.loads(out.get("text", "{}")) if out.get("type") == "websocket.send" else {}
+                if payload.get("type") == "message":
+                    first_received = payload
+                    break
+            self.assertIsNotNone(first_received)
+
+            await asyncio.sleep(0.35)
+            await comm.send_input(
+                {"type": "websocket.receive", "text": json.dumps({"type": "message", "content": "al doilea mesaj"})}
+            )
+
+            limited = None
+            for _ in range(5):
+                out = await comm.receive_output(timeout=5)
+                payload = json.loads(out.get("text", "{}")) if out.get("type") == "websocket.send" else {}
+                if payload.get("type") == "error":
+                    limited = payload
+                    break
+            await self._close(comm)
+            return limited
+
+        limited = async_to_sync(run)()
+        self.assertEqual(limited, {"type": "error", "code": "rate_limited"})
+        self.assertTrue(Message.objects.filter(conversation=self.conv, content="primul mesaj").exists())
+        self.assertFalse(Message.objects.filter(conversation=self.conv, content="al doilea mesaj").exists())

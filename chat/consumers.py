@@ -8,6 +8,7 @@ import time
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.conf import settings
+from django.core.cache import cache
 
 from .broadcast import conversation_group, serialize_message
 
@@ -67,6 +68,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if now - self._last_message_ts < MIN_MESSAGE_INTERVAL:
             return
         self._last_message_ts = now
+        if await self._is_rate_limited():
+            await self.send(text_data=json.dumps({"type": "error", "code": "rate_limited"}))
+            return
 
         message = await self._save_message(content)
         payload = await self._serialize(message)
@@ -123,3 +127,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def _mark_read(self):
         from .models import Conversation
         Conversation.objects.get(pk=self.conversation_id).mark_as_read(self.user)
+
+    @database_sync_to_async
+    def _is_rate_limited(self):
+        limit = getattr(settings, "CHAT_WS_MESSAGE_RATE_PER_MINUTE", 60)
+        if limit <= 0:
+            return False
+
+        bucket = int(time.time() // 60)
+        key = f"chat:ws:send:{self.user.id}:{self.conversation_id}:{bucket}"
+        if cache.add(key, 1, timeout=70):
+            return False
+        try:
+            count = cache.incr(key)
+        except ValueError:
+            cache.set(key, 1, timeout=70)
+            return False
+        return count > limit

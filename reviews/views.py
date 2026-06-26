@@ -13,8 +13,19 @@ from django_ratelimit.decorators import ratelimit
 from .models import Review, ReviewResponse
 from listings.models import Listing
 from .forms import ReviewForm, ReviewResponseForm
+from chat.models import Conversation
 
 User = get_user_model()
+
+
+def _can_review_transaction(reviewer, reviewed_user, listing=None):
+    conversations = Conversation.objects.filter(
+        participants=reviewer,
+        is_active=True,
+    ).filter(participants=reviewed_user)
+    if listing is not None:
+        conversations = conversations.filter(listing=listing)
+    return conversations.exists()
 
 def user_reviews_view(request, username):
     """Display all reviews for a user"""
@@ -73,7 +84,7 @@ def create_review_view(request, username, listing_slug=None):
     if reviewed_user == request.user:
         messages.error(request, "Nu poți lăsa un review pentru tine însuți.")
         return redirect('accounts:public_profile', username=username)
-    
+
     # Check whether a review already exists for this combination
     existing_review = Review.objects.filter(
         reviewer=request.user,
@@ -84,6 +95,13 @@ def create_review_view(request, username, listing_slug=None):
     if existing_review:
         messages.warning(request, "Ai lăsat deja un review pentru acest utilizator/anunț.")
         return redirect('reviews:user_reviews', username=username)
+
+    if not _can_review_transaction(request.user, reviewed_user, listing):
+        messages.error(
+            request,
+            "Poți lăsa review doar după o conversație relevantă cu acest utilizator.",
+        )
+        return redirect('accounts:public_profile', username=username)
     
     if request.method == 'POST':
         form = ReviewForm(request.POST)
