@@ -10,16 +10,7 @@
     <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
     <link rel="shortcut icon" href="{% static 'images/favicon.svg' %}">
 
-    <!-- Apply the saved theme before paint (anti-FOUC) -->
-    <script>
-        (function () {
-            try {
-                var t = localStorage.getItem('mm-theme');
-                if (!t) { t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
-                document.documentElement.setAttribute('data-theme', t);
-            } catch (e) {}
-        })();
-    </script>
+    <script src="{% static 'js/theme-boot.js' %}"></script>
 
     <link rel="stylesheet" href="{% static 'vendor/fontawesome/css/all.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/tokens.css' %}">

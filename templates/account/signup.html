@@ -39,7 +39,7 @@
                 </label>
                 <div style="position: relative;">
                     <input type="password" name="password1" id="id_password1" class="form-control" placeholder="{% trans 'Minimum 8 caractere' %}" required>
-                    <button type="button" onclick="togglePasswordVisibility('id_password1')" 
+                    <button type="button" data-password-toggle-target="id_password1"
                             style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #718096; cursor: pointer;">
                         <i class="fas fa-eye password-toggle-icon"></i>
                     </button>
@@ -52,7 +52,7 @@
                 </label>
                 <div style="position: relative;">
                     <input type="password" name="password2" id="id_password2" class="form-control" placeholder="{% trans 'Repetă parola' %}" required>
-                    <button type="button" onclick="togglePasswordVisibility('id_password2')" 
+                    <button type="button" data-password-toggle-target="id_password2"
                             style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #718096; cursor: pointer;">
                         <i class="fas fa-eye password-toggle-icon"></i>
                     </button>

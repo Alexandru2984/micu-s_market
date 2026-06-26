@@ -18,7 +18,7 @@
                     <a href="{% url 'listings:create' %}">{% trans "Adaugă Anunț" %}</a>
                     <a href="{% url 'chat:inbox' %}" class="messages-link">
                         <i class="fas fa-envelope"></i> {% trans "Mesaje" %}
-                        <span id="unread-count" class="unread-badge" style="display: none;">0</span>
+                        <span id="unread-count" class="unread-badge" style="display: none;" data-unread-count-url="{% url 'chat:unread_count' %}">0</span>
                     </a>
                     <a href="{% url 'accounts:my_listings' %}">{% trans "Anunțurile Mele" %}</a>
                     <div class="user-dropdown">
@@ -84,34 +84,3 @@
         </div>
     </div>
 </header>
-
-{% if user.is_authenticated %}
-<script>
-// Check for unread messages functionality moved to header.js but needs Django URL
-document.addEventListener('DOMContentLoaded', function() {
-    if (document.querySelector('.messages-link')) {
-        function checkUnreadMessages() {
-            fetch('{% url "chat:unread_count" %}')
-            .then(response => response.json())
-            .then(data => {
-                const badge = document.getElementById('unread-count');
-                if (badge) {
-                    if (data.unread_count > 0) {
-                        badge.textContent = data.unread_count;
-                        badge.style.display = 'flex';
-                    } else {
-                        badge.style.display = 'none';
-                    }
-                }
-            })
-            .catch(error => {
-                console.log('Error checking unread messages:', error);
-            });
-        }
-        
-        checkUnreadMessages();
-        setInterval(checkUnreadMessages, 30000);
-    }
-});
-</script>
-{% endif %}

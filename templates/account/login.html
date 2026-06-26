@@ -39,21 +39,12 @@
                 </label>
                 <div style="position: relative;">
                     <input type="password" name="password" id="id_password" class="form-control" placeholder="{% trans 'Parola ta' %}" data-no-meter="1" required>
-                    <button type="button" id="toggle_password_btn" 
+                    <button type="button" id="toggle_password_btn" data-password-toggle-target="id_password"
                  style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #718096; cursor: pointer;">
                         <i class="fas fa-eye password-toggle-icon"></i>
                     </button>
 
                 </div> 
-		<script>
-document.addEventListener('click', function (e) {
-  const btn = e.target.closest('#toggle_password_btn, .pw-toggle');
-  if (!btn) return;
-  const input = document.getElementById('id_password') || document.querySelector(btn.dataset.target);
-  if (!input) return;
-  input.type = input.type === 'password' ? 'text' : 'password';
-});
-</script>
             </div>
             
             <div class="form-check">

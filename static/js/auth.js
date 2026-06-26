@@ -1,6 +1,11 @@
 // Authentication pages JavaScript functionality
 
 document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[data-password-toggle-target]').forEach(button => {
+        button.addEventListener('click', function() {
+            togglePasswordVisibility(button.dataset.passwordToggleTarget);
+        });
+    });
     
     // Password strength checker
     const allowed = new Set(['password1', 'new_password1']); // allauth/reset
@@ -224,16 +229,21 @@ function addLoadingState(button) {
 // Show/hide password functionality
 function togglePasswordVisibility(inputId) {
     const input = document.getElementById(inputId);
+    if (!input) return;
     const icon = input.parentNode.querySelector('.password-toggle-icon');
     
     if (input.type === 'password') {
         input.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
+        if (icon) {
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
     } else {
         input.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
+        if (icon) {
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
     }
 }
 

@@ -24,16 +24,7 @@
     <link rel="manifest" href="{% url 'manifest' %}">
     <meta name="theme-color" content="#14b8a6">
 
-    <!-- Apply the saved theme before paint (anti-FOUC) -->
-    <script>
-        (function () {
-            try {
-                var t = localStorage.getItem('mm-theme');
-                if (!t) { t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
-                document.documentElement.setAttribute('data-theme', t);
-            } catch (e) {}
-        })();
-    </script>
+    <script src="{% static 'js/theme-boot.js' %}"></script>
 
     <!-- Font Awesome for icons (self-hosted) -->
     <link rel="stylesheet" href="{% static 'vendor/fontawesome/css/all.min.css' %}">
@@ -82,6 +73,7 @@
     <script src="{% static 'js/detail.js' %}"></script>
     <script src="{% static 'js/modals.js' %}"></script>
     <script src="{% static 'js/pwa.js' %}" defer></script>
+    <script src="{% static 'js/header.js' %}" defer></script>
     <script src="{% static 'js/cookie-consent.js' %}" defer></script>
     <script src="{% static 'js/theme.js' %}" defer></script>
     {% if user.is_authenticated %}<script src="{% static 'js/notifications.js' %}" defer></script>{% endif %}

@@ -256,13 +256,16 @@ DEFAULT_CONTENT_SECURITY_POLICY_REPORT_ONLY = (
     "default-src 'self'; "
     "script-src 'self'; "
     "style-src 'self' 'unsafe-inline'; "
-    "img-src 'self' data: blob: https:;"
-    "font-src 'self'; "
-    "connect-src 'self'; "
+    "img-src 'self' data: blob: https:; "
+    "font-src 'self' data:; "
+    "connect-src 'self' wss:; "
+    "worker-src 'self' blob:; "
+    "manifest-src 'self'; "
     "base-uri 'self'; "
     "form-action 'self'; "
     "object-src 'none'; "
-    "frame-ancestors 'none'"
+    "frame-ancestors 'none'; "
+    "upgrade-insecure-requests"
 )
 CONTENT_SECURITY_POLICY_REPORT_ONLY = os.getenv(
     "CONTENT_SECURITY_POLICY_REPORT_ONLY",

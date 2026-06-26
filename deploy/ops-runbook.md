@@ -169,13 +169,14 @@ venv/bin/python manage.py run_jobs --limit 10 --settings=Micu_market.settings_pr
 Install or refresh the vhost after adjusting certificate paths in `deploy/nginx/micu-market.conf`:
 
 ```bash
+sudo cp /home/micu/Micu_market/deploy/nginx/micu-market-security-headers.conf /etc/nginx/snippets/micu-market-security-headers.conf
 sudo cp /home/micu/Micu_market/deploy/nginx/micu-market.conf /etc/nginx/sites-available/micu-market.conf
 sudo ln -sfn /etc/nginx/sites-available/micu-market.conf /etc/nginx/sites-enabled/micu-market.conf
 sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-Keep the explicit security headers inside `/static/` and `/media/`: Nginx does not reliably inherit parent `add_header` directives after a location defines its own headers.
+Keep the market-specific security header snippet included by the vhost. If a child location adds its own `add_header`, include the same snippet inside that location too because Nginx does not reliably inherit parent `add_header` directives after a location defines its own headers.
 
 ## Cloudflare/origin checks
 
