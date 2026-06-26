@@ -143,6 +143,19 @@ sudo systemctl enable --now micu-market-jobs.timer
 systemctl list-timers 'micu-market-*'
 ```
 
+Mailcow outbound delivery check:
+
+```bash
+sudo cp /home/micu/Micu_market/deploy/systemd/mailcow-netfilter-egress-fix.* /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now mailcow-netfilter-egress-fix.timer
+sudo systemctl start mailcow-netfilter-egress-fix.service
+sudo systemctl status mailcow-netfilter-egress-fix.service --no-pager
+sudo docker exec mailcowdockerized-postfix-mailcow-1 postqueue -p
+```
+
+The service keeps the Mailcow `MAILCOW` iptables chain idempotently seeded with an `ESTABLISHED,RELATED` accept rule. Without it, outbound SMTP connections can send SYN packets but drop the returning SYN-ACK packets before they reach Postfix.
+
 Queue a background job manually:
 
 ```bash

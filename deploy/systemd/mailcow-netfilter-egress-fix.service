@@ -1,0 +1,13 @@
+[Unit]
+Description=Ensure Mailcow permits established outbound replies
+After=docker.service
+Wants=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/home/micu/Micu_market/scripts/ensure_mailcow_netfilter_egress.sh
+
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=read-only
+PrivateTmp=true
