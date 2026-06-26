@@ -190,6 +190,37 @@ sudo systemctl reload nginx
 
 Keep the market-specific security header snippet included by the vhost. If a child location adds its own `add_header`, include the same snippet inside that location too because Nginx does not reliably inherit parent `add_header` directives after a location defines its own headers.
 
+## Email deliverability DNS
+
+Current production DNS policy:
+
+```text
+_dmarc.micutu.com      TXT "v=DMARC1; p=none; rua=mailto:postmaster@micutu.com; ruf=mailto:postmaster@micutu.com; fo=1; adkim=s; aspf=s"
+_mta-sts.micutu.com    TXT "v=STSv1; id=<yyyymmddhhmmss>"
+_smtp._tls.micutu.com  TXT "v=TLSRPTv1; rua=mailto:postmaster@micutu.com"
+mta-sts.micutu.com     A   <origin-ip>
+```
+
+MTA-STS policy is served from:
+
+```text
+https://mta-sts.micutu.com/.well-known/mta-sts.txt
+```
+
+Install or refresh the policy host:
+
+```bash
+sudo install -d -o root -g root -m 755 /var/www/mta-sts.micutu.com/.well-known
+sudo cp /home/micu/Micu_market/deploy/mta-sts/mta-sts.txt /var/www/mta-sts.micutu.com/.well-known/mta-sts.txt
+sudo cp /home/micu/Micu_market/deploy/nginx/mta-sts.micutu.com.conf /etc/nginx/sites-available/mta-sts.micutu.com
+sudo ln -sfn /etc/nginx/sites-available/mta-sts.micutu.com /etc/nginx/sites-enabled/mta-sts.micutu.com
+sudo nginx -t
+sudo systemctl reload nginx
+curl -fsS https://mta-sts.micutu.com/.well-known/mta-sts.txt
+```
+
+The initial MTA-STS policy is `mode: testing` with a one-day `max_age`. Move to `mode: enforce` and a longer `max_age` only after TLS-RPT reports show no inbound delivery failures.
+
 ## Cloudflare/origin checks
 
 - Cloudflare SSL/TLS mode: `Full (strict)`.
