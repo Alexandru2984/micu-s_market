@@ -48,7 +48,7 @@
             
             <div class="listing-preview-content">
                 <!-- Image Section -->
-                <div class="listing-image-container" onclick="openImageModal()">
+                <div class="listing-image-container" data-open-image-modal>
                     {% if listing.main_image %}
                         <img src="{{ listing.images.first.image.url }}" alt="{{ listing.title }}" class="listing-main-image" id="preview-image" loading="lazy" decoding="async">
                         <div class="image-overlay">
@@ -171,9 +171,9 @@
 </div>
 
 <!-- Image Modal -->
-<div id="imageModal" class="image-modal" onclick="closeImageModal()">
+<div id="imageModal" class="image-modal" data-title="{{ listing.title }}" data-price="{{ listing.price|floatformat:0 }} RON">
     <div class="image-modal-content">
-        <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+        <span class="image-modal-close" data-close-image-modal>&times;</span>
         <img id="modalImage" class="modal-image" src="" alt="" loading="lazy" decoding="async">
         <div class="image-modal-info">
             <h3 id="modalTitle"></h3>
@@ -182,62 +182,8 @@
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const checkbox = document.getElementById('confirm-delete');
-    const button = document.getElementById('delete-button');
-    
-    checkbox.addEventListener('change', function() {
-        button.disabled = !this.checked;
-        if (this.checked) {
-            button.classList.remove('btn-disabled');
-            button.classList.add('btn-delete-final-active');
-        } else {
-            button.classList.add('btn-disabled');
-            button.classList.remove('btn-delete-final-active');
-        }
-    });
-});
+{% endblock %}
 
-function openImageModal() {
-    const previewImage = document.getElementById('preview-image');
-    if (!previewImage) return; // Do nothing if there is no image
-    
-    const modal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImage');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalPrice = document.getElementById('modalPrice');
-    
-    modal.style.display = "block";
-    modalImg.src = previewImage.src;
-    modalImg.alt = previewImage.alt;
-    modalTitle.textContent = "{{ listing.title }}";
-    modalPrice.textContent = "{{ listing.price|floatformat:0 }} RON";
-    
-    // Prevent body scroll
-    document.body.style.overflow = 'hidden';
-    
-    // Animation
-    setTimeout(() => {
-        modal.classList.add('show');
-    }, 10);
-}
-
-function closeImageModal() {
-    const modal = document.getElementById('imageModal');
-    modal.classList.remove('show');
-    
-    setTimeout(() => {
-        modal.style.display = "none";
-        document.body.style.overflow = 'auto';
-    }, 300);
-}
-
-// Close modal with Escape key
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        closeImageModal();
-    }
-});
-</script>
+{% block extra_js %}
+<script src="{% static 'js/listing-actions.js' %}" defer></script>
 {% endblock %}

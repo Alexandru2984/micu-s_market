@@ -91,15 +91,14 @@ class ListingCRUDTestCase(TestCase):
         self.assertEqual(self.listing.views_count, 1)
 
     def test_listing_detail_has_seo_metadata(self):
-        """The listing page exposes meta tags and structured data for indexing/sharing."""
+        """The listing page exposes social metadata without inline executable script."""
         response = self.client.get(
             reverse('listings:detail', kwargs={'slug': self.listing.slug})
         )
 
         self.assertContains(response, '<meta property="og:type" content="product">')
-        self.assertContains(response, '<script type="application/ld+json">')
-        self.assertContains(response, '"@type": "Product"')
         self.assertContains(response, f'<link rel="canonical" href="http://testserver{self.listing.get_absolute_url()}">')
+        self.assertNotContains(response, '<script type="application/ld+json">')
 
     def test_listing_list_ignores_invalid_price_filters(self):
         response = self.client.get(

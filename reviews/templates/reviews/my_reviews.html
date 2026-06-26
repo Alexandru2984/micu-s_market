@@ -116,7 +116,7 @@
                                 </a>
                                 <form method="post" action="{% url 'reviews:delete_review' review.id %}" style="display: inline;">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('{% trans 'Ești sigur că vrei să ștergi acest review?' %}')">
+                                    <button type="submit" class="btn btn-danger btn-sm" data-confirm-message="{% trans 'Ești sigur că vrei să ștergi acest review?' %}">
                                         <i class="fas fa-trash"></i> {% trans "Șterge" %}
                                     </button>
                                 </form>

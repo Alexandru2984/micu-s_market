@@ -59,7 +59,7 @@
                             <img src="{{ image.image.url }}" alt="{{ image.alt_text }}" class="w-full h-32 object-cover rounded-lg border" loading="lazy" decoding="async">
                             <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center">
                                 <div class="opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onclick="deleteImage({{ image.id }})" class="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                                    <button type="button" data-delete-image-redirect="{% url 'listings:update' slug=listing.slug %}" data-confirm-message="{% trans 'Ești sigur că vrei să ștergi această imagine?' %}" class="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </div>
@@ -181,13 +181,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-function deleteImage(imageId) {
-    if (confirm('Ești sigur că vrei să ștergi această imagine?')) {
-        // The AJAX logic for deleting the image should be implemented here
-        // For now, we redirect to the edit page
-        window.location.href = "{% url 'listings:update' slug=listing.slug %}";
-    }
-}
-</script>
+<script src="{% static 'js/listing-actions.js' %}" defer></script>
 {% endblock %}

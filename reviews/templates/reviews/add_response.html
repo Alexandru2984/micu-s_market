@@ -472,28 +472,8 @@ textarea:focus {
 }
 </style>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const textarea = document.getElementById('id_response_text');
-    const charCount = document.getElementById('charCount');
-    const maxLength = 1000;
-    
-    function updateCharCount() {
-        const currentLength = textarea.value.length;
-        charCount.textContent = currentLength;
-        
-        if (currentLength > maxLength) {
-            charCount.parentElement.classList.add('over-limit');
-        } else {
-            charCount.parentElement.classList.remove('over-limit');
-        }
-    }
-    
-    // Update count on page load
-    updateCharCount();
-    
-    // Update count as user types
-    textarea.addEventListener('input', updateCharCount);
-});
-</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/reviews.js' %}" defer></script>
 {% endblock %}

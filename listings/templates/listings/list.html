@@ -294,8 +294,7 @@
                                                   text-align: center;
                                                   color: #10b981;
                                                   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.1);"
-                                           onfocus="this.style.borderColor='#10b981'; this.style.background='#ffffff'; this.style.transform='scale(1.05)'; this.style.boxShadow='0 10px 25px rgba(16, 185, 129, 0.2)';"
-                                           onblur="this.style.borderColor='#e5e7eb'; this.style.background='linear-gradient(135deg, #ffffff 0%, #f0fff4 100%)'; this.style.transform='scale(1)'; this.style.boxShadow='0 6px 20px rgba(16, 185, 129, 0.1)';">
+                                           data-focus-class="price-input-focused">
                                     <span class="currency" style="font-size: 12px; color: #10b981; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">RON</span>
                                 </div>
                                 <div class="price-separator" 
@@ -328,8 +327,7 @@
                                                   text-align: center;
                                                   color: #10b981;
                                                   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.1);"
-                                           onfocus="this.style.borderColor='#10b981'; this.style.background='#ffffff'; this.style.transform='scale(1.05)'; this.style.boxShadow='0 10px 25px rgba(16, 185, 129, 0.2)';"
-                                           onblur="this.style.borderColor='#e5e7eb'; this.style.background='linear-gradient(135deg, #ffffff 0%, #f0fff4 100%)'; this.style.transform='scale(1)'; this.style.boxShadow='0 6px 20px rgba(16, 185, 129, 0.1)';">
+                                           data-focus-class="price-input-focused">
                                     <span class="currency" style="font-size: 12px; color: #10b981; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">RON</span>
                                 </div>
                             </div>
@@ -354,8 +352,7 @@
                                               transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                                               color: #374151;
                                               box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);"
-                                       onfocus="this.style.borderColor='#ef4444'; this.style.background='#ffffff'; this.style.transform='translateY(-3px)'; this.style.boxShadow='0 15px 35px rgba(239, 68, 68, 0.15), 0 5px 15px rgba(0, 0, 0, 0.05)';"
-                                       onblur="this.style.borderColor='#e5e7eb'; this.style.background='linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.08)';">
+                                       data-focus-class="city-input-focused">
                                 <div class="input-border"></div>
                             </div>
                         </div>
@@ -511,4 +508,5 @@
 
 {% block extra_js %}
 <script src="{% static 'js/listings-api.js' %}"></script>
+<script src="{% static 'js/listing-actions.js' %}" defer></script>
 {% endblock %}

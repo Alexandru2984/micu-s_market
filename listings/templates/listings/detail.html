@@ -14,30 +14,6 @@
 {% block twitter_card %}{% if listing.main_image %}summary_large_image{% else %}summary{% endif %}{% endblock %}
 {% block twitter_title %}{{ listing.title }} - {{ listing.price }} RON{% endblock %}
 {% block twitter_description %}{{ listing.description|striptags|truncatechars:180 }}{% endblock %}
-{% block structured_data %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Product",
-  "name": "{{ listing.title|escapejs }}",
-  "description": "{{ listing.description|striptags|truncatechars:300|escapejs }}",
-  {% if listing.main_image %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ listing.main_image.url }}",{% endif %}
-  "category": "{{ listing.category.name|default:'Anunțuri'|escapejs }}",
-  "offers": {
-    "@type": "Offer",
-    "price": "{{ listing.price|floatformat:2 }}",
-    "priceCurrency": "RON",
-    "availability": "https://schema.org/InStock",
-    "url": "{{ request.scheme }}://{{ request.get_host }}{{ listing.get_absolute_url }}"
-  },
-  "seller": {
-    "@type": "Person",
-    "name": "{{ listing.owner.get_full_name|default:listing.owner.username|escapejs }}"
-  }
-}
-</script>
-{% endblock %}
-
 {% block content %}
 
 
@@ -65,7 +41,7 @@
                              loading="lazy"
                              decoding="async"
                              class="thumbnail {% if forloop.first %}active{% endif %}"
-                             onclick="changeMainImage('{{ image.image.url }}', this)">
+                             data-main-image-src="{{ image.image.url }}">
                         {% endfor %}
                     </div>
                     {% endif %}
@@ -351,7 +327,5 @@
 
 {% block extra_js %}
 <script src="{% static 'js/favorites.js' %}"></script>
-<script>
-
-</script>
+<script src="{% static 'js/listing-actions.js' %}" defer></script>
 {% endblock %}

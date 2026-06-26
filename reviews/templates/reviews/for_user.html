@@ -121,7 +121,7 @@
                                     </a>
                                     <form method="post" action="{% url 'reviews:delete_review' review.id %}" style="display: inline;">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn-small btn-danger" onclick="return confirm('Ești sigur?')">
+                                        <button type="submit" class="btn-small btn-danger" data-confirm-message="Ești sigur?">
                                             <i class="fas fa-trash"></i> Șterge
                                         </button>
                                     </form>

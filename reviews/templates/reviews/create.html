@@ -520,55 +520,8 @@ textarea {
 }
 </style>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ratingInput = document.getElementById('id_rating');
-    const stars = document.querySelectorAll('.rating-stars span');
-    const labels = document.querySelectorAll('.rating-labels span');
-    
-    // Initialize rating display
-    const currentRating = parseInt(ratingInput.value) || 0;
-    updateStarsDisplay(currentRating);
-    
-    // Handle star clicks
-    stars.forEach((star, index) => {
-        star.addEventListener('click', function() {
-            const rating = index + 1;
-            ratingInput.value = rating;
-            updateStarsDisplay(rating);
-        });
-        
-        star.addEventListener('mouseenter', function() {
-            updateStarsDisplay(index + 1, true);
-        });
-    });
-    
-    // Reset on mouse leave
-    document.querySelector('.rating-stars').addEventListener('mouseleave', function() {
-        const currentRating = parseInt(ratingInput.value) || 0;
-        updateStarsDisplay(currentRating);
-    });
-    
-    function updateStarsDisplay(rating, isHover = false) {
-        stars.forEach((star, index) => {
-            if (index < rating) {
-                star.innerHTML = '<i class="fas fa-star"></i>';
-                star.classList.add('active');
-            } else {
-                star.innerHTML = '<i class="far fa-star"></i>';
-                star.classList.remove('active');
-            }
-        });
-        
-        // Update labels
-        labels.forEach((label, index) => {
-            if (index + 1 === rating) {
-                label.classList.add('active');
-            } else {
-                label.classList.remove('active');
-            }
-        });
-    }
-});
-</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/reviews.js' %}" defer></script>
 {% endblock %}

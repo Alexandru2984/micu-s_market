@@ -248,10 +248,9 @@ CSRF_COOKIE_SAMESITE = os.getenv("CSRF_COOKIE_SAMESITE", "Lax")
 PERMISSIONS_POLICY = os.getenv("PERMISSIONS_POLICY", "geolocation=(), microphone=(), camera=()")
 CROSS_ORIGIN_RESOURCE_POLICY = os.getenv("CROSS_ORIGIN_RESOURCE_POLICY", "same-site")
 CROSS_ORIGIN_OPENER_POLICY = os.getenv("CROSS_ORIGIN_OPENER_POLICY", "same-origin")
-# The enforced CSP is served by nginx (snippets/security-headers.conf) as the
-# single source for market. Here we only define a stricter variant (script-src
-# without 'unsafe-inline', plus object-src/base-uri/form-action) run in
-# report-only, to surface what must be cleaned up (onclick handlers) before lockdown.
+# The enforced CSP is served by nginx as the single source for market. Django
+# keeps the same policy in report-only so header regressions are visible during
+# deploy checks without changing Nginx first.
 DEFAULT_CONTENT_SECURITY_POLICY_REPORT_ONLY = (
     "default-src 'self'; "
     "script-src 'self'; "

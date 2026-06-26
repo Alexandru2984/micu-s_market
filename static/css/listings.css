@@ -1707,6 +1707,20 @@
     font-weight: 900;
 }
 
+.price-input.price-input-focused {
+    border-color: #10b981 !important;
+    background: #ffffff !important;
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2) !important;
+}
+
+.filter-input.city-input-focused {
+    border-color: #ef4444 !important;
+    background: #ffffff !important;
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(239, 68, 68, 0.15), 0 5px 15px rgba(0, 0, 0, 0.05) !important;
+}
+
 /* Mobile favorites visibility */
 @media (max-width: 768px) {
     .listing-actions {
