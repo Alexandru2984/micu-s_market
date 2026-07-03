@@ -97,12 +97,12 @@ def listing_list_view(request):
     listings = Listing.objects.filter(status='active').select_related('category', 'owner').prefetch_related('images')
     
     # Filter by seller
-    seller = request.GET.get('seller')
+    seller = request.GET.get('seller') or ''
     if seller:
         listings = listings.filter(owner__username=seller)
-    
+
     # Filter by category
-    category_param = request.GET.get('category')
+    category_param = request.GET.get('category') or ''
     selected_category = None
     if category_param:
         try:
@@ -131,12 +131,12 @@ def listing_list_view(request):
         listings = listings.filter(price__lte=max_price)
     
     # Filter by city
-    city = request.GET.get('city')
+    city = request.GET.get('city') or ''
     if city:
         listings = listings.filter(city__icontains=city)
-    
-    # Search
-    search = request.GET.get('search')
+
+    # Search — normalize to '' so templates never render the string "None"
+    search = request.GET.get('search') or ''
     listings, search_applied = apply_listing_search(listings, search)
     
     # Sorting

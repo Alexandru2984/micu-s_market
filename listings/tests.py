@@ -110,6 +110,12 @@ class ListingCRUDTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.listing.title)
 
+    def test_listing_list_does_not_render_none_in_search_input(self):
+        """Without a search param, inputs must not show the literal string None."""
+        response = self.client.get(reverse('listings:list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'value="None"')
+
     def test_listing_list_applies_zero_price_filters(self):
         """min_price=0 is a valid filter, and max_price=0 excludes priced listings."""
         response = self.client.get(reverse('listings:list'), {'min_price': '0'})
