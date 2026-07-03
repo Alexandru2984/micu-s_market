@@ -147,10 +147,6 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.ScryptPasswordHasher",
 ]
 
-LOGIN_URL = "accounts:login"
-LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "home"
-
 # ======================
 # LOCALE / i18n
 # ======================
@@ -227,7 +223,7 @@ LISTING_RISK_TERMS = _split_env(
 )
 CHAT_MESSAGE_MAX_LENGTH = int(os.getenv("CHAT_MESSAGE_MAX_LENGTH", "5000"))
 
-# Security settings for production
+# Security settings for production (HTTPS redirect, HSTS, secure cookies)
 if not DEBUG:
     SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "True") == "True"
     SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "31536000"))
@@ -235,7 +231,6 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = os.getenv("SECURE_HSTS_PRELOAD", "True") == "True"
     SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "True") == "True"
     CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "True") == "True"
-    SECURE_REFERRER_POLICY = "same-origin"
 
 # Security settings — always active (not only in production)
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -270,15 +265,6 @@ CONTENT_SECURITY_POLICY_REPORT_ONLY = os.getenv(
     "CONTENT_SECURITY_POLICY_REPORT_ONLY",
     DEFAULT_CONTENT_SECURITY_POLICY_REPORT_ONLY,
 )
-
-# HTTPS settings active only when not in local dev
-if not DEBUG:
-    SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "True") == "True"
-    SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "31536000"))
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = os.getenv("SECURE_HSTS_INCLUDE_SUBDOMAINS", "True") == "True"
-    SECURE_HSTS_PRELOAD = os.getenv("SECURE_HSTS_PRELOAD", "True") == "True"
-    SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "True") == "True"
-    CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "True") == "True"
 
 # Sessions — expire after 2 weeks (not permanent sessions)
 SESSION_COOKIE_AGE = 1209600  # 14 days in seconds
@@ -354,8 +340,6 @@ MFA_TOTP_ISSUER = "Micu's Market"
 # Login/logout settings
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_GET = False
-ACCOUNT_LOGOUT_REDIRECT_URL = '/'
-
 
 # Password reset settings
 ACCOUNT_PASSWORD_MIN_LENGTH = 8
@@ -363,6 +347,7 @@ ACCOUNT_PASSWORD_MIN_LENGTH = 8
 # Redirect URLs
 LOGIN_URL = '/accounts/custom/login/'
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/'
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/'
@@ -394,8 +379,5 @@ if os.getenv("DJANGO_USE_X_FORWARDED_PROTO", "False") == "True":
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 TRUSTED_PROXY_CHAIN_CONFIGURED = os.getenv("DJANGO_TRUSTED_PROXY_CHAIN_CONFIGURED", "False") == "True"
 
-# allauth
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 # Email backend for development (uncomment for console testing)
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

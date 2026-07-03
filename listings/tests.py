@@ -109,6 +109,16 @@ class ListingCRUDTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.listing.title)
 
+    def test_listing_list_applies_zero_price_filters(self):
+        """min_price=0 is a valid filter, and max_price=0 excludes priced listings."""
+        response = self.client.get(reverse('listings:list'), {'min_price': '0'})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.listing.title)
+
+        response = self.client.get(reverse('listings:list'), {'max_price': '0'})
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, self.listing.title)
+
     def test_listing_edit_requires_owner(self):
         """Editing a listing is allowed only for the owner"""
         self.client.login(username='other', password='OtherPass123!')

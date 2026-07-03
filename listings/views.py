@@ -122,9 +122,9 @@ def listing_list_view(request):
     # Filter by price
     min_price = _parse_price_filter(request.GET.get('min_price'))
     max_price = _parse_price_filter(request.GET.get('max_price'))
-    if min_price:
+    if min_price is not None:
         listings = listings.filter(price__gte=min_price)
-    if max_price:
+    if max_price is not None:
         listings = listings.filter(price__lte=max_price)
     
     # Filter by city
