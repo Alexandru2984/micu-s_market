@@ -283,7 +283,7 @@
                                 <div class="price-input-group">
                                     <span class="price-label" style="font-size: 12px; color: #10b981; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">{% trans "De la" %}</span>
                                     <input type="number" name="min_price" class="price-input" 
-                                           placeholder="0" value="{{ min_price }}"
+                                           placeholder="0" value="{{ min_price|default_if_none:'' }}"
                                            style="padding: 12px 16px;
                                                   border: 3px solid #e5e7eb;
                                                   border-radius: 15px;
@@ -316,7 +316,7 @@
                                 <div class="price-input-group">
                                     <span class="price-label" style="font-size: 12px; color: #10b981; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">{% trans "Până la" %}</span>
                                     <input type="number" name="max_price" class="price-input" 
-                                           placeholder="999999" value="{{ max_price }}"
+                                           placeholder="999999" value="{{ max_price|default_if_none:'' }}"
                                            style="padding: 12px 16px;
                                                   border: 3px solid #e5e7eb;
                                                   border-radius: 15px;
