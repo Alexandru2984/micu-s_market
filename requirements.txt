@@ -19,7 +19,7 @@ boto3==1.43.29
 redis==6.4.0
 
 # Real-time chat (WebSocket prin Django Channels + layer Redis)
-channels==4.3.1
+channels==4.3.2
 channels-redis==4.3.0
 websockets==16.0
 
