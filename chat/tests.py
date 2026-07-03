@@ -4,6 +4,7 @@ Teste pentru sistemul de chat — conversații și mesaje
 import asyncio
 import json
 import tempfile
+import time
 import zipfile
 from io import BytesIO
 
@@ -423,6 +424,14 @@ class ChatConsumerTestCase(TransactionTestCase):
 
     @override_settings(CHAT_WS_MESSAGE_RATE_PER_MINUTE=1)
     def test_websocket_message_rate_limit_is_enforced_across_connection(self):
+        # The limiter counts per minute bucket (time.time() // 60). If the
+        # first message lands at the end of a bucket and the second in the
+        # next one, the limit legitimately resets and the test would hang
+        # waiting for the error frame. Start clear of the boundary.
+        seconds_into_minute = time.time() % 60
+        if seconds_into_minute > 56:
+            time.sleep(60.5 - seconds_into_minute)
+
         async def run():
             comm = self._communicator(self.buyer)
             self.assertTrue(await self._connect(comm))
