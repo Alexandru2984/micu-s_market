@@ -252,3 +252,179 @@ class ListingApiTests(TestCase):
             content_type='application/json',
         )
         self.assertEqual(response.status_code, 400)
+
+
+class ApiV1Tests(TestCase):
+    """Tests for the versioned django-ninja API under /api/v1/."""
+
+    def setUp(self):
+        self.client = Client()
+        self.owner = User.objects.create_user(
+            username='v1-owner',
+            email='v1-owner@example.com',
+            password='OwnerPass123!',
+        )
+        self.buyer = User.objects.create_user(
+            username='v1-buyer',
+            email='v1-buyer@example.com',
+            password='BuyerPass123!',
+        )
+        self.category = Category.objects.create(
+            name='V1 Category',
+            slug='v1-category',
+            is_active=True,
+        )
+        self.listing = Listing.objects.create(
+            title='Laptop V1',
+            description='Laptop test v1',
+            price=1500,
+            owner=self.owner,
+            category=self.category,
+            city='Bucuresti',
+            county='Bucuresti',
+            status='active',
+        )
+
+    def _bearer(self, raw_key):
+        return {'HTTP_AUTHORIZATION': f'Bearer {raw_key}'}
+
+    def test_openapi_schema_is_served(self):
+        response = self.client.get('/api/v1/openapi.json')
+        self.assertEqual(response.status_code, 200)
+        schema = response.json()
+        self.assertEqual(schema['info']['title'], "Micu's Market API")
+        self.assertIn('/api/v1/listings', schema['paths'])
+
+    def test_list_returns_only_active_listings(self):
+        Listing.objects.create(
+            title='Ascuns V1',
+            description='inactiv',
+            price=10,
+            owner=self.owner,
+            category=self.category,
+            city='Cluj',
+            status='inactive',
+        )
+        response = self.client.get('/api/v1/listings')
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        slugs = [item['slug'] for item in payload['results']]
+        self.assertIn(self.listing.slug, slugs)
+        self.assertNotIn('ascuns-v1', slugs)
+
+    def test_detail_404_for_inactive_listing(self):
+        self.listing.status = 'inactive'
+        self.listing.save(update_fields=['status'])
+        response = self.client.get(f'/api/v1/listings/{self.listing.slug}')
+        self.assertEqual(response.status_code, 404)
+
+    def test_create_listing_requires_auth(self):
+        response = self.client.post(
+            '/api/v1/listings',
+            data=json.dumps({'title': 'X', 'description': 'Y', 'price': '10'}),
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_create_listing_with_api_key(self):
+        from api.models import ApiKey
+
+        _key, raw_key = ApiKey.generate(self.buyer, name='test')
+        response = self.client.post(
+            '/api/v1/listings',
+            data=json.dumps({
+                'title': 'Bicicleta V1',
+                'description': 'Aproape noua',
+                'price': '350.00',
+                'category_id': self.category.id,
+                'city': 'Brasov',
+                'county': 'Brasov',
+            }),
+            content_type='application/json',
+            **self._bearer(raw_key),
+        )
+        self.assertEqual(response.status_code, 201)
+        payload = response.json()
+        self.assertEqual(payload['owner']['username'], 'v1-buyer')
+        self.assertTrue(Listing.objects.filter(slug=payload['slug'], owner=self.buyer).exists())
+
+    def test_invalid_and_revoked_keys_are_rejected(self):
+        from api.models import ApiKey
+
+        response = self.client.get('/api/v1/me', **self._bearer('mk_bad_key'))
+        self.assertEqual(response.status_code, 401)
+
+        key, raw_key = ApiKey.generate(self.buyer)
+        key.revoke()
+        response = self.client.get('/api/v1/me', **self._bearer(raw_key))
+        self.assertEqual(response.status_code, 401)
+
+    def test_favorite_toggle_with_api_key(self):
+        from api.models import ApiKey
+
+        _key, raw_key = ApiKey.generate(self.buyer)
+        response = self.client.post(
+            '/api/v1/favorites/toggle',
+            data=json.dumps({'listing_id': self.listing.id}),
+            content_type='application/json',
+            **self._bearer(raw_key),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['is_favorited'])
+        self.assertTrue(Favorite.objects.filter(user=self.buyer, listing=self.listing).exists())
+
+    def test_me_with_session(self):
+        self.client.login(username='v1-buyer', password='BuyerPass123!')
+        response = self.client.get('/api/v1/me')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['username'], 'v1-buyer')
+
+    def test_key_management_requires_session_not_api_key(self):
+        from api.models import ApiKey
+
+        _key, raw_key = ApiKey.generate(self.buyer)
+        response = self.client.post(
+            '/api/v1/keys',
+            data=json.dumps({'name': 'nope'}),
+            content_type='application/json',
+            **self._bearer(raw_key),
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_key_lifecycle_create_list_revoke(self):
+        from api.models import ApiKey
+
+        self.client.login(username='v1-buyer', password='BuyerPass123!')
+
+        response = self.client.post(
+            '/api/v1/keys',
+            data=json.dumps({'name': 'cli'}),
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 201)
+        payload = response.json()
+        self.assertTrue(payload['key'].startswith('mk_'))
+        key_id = payload['id']
+
+        response = self.client.get('/api/v1/keys')
+        self.assertEqual(response.status_code, 200)
+        listed = response.json()
+        self.assertEqual(len(listed), 1)
+        self.assertNotIn('key', listed[0])
+
+        response = self.client.delete(f'/api/v1/keys/{key_id}')
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(ApiKey.objects.get(pk=key_id).is_active)
+
+    def test_active_key_limit_enforced(self):
+        from api.models import ApiKey
+
+        for _ in range(5):
+            ApiKey.generate(self.buyer)
+        self.client.login(username='v1-buyer', password='BuyerPass123!')
+        response = self.client.post(
+            '/api/v1/keys',
+            data=json.dumps({'name': 'peste-limita'}),
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 400)

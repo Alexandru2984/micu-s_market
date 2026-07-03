@@ -1,5 +1,4 @@
 import json
-from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
 from django.core.paginator import Paginator
@@ -9,12 +8,12 @@ from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 from django_ratelimit.decorators import ratelimit
 
-from categories.models import Category
 from favorites.models import Favorite
 from listings.forms import ListingForm
 from listings.models import Listing
 from listings.moderation import apply_listing_risk_review
-from listings.search import apply_listing_search, order_search_results
+
+from .filters import filter_listing_queryset
 
 
 def _json_body(request):
@@ -96,62 +95,10 @@ def _listing_detail(request, listing):
     return data
 
 
-def _filter_decimal(queryset, field_name, raw_value, lookup):
-    if raw_value in (None, ''):
-        return queryset
-    try:
-        value = Decimal(str(raw_value))
-    except (InvalidOperation, ValueError):
-        return queryset
-    if value < 0:
-        return queryset
-    return queryset.filter(**{f'{field_name}__{lookup}': value})
-
-
 @require_GET
 @ratelimit(key='ip', rate=settings.API_READ_RATE, method='GET', block=True)
 def listing_list_api(request):
-    listings = (
-        Listing.objects.filter(status='active')
-        .select_related('category', 'owner')
-        .prefetch_related('images')
-    )
-
-    seller = request.GET.get('seller')
-    if seller:
-        listings = listings.filter(owner__username=seller)
-
-    category = request.GET.get('category')
-    if category:
-        category_obj = None
-        try:
-            category_obj = Category.objects.get(slug=category, is_active=True)
-        except Category.DoesNotExist:
-            if category.isdigit():
-                try:
-                    category_obj = Category.objects.get(id=int(category), is_active=True)
-                except Category.DoesNotExist:
-                    category_obj = None
-        if category_obj:
-            category_ids = [category_obj.id] + [child.id for child in category_obj.get_all_children]
-            listings = listings.filter(category_id__in=category_ids)
-
-    city = request.GET.get('city')
-    if city:
-        listings = listings.filter(city__icontains=city)
-
-    query = request.GET.get('q') or request.GET.get('search')
-    listings, search_applied = apply_listing_search(listings, query)
-
-    listings = _filter_decimal(listings, 'price', request.GET.get('min_price'), 'gte')
-    listings = _filter_decimal(listings, 'price', request.GET.get('max_price'), 'lte')
-
-    sort_by = request.GET.get('sort', 'relevance' if search_applied else '-created_at')
-    if sort_by not in {'relevance', '-created_at', 'created_at', 'price', '-price', 'title', '-title'}:
-        sort_by = '-created_at'
-    listings = order_search_results(listings, sort_by, search_applied)
-    if sort_by != 'relevance':
-        listings = listings.order_by(sort_by)
+    listings, _search_applied, _sort_by = filter_listing_queryset(request.GET)
 
     page_number = request.GET.get('page', 1)
     try:

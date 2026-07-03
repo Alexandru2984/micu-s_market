@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
 
+from api.v1 import api as api_v1
 from Micu_market.sitemaps import SITEMAPS
 from pages.views import healthcheck_view, manifest_view, offline_view, robots_txt, service_worker_view
 
@@ -25,6 +26,9 @@ urlpatterns = [
     # Homepage
     path("", include(("listings.urls", "listings"), namespace="listings")),
     
+    # Versioned public API (django-ninja; interactive docs at /api/v1/docs)
+    path("api/v1/", api_v1.urls),
+
     # Apps
     path("pages/", include(("pages.urls", "pages"), namespace="pages")),
     path("accounts/custom/", include(("accounts.urls", "accounts"), namespace="accounts")),
