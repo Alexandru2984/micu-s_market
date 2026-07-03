@@ -1,151 +1,133 @@
 # 🏪 Micu's Market
 
-**Micu's Market** este o platformă modernă de tip marketplace local (anunțuri de mică publicitate), dezvoltată în Python folosind framework-ul **Django**. Platforma permite utilizatorilor să publice anunțuri, să comunice în timp real prin chat, să își salveze anunțurile favorite și să își acorde recenzii reciproce pentru tranzacții.
+[![CI](https://github.com/Alexandru2984/micu-s_market/actions/workflows/ci.yml/badge.svg)](https://github.com/Alexandru2984/micu-s_market/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/python-3.13%20%7C%203.14-blue)
+![Django](https://img.shields.io/badge/django-6.0-092e20)
+![Coverage](https://img.shields.io/badge/coverage-%E2%89%A570%25%20enforced-brightgreen)
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
+
+A production-deployed classifieds marketplace (Romanian market) built with **Django 6**, running live at **[market.micutu.com](https://market.micutu.com)** — real-time chat over WebSockets, full-text search, a versioned public API with interactive docs, moderation & anti-abuse tooling, and a fully automated ops setup (backups, background jobs, health checks) on a self-managed VPS.
+
+**Live demo:** <https://market.micutu.com> · **API docs (Swagger):** <https://market.micutu.com/api/v1/docs>
+
+| Home (light) | Home (dark) |
+| --- | --- |
+| ![Homepage light](docs/screenshots/home-light.png) | ![Homepage dark](docs/screenshots/home-dark.png) |
+
+| Listings | API docs |
+| --- | --- |
+| ![Listings](docs/screenshots/listings.png) | ![Swagger UI](docs/screenshots/api-docs.png) |
 
 ---
 
-## 🚀 Caracteristici Principale
+## Architecture
 
-### 🔐 Autentificare & Securitate (Allauth)
-* **Autentificare pe bază de Email:** Logarea se face exclusiv prin adresă de email validă și unică.
-* **Verificare Obligatorie:** Utilizatorii trebuie să își confirme adresa de email pentru a activa contul.
-* **Securitate Sporită:** Criptare parole cu Argon2, indicator de putere a parolei la înregistrare/resetare și rate-limiting pe login, signup și trimiteri de email.
-* **Protecții CSRF & Metodă POST:** Deconectarea (logout) și ștergerile se fac exclusiv prin cereri POST pentru a preveni atacurile de deconectare forțată.
-* **Hardening:** URL de admin configurabil, security headers (HSTS, X-Frame, CSP), audit logging, IP real restaurat din Cloudflare pentru rate-limiting corect.
-
-### 📦 Gestiune Anunțuri (Listings)
-* **Creare & Editare completă:** Utilizatorii pot adăuga detalii ca: titlu, descriere, preț, negociabilitate, stare produs, locație (oraș/județ) și date de contact.
-* **Imagini Multiple:** Suport pentru încărcare de până la 10 imagini per anunț, cu validare strictă server-side a extensiilor și dimensiunii imaginii (folosind Pillow).
-* **Filtrare Avansată:** Sortare și filtrare după categorii/subcategorii ierarhice, plajă de preț, județ/oraș și căutare textuală.
-
-### 💬 Chat în Timp Real (WebSocket)
-* **Mesaje live prin WebSocket** (Django Channels + layer Redis): mesaje, indicator de „scrie…" real și confirmări de citire (✓✓), fără reîncărcarea paginii.
-* **Atașamente Securizate:** Imagini sau documente (PDF, Word, Excel, TXT) cu limite stricte (max. 10MB per fișier, verificare integritate imagini). Atașamentele sunt private — servite doar de Django, după verificarea participării la conversație.
-* **Fallback robust:** dacă WebSocket-ul nu e disponibil, trimiterea cade automat pe AJAX; mesajele cu atașamente folosesc tot AJAX dar apar live la ambii participanți.
-* **Notificări inbox:** contorizarea mesajelor necitite.
-
-### ⭐ Recenzii & Rating-uri
-* **Feedback Tranzacțional:** Cumpărătorii și vânzătorii își pot acorda note (1-5 stele) asociate unui anunț specific.
-* **Răspunsuri la Recenzii:** Utilizatorii recenzați pot adăuga un singur răspuns oficial la recenzia primită.
-* **Prevenire Abuse:** Sistemul blochează auto-recenziile (self-review), recenziile duplicate și permite limitarea frecvenței acestora.
-
-### 🔔 Notificări & Favorite
-* **Sistem de Notificări:** Alerte vizuale pentru mesaje noi sau recenzii primite, cu dispecer de email pe fundal.
-* **Listă Favorite:** Salvarea anunțurilor de interes direct în contul de utilizator.
-
-### 🎨 Design & UX
-* **Sistem de design pe token-uri** (`static/css/tokens.css`): paletă unitară (accent teal), spațiere, raze, umbre — sursă unică pentru tot CSS-ul.
-* **Dark mode** cu buton de comutare în header (persistat în localStorage, fără flash la încărcare).
-* **PWA:** manifest, service worker și pagină offline. Font Awesome este self-hosted (fără CDN).
-
-### 🔎 SEO
-* `sitemap.xml` (pagini statice + anunțuri active) și `robots.txt` generate dinamic.
-* Meta tags OG/Twitter, canonical și structured data în template-ul de bază.
-
----
-
-## 🛠️ Stack Tehnologic
-
-* **Backend:** Python / Django (vezi versiunile fixate în `requirements.txt`)
-* **Bază de date:** PostgreSQL (conexiuni persistente cu `CONN_MAX_AGE`)
-* **Real-time:** Django Channels + `channels-redis` (layer Redis pentru WebSocket)
-* **Cache & rate-limit & channel layer:** Redis
-* **Server Web (Producție):** Gunicorn cu worker ASGI `uvicorn_worker.UvicornWorker`
-* **Reverse proxy:** nginx (unix socket + bloc `/ws/` pentru WebSocket), în spatele Cloudflare
-* **Fișiere Statice:** WhiteNoise (comprimare, caching, manifest hash-uit)
-* **Validări imagini:** Pillow (PIL)
-* **Backup offsite:** Cloudflare R2 (S3-compatibil) via boto3
-
----
-
-## 💻 Instalare și Configurare Locală
-
-### 1. Clonarea proiectului
-```bash
-git clone <url-repository>
-cd Micu_market
+```mermaid
+flowchart LR
+    U["Browser / API client"] --> CF["Cloudflare\n(TLS, CDN, real IP)"]
+    CF --> NG["nginx\nstatic/media, CSP headers,\n/ws/ upgrade"]
+    NG -->|unix socket| GU["Gunicorn + Uvicorn workers\n(ASGI)"]
+    GU --> DJ["Django 6\nviews · allauth · django-ninja API"]
+    GU --> CH["Django Channels\nchat + notifications"]
+    DJ --> PG[("PostgreSQL\nfull-text + trigram search")]
+    DJ --> RD[("Redis\ncache · rate limits · channel layer")]
+    CH --> RD
+    subgraph systemd timers
+        T1["job worker (1 min)"]
+        T2["email dispatcher (5 min)"]
+        T3["daily backup → Cloudflare R2"]
+        T4["monthly media cleanup"]
+    end
+    T1 --> PG
+    T2 --> PG
+    T3 --> PG
 ```
 
-### 2. Crearea și activarea mediului virtual
+## Engineering highlights
+
+Things worth reading the source for:
+
+- **Database-backed job queue** (`jobs/`) — no Celery dependency: `SELECT ... FOR UPDATE SKIP LOCKED` claiming, priorities, retries with backoff, stale-job recovery, driven by a systemd timer. ~130 lines.
+- **Idempotent signed payment webhooks** (`billing/`) — HMAC-SHA256 over `timestamp.body` with constant-time compare, timestamp tolerance window, event deduplication by `event_id`, row locking on order updates.
+- **Hybrid Postgres search** (`listings/search.py`) — weighted `tsvector` ranking (title > category > city > description) combined with trigram similarity for typo tolerance, with a portable `icontains` fallback.
+- **API keys hashed at rest** (`api/models.py`) — `mk_<prefix>_<secret>` bearer tokens, SHA-256 stored, shown once at creation; key management is session-only so a leaked key cannot mint new keys.
+- **Real-time chat with graceful degradation** (`chat/`) — WebSocket consumer with per-connection and per-user rate limiting, typing indicators, read receipts; falls back to AJAX automatically if the socket is unavailable. Attachments are private, served only by Django after a participant check (blocked at nginx level).
+- **Layered anti-abuse** — django-ratelimit on every write path, risk scoring of new listings against configurable scam-term lists, auto-hide after N user reports, user strikes, audit log of moderation actions.
+- **Ops as code** (`deploy/`, `scripts/`) — systemd units/timers, nginx configs, release script with preflight checks and rollback, smoke checks, verified daily Postgres backups shipped offsite to Cloudflare R2.
+
+## Features
+
+- **Auth & security** — email-only login with mandatory verification (django-allauth), optional 2FA (TOTP + recovery codes), Argon2 hashing, granular rate limits on login/signup/email, configurable admin URL, strict CSP + security headers, Cloudflare real-IP restoration.
+- **Listings** — hierarchical categories, up to 10 images per listing (server-side Pillow validation + optimization), price/city/county filters, featured/promotion states with expiry, view counters with cooldown.
+- **Search** — Postgres full-text + trigram, relevance sorting, saved searches.
+- **Chat** — live messages, typing indicator, read receipts (✓✓), secure file attachments, unread counters pushed over a notifications WebSocket.
+- **Reviews** — transaction-scoped 1–5★ ratings, one official reply per review, self-review/duplicate prevention.
+- **Notifications** — in-app + background email dispatcher with URL allow-listing.
+- **Moderation** — report queue for listings and users, auto-hide thresholds, moderation notes, admin dashboards.
+- **i18n** — Romanian (source) and English, language switcher.
+- **UX** — design-token CSS system, dark mode (no flash), PWA (manifest + service worker + offline page), self-hosted fonts/icons.
+- **SEO** — dynamic sitemap/robots, OG/Twitter meta, canonical URLs.
+
+## Public API (`/api/v1`)
+
+Versioned API built with **django-ninja** (OpenAPI 3.1). Read endpoints are public; writes need a bearer key or session. Interactive docs: [`/api/v1/docs`](https://market.micutu.com/api/v1/docs).
+
 ```bash
-python3 -m venv venv
-source venv/bin/activate  # Pe Linux/macOS
-# sau
-venv\Scripts\activate     # Pe Windows
+# Search listings
+curl "https://market.micutu.com/api/v1/listings?q=laptop&min_price=100&sort=price"
+
+# Create a listing (get a key from /api/v1/keys while logged in)
+curl -X POST "https://market.micutu.com/api/v1/listings" \
+  -H "Authorization: Bearer mk_..." \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Laptop", "description": "...", "price": "1200.00"}'
 ```
 
-### 3. Instalarea dependențelor
+The legacy unversioned `/api/` JSON endpoints remain for the site's own AJAX.
+
+## Tech stack
+
+| Layer | Choice |
+| --- | --- |
+| Backend | Python 3.13 · Django 6 · django-ninja · django-allauth |
+| Real-time | Django Channels + Redis channel layer |
+| Data | PostgreSQL 17 (FTS + pg_trgm) · Redis (cache, rate limits) |
+| Serving | Gunicorn (Uvicorn ASGI workers) ← unix socket ← nginx ← Cloudflare |
+| Static/media | WhiteNoise (hashed manifests) · Pillow · optional S3/R2 media backend |
+| Observability | Sentry · request-ID logging · `/healthz` (DB + cache probe) · audit log |
+| Quality | ruff · coverage (70% floor) · bandit · pip-audit · GitHub Actions (Python 3.13/3.14 matrix) |
+
+## Local setup
+
 ```bash
+git clone https://github.com/Alexandru2984/micu-s_market.git && cd micu-s_market
+python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-```
 
-### 4. Configurarea variabilelor de mediu
-Copiați `.env.example` în `.env` și completați valorile. `.env.example` conține toate cheile (Django, DB, Redis, email, R2, storage). Minim pentru dezvoltare:
+cp .env.example .env   # fill in at least: DJANGO_SECRET_KEY, DB_*, CHANNELS_IN_MEMORY=1
 
-```env
-DJANGO_SECRET_KEY="cheie_secreta_pentru_dezvoltare"
-DJANGO_DEBUG=1
-DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost
-
-DB_NAME=micu_market
-DB_USER=micu
-DB_PASS=parola_bazei_de_date
-DB_HOST=127.0.0.1
-DB_PORT=5432
-
-# Redis (cache + channel layer pentru chat real-time).
-# Fără Redis local, pentru dezvoltare/teste poți forța channel layer in-memory:
-CHANNELS_IN_MEMORY=1
-```
-
-### 5. Rularea migrărilor și pornirea serverului
-```bash
 python manage.py migrate
-
-# (Opțional) Populați categoriile implicite
-python populate_categories_script.py
-
-# Creați un cont de administrator (Superuser)
+python populate_categories_script.py   # optional: default categories
 python manage.py createsuperuser
-
-# Porniți serverul de dezvoltare
 python manage.py runserver
 ```
-Aplicația va fi accesibilă la adresa `http://127.0.0.1:8000/`.
 
----
-
-## 🧪 Teste & CI
-
-Rulați suita de teste fără să depindeți de `.env` local (channel layer in-memory, fără Redis):
+### Tests & linting
 
 ```bash
-python manage.py test --settings=Micu_market.settings_test
+python manage.py test --settings=Micu_market.settings_test   # no Redis/.env needed
+ruff check .
+coverage run manage.py test --settings=Micu_market.settings_test && coverage report
 ```
 
-În mediul local din acest repo, `python` poate lipsi din PATH; folosiți `venv/bin/python`.
+CI runs the same plus `manage.py check --deploy`, migration drift checks, `bandit`, and `pip-audit` on every push.
 
-CI (GitHub Actions, `.github/workflows/ci.yml`) rulează pe fiecare push/PR: `manage.py check`, verificare migrații necomise, suita de teste (Python 3.13 & 3.14), `pip-audit`, `bandit` și `check --deploy`.
+## Production
 
----
+Deployed on a self-managed VPS: systemd service (Gunicorn/ASGI over a unix socket), nginx in front (static/media, WebSocket upgrade block, CSP as the single enforced header source), PostgreSQL and Redis as system services, four systemd timers (job worker, email dispatcher, daily backup with R2 offsite upload + verification, media cleanup). Release flow: `scripts/deploy_release.sh` (preflight → migrate → collectstatic → restart → smoke check), with `scripts/rollback_release.sh` on standby.
 
-## 🌐 Configurare Producție
+Docker Compose (`docker-compose.yml`) is provided as an alternative bootstrap; the runbook lives in [`deploy/ops-runbook.md`](deploy/ops-runbook.md).
 
-Producția folosește `settings_production.py` (SSL redirect, cookie `SECURE`/`HTTPONLY`, HSTS, conexiuni DB persistente). Componente:
+## License
 
-* **Aplicație:** serviciu systemd care rulează Gunicorn + worker ASGI peste un unix socket:
-  ```bash
-  gunicorn -c gunicorn.conf.py Micu_market.asgi:application
-  ```
-* **nginx:** servește static/media, proxy către socket și un bloc `location /ws/` cu header-ele de upgrade pentru WebSocket. Atașamentele de chat (`/media/chat/`) sunt blocate la nivel nginx (servite doar de Django, cu autorizare). Vezi `deploy/nginx/` și `deploy/cloudflare-nginx.md`.
-* **Redis** (cache, rate-limit, channel layer) și **PostgreSQL** ca servicii.
-* **Timere systemd** (`deploy/systemd/`): backup zilnic, worker de joburi, dispecer email-uri și cleanup media. Backup-ul face dump local **și** upload offsite în Cloudflare R2 (`scripts/backup_postgres.sh` + `scripts/r2_upload.py`, activat de `R2_ENABLED=1`).
-* **Health check:** `GET /healthz` verifică DB + cache și întoarce `503` dacă pică ceva (potrivit pentru un monitor de uptime).
-
-Pași de deploy și operare: vezi `deploy/ops-runbook.md`.
-
----
-
-## 📄 Licență
-
-Vezi fișierul `LICENSE`.
+[MIT](LICENSE)
