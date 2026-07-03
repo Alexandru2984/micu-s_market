@@ -73,14 +73,19 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-audit.txt
 
+      - name: Lint (ruff)
+        run: ruff check .
+
       - name: Django system check
         run: python manage.py check --settings=Micu_market.settings_test
 
       - name: Check migrations are committed
         run: python manage.py makemigrations --check --dry-run
 
-      - name: Run tests
-        run: python manage.py test --settings=Micu_market.settings_test
+      - name: Run tests with coverage
+        run: |
+          coverage run manage.py test --settings=Micu_market.settings_test
+          coverage report --fail-under=70
 
       - name: Audit Python dependencies
         run: pip-audit -r requirements.txt
