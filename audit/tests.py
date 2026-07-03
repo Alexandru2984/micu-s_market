@@ -1,12 +1,13 @@
-from django.contrib.auth import get_user_model
 from django.contrib.admin.sites import AdminSite
+from django.contrib.auth import get_user_model
 from django.test import Client, RequestFactory, TestCase, override_settings
 from django.urls import reverse
 
-from .models import AuditEvent
 from categories.models import Category
 from listings.admin import ListingAdmin
 from listings.models import Listing
+
+from .models import AuditEvent
 
 User = get_user_model()
 

@@ -2,7 +2,7 @@ import tempfile
 from io import StringIO
 from unittest.mock import patch
 
-from django.core.management import call_command, CommandError
+from django.core.management import CommandError, call_command
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 

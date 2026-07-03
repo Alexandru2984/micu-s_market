@@ -1,8 +1,12 @@
+from datetime import timedelta
+
 from django.contrib import admin
 from django.utils import timezone
-from datetime import timedelta
-from .models import Listing, ListingImage, ListingReport
+
 from audit.utils import audit_log
+
+from .models import Listing, ListingImage, ListingReport
+
 
 class ListingImageInline(admin.TabularInline):
     model = ListingImage

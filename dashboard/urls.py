@@ -1,8 +1,6 @@
 from django.urls import path
-from .views import verify_listings_view
-from .views import reports_list_view
-from .views import dashboard_home_view
-from .views import seller_insights_view
+
+from .views import dashboard_home_view, reports_list_view, seller_insights_view, verify_listings_view
 
 app_name = "dashboard"
 

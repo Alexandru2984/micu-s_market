@@ -1,5 +1,7 @@
 from django.contrib import admin
+
 from audit.utils import audit_log
+
 from .models import UserProfile, UserReport, UserStrike
 
 

@@ -1,7 +1,10 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Listing, ListingImage, ListingReport
+from django.forms import modelformset_factory
+
 from categories.models import Category
+
+from .models import Listing, ListingImage, ListingReport
 
 
 class ListingForm(forms.ModelForm):
@@ -128,15 +131,13 @@ class ListingImageForm(forms.ModelForm):
                 img = PilImage.open(image)
                 img.verify()  # verify() detects corrupt or fake files
                 image.seek(0)  # reset the cursor after verify()
-            except Exception:
-                raise ValidationError('Fişierul nu este o imagine validă.')
+            except Exception as exc:
+                raise ValidationError('Fişierul nu este o imagine validă.') from exc
         
         return image
 
 
 # Formset for multiple images
-from django.forms import modelformset_factory
-
 ListingImageFormSet = modelformset_factory(
     ListingImage,
     form=ListingImageForm,

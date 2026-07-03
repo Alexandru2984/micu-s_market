@@ -1,8 +1,8 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-from django.http import JsonResponse
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 from django_ratelimit.decorators import ratelimit
 
 from .models import Notification

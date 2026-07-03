@@ -49,7 +49,7 @@ class NotificationEmailTestCase(TestCase):
         SITE_URL="https://market.example",
     )
     def test_notification_email_uses_site_url_for_relative_action_url(self):
-        notification = Notification.objects.create(
+        Notification.objects.create(
             recipient=self.user,
             notification_type="new_message",
             title="Mesaj nou",
@@ -67,7 +67,7 @@ class NotificationEmailTestCase(TestCase):
         SITE_URL="https://market.example",
     )
     def test_notification_email_rejects_external_action_url(self):
-        notification = Notification.objects.create(
+        Notification.objects.create(
             recipient=self.user,
             notification_type="new_message",
             title="Mesaj nou",

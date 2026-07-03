@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
+
 import django
 
 # Setup Django
@@ -8,9 +9,11 @@ sys.path.append('/home/micu/Desktop/micu\'s_market/Micu_market')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Micu_market.settings')
 django.setup()
 
-from categories.models import Category
-from django.utils.text import slugify
-from django.db import transaction
+from django.db import transaction  # noqa: E402
+from django.utils.text import slugify  # noqa: E402
+
+from categories.models import Category  # noqa: E402
+
 
 def populate_categories(clear_existing=False):
     

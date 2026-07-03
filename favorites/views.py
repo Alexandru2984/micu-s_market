@@ -1,13 +1,16 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.core.paginator import Paginator
-from django.contrib import messages
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 from django_ratelimit.decorators import ratelimit
-from .models import Favorite
+
 from listings.models import Listing
+
+from .models import Favorite
+
 
 @login_required
 def favorites_list_view(request):
@@ -68,7 +71,7 @@ def toggle_favorite_view(request):
         
     except Listing.DoesNotExist:
         return JsonResponse({'error': 'Anunțul nu a fost găsit'}, status=404)
-    except Exception as e:
+    except Exception:
         return JsonResponse({'error': 'A apărut o eroare'}, status=500)
 
 @login_required

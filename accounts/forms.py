@@ -1,6 +1,7 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+
 from .models import UserProfile, UserReport
 
 User = get_user_model()
@@ -177,8 +178,8 @@ class UserProfileForm(forms.ModelForm):
                 img = PilImage.open(avatar)
                 img.verify()
                 avatar.seek(0)
-            except Exception:
-                raise forms.ValidationError('Fişierul nu este o imagine validă.')
+            except Exception as exc:
+                raise forms.ValidationError('Fişierul nu este o imagine validă.') from exc
         
         return avatar
 

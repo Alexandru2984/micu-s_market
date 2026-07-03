@@ -1,8 +1,9 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
+
 from Micu_market.images import optimize_image_field
 
 User = get_user_model()

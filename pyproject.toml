@@ -1,0 +1,56 @@
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+extend-exclude = [
+    "*/migrations/*",
+    "venv",
+    "staticfiles",
+    "media",
+]
+
+[tool.ruff.lint]
+# Defaults (pyflakes + pycodestyle errors) plus import sorting and common bugbears.
+select = ["E4", "E7", "E9", "F", "I", "B"]
+ignore = [
+    # Allow star re-exports in the settings module chain (settings_production etc.).
+    "F403",
+    "F405",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "Micu_market",
+    "accounts",
+    "api",
+    "audit",
+    "billing",
+    "categories",
+    "chat",
+    "dashboard",
+    "favorites",
+    "jobs",
+    "listings",
+    "notifications",
+    "pages",
+    "reviews",
+    "search",
+]
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "*/migrations/*",
+    "venv/*",
+    "manage.py",
+    "Micu_market/asgi.py",
+    "Micu_market/wsgi.py",
+    "Micu_market/settings*.py",
+    "scripts/*",
+    "*/tests.py",
+    "populate_categories_script.py",
+]
+
+[tool.coverage.report]
+skip_covered = false
+show_missing = false
+precision = 1

@@ -1,10 +1,11 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
-from django.urls import path, include
-from django.conf.urls.static import static
-from django.conf import settings
-from pages.views import healthcheck_view, manifest_view, offline_view, robots_txt, service_worker_view
+from django.urls import include, path
+
 from Micu_market.sitemaps import SITEMAPS
+from pages.views import healthcheck_view, manifest_view, offline_view, robots_txt, service_worker_view
 
 urlpatterns = [
     path("healthz", healthcheck_view, name="healthcheck"),

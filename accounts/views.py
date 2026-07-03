@@ -1,19 +1,20 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, authenticate, logout, get_user_model
-from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.core.paginator import Paginator
-from django.views.decorators.http import require_POST
-from django.db.models import Count
-from django.conf import settings
 from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.http import require_POST
 from django_ratelimit.decorators import ratelimit
-from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfileForm, UserReportForm
-from .models import UserProfile, UserReport
-from listings.models import Listing
+
 from audit.utils import audit_log
+from listings.models import Listing
+
+from .forms import CustomAuthenticationForm, CustomUserCreationForm, UserProfileForm, UserReportForm
+from .models import UserProfile, UserReport
 
 User = get_user_model()
 
@@ -27,7 +28,7 @@ def register_view(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            form.save()
             username = form.cleaned_data.get('username')
             messages.success(request, f'Contul pentru {username} a fost creat cu succes! Te poți autentifica acum.')
             return redirect('accounts:login')

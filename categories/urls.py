@@ -1,7 +1,6 @@
 from django.urls import path
-from .views import subcategory_detail_view
-from .views import category_detail_view
-from .views import category_list_view
+
+from .views import category_detail_view, category_list_view, subcategory_detail_view
 
 urlpatterns = [
 

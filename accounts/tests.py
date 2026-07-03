@@ -3,11 +3,12 @@ Tests for the authentication and profiles system
 """
 from io import BytesIO
 
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, Client, override_settings
-from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import Client, TestCase, override_settings
+from django.urls import reverse
 from PIL import Image as PilImage
+
 from .forms import CustomUserCreationForm, UserProfileForm
 from .models import UserReport
 
@@ -101,7 +102,7 @@ class AuthViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_profile_form_rejects_another_users_email(self):
-        other = User.objects.create_user(
+        User.objects.create_user(
             username='otheruser',
             email='other@example.com',
             password='OtherPass123!',
@@ -168,7 +169,7 @@ class AuthViewsTestCase(TestCase):
         self.assertFalse(UserReport.objects.exists())
 
     def test_user_can_report_another_user_once(self):
-        reporter = User.objects.create_user(
+        User.objects.create_user(
             username='reporter',
             email='reporter@example.com',
             password='ReporterPass123!',

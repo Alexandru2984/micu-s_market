@@ -1,7 +1,10 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
+
 from Micu_market.images import optimize_image_field
 
 User = get_user_model()
@@ -100,9 +103,10 @@ class UserProfile(models.Model):
     
     def update_statistics(self):
         """Update the user's statistics — SQL queries, not Python loops"""
+        from django.db.models import Avg
+
         from listings.models import Listing
         from reviews.models import Review
-        from django.db.models import Avg
 
         # Count active and sold listings
         self.total_listings = Listing.objects.filter(owner=self.user, status='active').count()
@@ -119,9 +123,6 @@ class UserProfile(models.Model):
 
 
 # Signal that automatically creates a profile when a new user is created
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
-
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     """Create the profile and preferences on the user's first save"""

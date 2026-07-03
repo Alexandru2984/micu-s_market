@@ -1,19 +1,19 @@
 import os
 import random
 import urllib.request
-from urllib.parse import urlparse
 from io import BytesIO
-from django.core.management.base import BaseCommand
+from urllib.parse import urlparse
+
 from django.contrib.auth import get_user_model
-from django.utils.text import slugify
-from django.db import transaction
 from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
+from django.core.management.base import BaseCommand
+from django.db import transaction
+from django.utils.text import slugify
 from PIL import Image, ImageDraw, ImageFont
 
+from accounts.models import UserProfile
 from categories.models import Category
 from listings.models import Listing, ListingImage
-from accounts.models import UserProfile
 
 User = get_user_model()
 

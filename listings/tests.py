@@ -1,23 +1,24 @@
 """
 Teste pentru anunțuri — CRUD, access control, validare imagini
 """
-from django.test import TestCase, Client, override_settings
-from django.urls import reverse
-from django.contrib.auth import get_user_model
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.management import call_command
-from django.core.cache import cache
-from django.utils import timezone
-from io import BytesIO
-from pathlib import Path
-from io import StringIO
 import tempfile
 from datetime import timedelta
+from io import BytesIO, StringIO
+from pathlib import Path
+
+from django.contrib.auth import get_user_model
+from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management import call_command
+from django.test import Client, TestCase, override_settings
+from django.urls import reverse
+from django.utils import timezone
 from PIL import Image as PilImage
 
-from .models import Listing, ListingImage, ListingReport
 from categories.models import Category
 from notifications.models import Notification
+
+from .models import Listing, ListingImage, ListingReport
 
 User = get_user_model()
 
@@ -180,7 +181,7 @@ class ListingCRUDTestCase(TestCase):
     def test_pages_home_view_filters_active(self):
         """pages/home_view returns only active listings"""
         # Create an inactive listing
-        inactive = Listing.objects.create(
+        Listing.objects.create(
             title='Anunț inactiv',
             description='Test',
             price=50.00,

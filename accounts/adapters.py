@@ -1,7 +1,8 @@
 # accounts/adapters.py
+import re
+
 from allauth.account.adapter import DefaultAccountAdapter
 from django.contrib.auth.models import User
-import re
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):

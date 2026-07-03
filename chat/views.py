@@ -1,21 +1,23 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
-from django.contrib import messages
-from django.db.models import Q, Count
-from django.http import FileResponse, JsonResponse
-from django.core.paginator import Paginator
-from django.conf import settings
-from django.views.decorators.http import require_GET, require_POST
-from django_ratelimit.decorators import ratelimit
 import logging
 import mimetypes
 
-from .models import Conversation, Message, MessageAttachment
-from .broadcast import broadcast_message
-from .validators import MAX_ATTACHMENTS_PER_MESSAGE, is_allowed_chat_attachment
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import Count, Q
+from django.http import FileResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_GET, require_POST
+from django_ratelimit.decorators import ratelimit
+
 from listings.models import Listing
 from notifications.models import Notification
+
+from .broadcast import broadcast_message
+from .models import Conversation, Message, MessageAttachment
+from .validators import MAX_ATTACHMENTS_PER_MESSAGE, is_allowed_chat_attachment
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -125,7 +127,7 @@ def start_conversation_view(request, listing_slug):
         messages.success(request, f"Conversația despre '{listing.title}' a fost începută cu succes!")
         return redirect('chat:conversation', pk=conversation.pk)
         
-    except Exception as e:
+    except Exception:
         logger.exception("Eroare în start_conversation_view pentru user=%s, listing=%s",
                          request.user, listing_slug)
         messages.error(request, "A apărut o eroare. Te rugăm încearcă din nou.")

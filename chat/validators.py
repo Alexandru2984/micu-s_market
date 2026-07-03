@@ -2,7 +2,6 @@ import zipfile
 
 from PIL import Image as PilImage
 
-
 MAX_ATTACHMENT_SIZE = 10 * 1024 * 1024
 MAX_ATTACHMENTS_PER_MESSAGE = 5
 MAX_OFFICE_ARCHIVE_FILES = 1000

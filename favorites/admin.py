@@ -1,5 +1,7 @@
 from django.contrib import admin
+
 from .models import Favorite, SavedSearch
+
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):

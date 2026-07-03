@@ -1,9 +1,10 @@
-from django.db import models
+from pathlib import PurePath
+
 from django.contrib.auth import get_user_model
+from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import get_valid_filename
-from pathlib import PurePath
 
 User = get_user_model()
 

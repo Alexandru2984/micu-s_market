@@ -8,6 +8,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from chat.models import Message
+
 from .consumers import user_group
 
 logger = logging.getLogger(__name__)

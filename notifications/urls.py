@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import mark_read_view
-from .views import notifications_list_view
+
+from .views import mark_read_view, notifications_list_view
 
 app_name = "notifications"
 

@@ -2,8 +2,9 @@
 Django settings for Micu_market project.
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 
 # ======================

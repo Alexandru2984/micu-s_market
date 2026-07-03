@@ -6,7 +6,6 @@ from django.utils import timezone
 from audit.utils import audit_log
 from notifications.models import Notification
 
-
 PHONE_RE = re.compile(r"(?<!\d)(?:\+?4?0|0)?(?:\s|-|\.)?\d(?:\s|-|\.?\d){7,}(?!\d)")
 URL_RE = re.compile(r"https?://|www\.", re.IGNORECASE)
 

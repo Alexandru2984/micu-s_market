@@ -9,19 +9,20 @@ from io import BytesIO
 
 from asgiref.sync import async_to_sync
 from asgiref.testing import ApplicationCommunicator
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, TransactionTestCase, Client, override_settings
+from django.test import Client, TestCase, TransactionTestCase, override_settings
 from django.urls import reverse
-from django.contrib.auth import get_user_model
+
+from categories.models import Category
+from listings.models import Listing
+from notifications.models import Notification
 
 from .consumers import ChatConsumer
 from .models import Conversation, Message, MessageAttachment
 from .validators import is_allowed_chat_attachment
-from listings.models import Listing
-from categories.models import Category
-from notifications.models import Notification
 
 User = get_user_model()
 

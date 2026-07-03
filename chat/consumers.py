@@ -96,8 +96,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def _save_message(self, content):
-        from .models import Conversation, Message
         from notifications.models import Notification
+
+        from .models import Conversation, Message
 
         conversation = Conversation.objects.get(pk=self.conversation_id)
         receiver = conversation.get_other_participant(self.user)

@@ -5,11 +5,12 @@ from django.db import connections
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.templatetags.static import static
-from django.views.decorators.cache import cache_control
-from django.views.decorators.cache import never_cache
+from django.views.decorators.cache import cache_control, never_cache
 from django.views.decorators.http import require_GET
-from listings.models import Listing
+
 from categories.models import Category
+from listings.models import Listing
+
 # Create your views here.
 
 

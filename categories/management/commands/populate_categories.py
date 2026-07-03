@@ -1,7 +1,8 @@
 from django.core.management.base import BaseCommand
-from categories.models import Category
-from django.utils.text import slugify
 from django.db import transaction
+from django.utils.text import slugify
+
+from categories.models import Category
 
 
 class Command(BaseCommand):
@@ -199,7 +200,7 @@ class Command(BaseCommand):
         total_subcategories = Category.objects.filter(parent__isnull=False).count()
         
         self.stdout.write('\n' + '='*50)
-        self.stdout.write(self.style.SUCCESS(f'FINALIZAT!'))
+        self.stdout.write(self.style.SUCCESS('FINALIZAT!'))
         self.stdout.write(self.style.SUCCESS(f'Total categorii principale: {total_categories}'))
         self.stdout.write(self.style.SUCCESS(f'Total subcategorii: {total_subcategories}'))
         self.stdout.write(self.style.SUCCESS(f'Total general: {total_categories + total_subcategories}'))
