@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from audit.utils import audit_log
 
-from .models import Listing, ListingImage, ListingReport
+from .models import Listing, ListingImage, ListingReport, ListingTransaction
 
 
 class ListingImageInline(admin.TabularInline):
@@ -170,3 +170,12 @@ class ListingImageAdmin(admin.ModelAdmin):
     def data_creare(self, obj):
         return obj.created_at.strftime('%d.%m.%Y %H:%M')
     data_creare.short_description = 'Creat la'
+
+
+@admin.register(ListingTransaction)
+class ListingTransactionAdmin(admin.ModelAdmin):
+    list_display = ('listing', 'seller', 'buyer', 'sold_price', 'created_at')
+    search_fields = ('listing__title', 'seller__username', 'buyer__username')
+    autocomplete_fields = ('listing', 'seller', 'buyer')
+    readonly_fields = ('created_at',)
+    list_select_related = ('listing', 'seller', 'buyer')

@@ -12,6 +12,7 @@ urlpatterns = [
     path('adauga/', views.listing_create_view, name='create'),
     path('anunt/<slug:slug>/editeaza/', views.listing_update_view, name='update'),
     path('anunt/<slug:slug>/sterge/', views.listing_delete_view, name='delete'),
+    path('anunt/<slug:slug>/vandut/', views.listing_mark_sold_view, name='mark_sold'),
     path('anunturile-mele/', views.my_listings_view, name='my_listings'),
     path('anunt/<slug:slug>/imagini/', views.upload_images_view, name='upload_images'),
 ]

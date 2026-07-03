@@ -13,6 +13,16 @@ class Review(models.Model):
     reviewed_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews_received', verbose_name="Utilizator recenzat")
     # The listing the review is about (optional)
     listing = models.ForeignKey('listings.Listing', on_delete=models.SET_NULL, null=True, blank=True, related_name='reviews', verbose_name="Anunț")
+    # The confirmed sale this review is based on (set automatically when the
+    # listing was marked sold to a buyer and the reviewer is part of the pair)
+    transaction = models.ForeignKey(
+        'listings.ListingTransaction',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reviews',
+        verbose_name="Tranzacție",
+    )
 
     # The review content
     rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], verbose_name="Rating")
@@ -40,6 +50,10 @@ class Review(models.Model):
     
     def __str__(self):
         return f"Review de la {self.reviewer.username} pentru {self.reviewed_user.username} - {self.rating}★"
+
+    @property
+    def is_verified_transaction(self):
+        return self.transaction_id is not None
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

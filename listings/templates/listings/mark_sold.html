@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block title %}{% trans "Marchează ca vândut" %} - Micu's Market{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center gap-3">
+                <a href="{% url 'listings:my_listings' %}" class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">{% trans "Marchează ca vândut" %}</h1>
+                    <p class="text-gray-600">{{ listing.title }} — {{ listing.price|floatformat:0 }} RON</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Buyer selection -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1">{% trans "Cui ai vândut?" %}</h3>
+                    <p class="text-sm text-gray-500 mb-4">
+                        {% trans "Dacă alegi un cumpărător, amândoi veți putea lăsa recenzii marcate ca tranzacție verificată." %}
+                    </p>
+
+                    <div class="space-y-2">
+                        {% for candidate in buyer_candidates %}
+                            <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="buyer" value="{{ candidate.pk }}"
+                                       class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300">
+                                <span class="flex items-center gap-2">
+                                    <i class="fas fa-user-circle text-gray-400"></i>
+                                    <span class="font-medium text-gray-900">{{ candidate.get_full_name|default:candidate.username }}</span>
+                                    <span class="text-sm text-gray-500">@{{ candidate.username }}</span>
+                                </span>
+                            </label>
+                        {% empty %}
+                            <p class="text-sm text-gray-500 italic">
+                                {% trans "Nu ai conversații pe acest anunț — poți marca doar vânzare în afara platformei." %}
+                            </p>
+                        {% endfor %}
+
+                        <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                            <input type="radio" name="buyer" value="" checked
+                                   class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300">
+                            <span class="flex items-center gap-2">
+                                <i class="fas fa-store-slash text-gray-400"></i>
+                                <span class="font-medium text-gray-900">{% trans "Vândut în afara platformei" %}</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Final price (optional) -->
+                <div>
+                    <label for="sold_price" class="block text-sm font-medium text-gray-700 mb-1">
+                        {% trans "Preț final (opțional)" %}
+                    </label>
+                    <input type="number" name="sold_price" id="sold_price" step="0.01" min="0"
+                           placeholder="{{ listing.price|floatformat:2 }}"
+                           class="form-control w-48">
+                </div>
+
+                <!-- Action buttons -->
+                <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                    <a href="{% url 'listings:my_listings' %}" class="btn-cancel">
+                        {% trans "Anulează" %}
+                    </a>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-handshake"></i>
+                        {% trans "Confirmă vânzarea" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

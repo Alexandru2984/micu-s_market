@@ -4,11 +4,13 @@ from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.db.models import Count, F, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django_ratelimit.decorators import ratelimit
@@ -19,7 +21,7 @@ from favorites.models import Favorite
 from notifications.models import Notification
 
 from .forms import ListingForm, ListingImageForm, ListingImageFormSet, ListingReportForm
-from .models import Listing, ListingReport
+from .models import Listing, ListingReport, ListingTransaction
 from .moderation import apply_listing_risk_review
 from .search import apply_listing_search, order_search_results
 
@@ -359,6 +361,83 @@ def listing_delete_view(request, slug):
     
     context = {'listing': listing}
     return render(request, 'listings/delete.html', context)
+
+@login_required
+def listing_mark_sold_view(request, slug):
+    """Mark a listing as sold, optionally to a buyer from its chat conversations.
+
+    Creates a ListingTransaction so reviews between the pair count as a
+    verified transaction. Buyer is optional (sold outside the platform).
+    """
+    listing = get_object_or_404(
+        Listing,
+        slug=slug,
+        owner=request.user,
+        status__in=["active", "reserved"],
+    )
+    User = get_user_model()
+    buyer_candidates = (
+        User.objects.filter(conversations__listing=listing)
+        .exclude(pk=request.user.pk)
+        .distinct()
+        .order_by("username")
+    )
+
+    if request.method == 'POST':
+        buyer = None
+        buyer_id = request.POST.get('buyer')
+        if buyer_id:
+            buyer = buyer_candidates.filter(pk=buyer_id).first()
+            if buyer is None:
+                messages.error(request, "Cumpărătorul selectat nu este valid.")
+                return redirect('listings:mark_sold', slug=listing.slug)
+
+        sold_price = _parse_price_filter(request.POST.get('sold_price'))
+
+        listing.status = 'sold'
+        listing.save(update_fields=['status', 'updated_at'])
+        transaction = ListingTransaction.objects.create(
+            listing=listing,
+            seller=request.user,
+            buyer=buyer,
+            sold_price=sold_price,
+        )
+        audit_log(
+            "listing.mark_sold",
+            request=request,
+            obj=listing,
+            metadata={"transaction_id": transaction.pk, "buyer_id": buyer.pk if buyer else None},
+        )
+        if hasattr(request.user, 'profile'):
+            request.user.profile.update_statistics()
+
+        if buyer:
+            Notification.objects.create(
+                recipient=buyer,
+                notification_type="listing_sold",
+                title="Tranzacție confirmată",
+                message=(
+                    f"{request.user.get_full_name() or request.user.username} a confirmat că ți-a vândut "
+                    f"\"{listing.title}\". Poți lăsa o recenzie."
+                ),
+                related_object_type="Listing",
+                related_object_id=listing.pk,
+                action_url=reverse(
+                    'reviews:create_review_listing',
+                    kwargs={'username': request.user.username, 'listing_slug': listing.slug},
+                ),
+            )
+            messages.success(request, f"Anunțul a fost marcat ca vândut către {buyer.username}.")
+        else:
+            messages.success(request, "Anunțul a fost marcat ca vândut.")
+        return redirect('listings:my_listings')
+
+    context = {
+        'listing': listing,
+        'buyer_candidates': buyer_candidates,
+    }
+    return render(request, 'listings/mark_sold.html', context)
+
 
 @login_required
 def my_listings_view(request):

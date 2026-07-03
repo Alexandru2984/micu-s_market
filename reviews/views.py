@@ -18,7 +18,20 @@ from .models import Review
 User = get_user_model()
 
 
+def _listing_transaction(listing):
+    if listing is None:
+        return None
+    return getattr(listing, 'transaction', None)
+
+
 def _can_review_transaction(reviewer, reviewed_user, listing=None):
+    # A confirmed sale with a buyer restricts reviews on that listing to the
+    # exact seller/buyer pair; without one we fall back to "had a relevant
+    # conversation".
+    transaction = _listing_transaction(listing)
+    if transaction is not None and transaction.buyer_id is not None:
+        return transaction.involves(reviewer, reviewed_user)
+
     conversations = Conversation.objects.filter(
         participants=reviewer,
         is_active=True,
@@ -110,6 +123,9 @@ def create_review_view(request, username, listing_slug=None):
             review.reviewer = request.user
             review.reviewed_user = reviewed_user
             review.listing = listing
+            transaction = _listing_transaction(listing)
+            if transaction is not None and transaction.involves(request.user, reviewed_user):
+                review.transaction = transaction
             review.save()
             
             messages.success(request, "Review-ul a fost adăugat cu succes!")

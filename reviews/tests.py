@@ -245,3 +245,75 @@ class ReviewSecurityTestCase(TestCase):
 
         self.reviewed.profile.refresh_from_db()
         self.assertEqual(self.reviewed.profile.average_rating, 0)
+
+
+class TransactionReviewGatingTestCase(TestCase):
+    """Reviews on a listing with a confirmed sale are restricted to the pair."""
+
+    def setUp(self):
+        self.client = Client()
+        self.seller = User.objects.create_user(
+            username='tx-seller', email='tx-seller@example.com', password='SellerPass123!',
+        )
+        self.buyer = User.objects.create_user(
+            username='tx-buyer', email='tx-buyer@example.com', password='BuyerPass123!',
+        )
+        self.bystander = User.objects.create_user(
+            username='tx-bystander', email='tx-bystander@example.com', password='ByPass123!',
+        )
+        category = Category.objects.create(name='TX Cat', slug='tx-cat', is_active=True)
+        self.listing = Listing.objects.create(
+            title='Produs tranzactie',
+            description='Test',
+            price=300.00,
+            owner=self.seller,
+            category=category,
+            city='Brasov',
+            status='sold',
+        )
+        # Both the buyer and a bystander talked to the seller about the listing.
+        for participant in (self.buyer, self.bystander):
+            conversation = Conversation.objects.create(listing=self.listing)
+            conversation.participants.add(self.seller, participant)
+
+        from listings.models import ListingTransaction
+        self.transaction = ListingTransaction.objects.create(
+            listing=self.listing,
+            seller=self.seller,
+            buyer=self.buyer,
+        )
+
+    def _post_review(self, username):
+        return self.client.post(
+            reverse('reviews:create_review_listing', kwargs={
+                'username': self.seller.username,
+                'listing_slug': self.listing.slug,
+            }),
+            {'rating': 5, 'comment': 'Totul ok', 'transaction_type': 'purchase'},
+        )
+
+    def test_buyer_review_is_linked_to_transaction(self):
+        self.client.login(username='tx-buyer', password='BuyerPass123!')
+        response = self._post_review('tx-buyer')
+        self.assertEqual(response.status_code, 302)
+
+        review = Review.objects.get(reviewer=self.buyer, reviewed_user=self.seller)
+        self.assertEqual(review.transaction, self.transaction)
+        self.assertTrue(review.is_verified_transaction)
+
+    def test_bystander_cannot_review_sold_listing(self):
+        self.client.login(username='tx-bystander', password='ByPass123!')
+        response = self._post_review('tx-bystander')
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Review.objects.filter(reviewer=self.bystander).exists())
+
+    def test_conversation_fallback_when_sold_without_buyer(self):
+        self.transaction.buyer = None
+        self.transaction.save(update_fields=['buyer'])
+
+        self.client.login(username='tx-bystander', password='ByPass123!')
+        response = self._post_review('tx-bystander')
+        self.assertEqual(response.status_code, 302)
+        review = Review.objects.get(reviewer=self.bystander, reviewed_user=self.seller)
+        self.assertIsNone(review.transaction)
+        self.assertFalse(review.is_verified_transaction)

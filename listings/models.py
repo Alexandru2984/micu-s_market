@@ -131,6 +131,64 @@ class ListingImage(models.Model):
                 type(self).objects.filter(pk=self.pk).update(image=optimized_name)
 
 
+class ListingTransaction(models.Model):
+    """Record of a completed sale for a listing.
+
+    ``buyer`` is one of the users the seller talked to in chat about this
+    listing; it stays NULL when the item was sold outside the platform.
+    Reviews link to this record so ratings reflect real transactions.
+    """
+
+    listing = models.OneToOneField(
+        Listing,
+        on_delete=models.CASCADE,
+        related_name="transaction",
+        verbose_name="Anunț",
+    )
+    seller = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="sales",
+        verbose_name="Vânzător",
+    )
+    buyer = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="purchases",
+        verbose_name="Cumpărător",
+    )
+    sold_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Preț final",
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Vândut la")
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Tranzacție anunț"
+        verbose_name_plural = "Tranzacții anunțuri"
+        indexes = [
+            models.Index(fields=["seller", "-created_at"]),
+            models.Index(fields=["buyer", "-created_at"]),
+        ]
+
+    def __str__(self):
+        buyer = self.buyer.username if self.buyer else "în afara platformei"
+        return f"{self.listing.title} → {buyer}"
+
+    def involves(self, first_user, second_user):
+        """True when the two users are exactly the seller/buyer pair."""
+        if self.buyer is None:
+            return False
+        pair = {self.seller_id, self.buyer_id}
+        return {first_user.pk, second_user.pk} == pair
+
+
 class ListingReport(models.Model):
     REASON_CHOICES = [
         ("scam", "Înșelătorie"),

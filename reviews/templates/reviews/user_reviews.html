@@ -20,8 +20,13 @@
     <div style="padding:.6rem 0;border-bottom:1px solid #f2f4f7">
       <div style="font-size:.95rem;color:#334155">
         {% trans "Utilizator" as default_user %}
-        <strong>{{ r.author.username|default:default_user }}</strong>
+        <strong>{{ r.reviewer.username|default:default_user }}</strong>
         <span style="color:#94a3b8"> • {{ r.created_at|date:"j M Y" }}</span>
+        {% if r.is_verified_transaction %}
+          <span style="display:inline-flex;align-items:center;gap:.25rem;margin-left:.4rem;padding:.1rem .5rem;border-radius:999px;background:#ecfdf5;color:#047857;font-size:.78rem;font-weight:600">
+            ✓ {% trans "Tranzacție verificată" %}
+          </span>
+        {% endif %}
       </div>
       <div style="color:#f59e0b;letter-spacing:.05em;margin:.15rem 0">
         {# simple stars, no dependencies #}

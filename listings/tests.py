@@ -16,9 +16,10 @@ from django.utils import timezone
 from PIL import Image as PilImage
 
 from categories.models import Category
+from chat.models import Conversation
 from notifications.models import Notification
 
-from .models import Listing, ListingImage, ListingReport
+from .models import Listing, ListingImage, ListingReport, ListingTransaction
 
 User = get_user_model()
 
@@ -448,3 +449,83 @@ class MediaCleanupCommandTestCase(TestCase):
 
                 self.assertIn("orphans/old.txt", output.getvalue())
                 self.assertTrue(orphan.exists())
+
+
+class MarkSoldTestCase(TestCase):
+    """Tests for the mark-as-sold flow and ListingTransaction."""
+
+    def setUp(self):
+        self.client = Client()
+        self.seller = User.objects.create_user(
+            username='ms-seller', email='ms-seller@example.com', password='SellerPass123!',
+        )
+        self.buyer = User.objects.create_user(
+            username='ms-buyer', email='ms-buyer@example.com', password='BuyerPass123!',
+        )
+        self.stranger = User.objects.create_user(
+            username='ms-stranger', email='ms-stranger@example.com', password='StrangerPass123!',
+        )
+        self.category = Category.objects.create(name='MS Cat', slug='ms-cat', is_active=True)
+        self.listing = Listing.objects.create(
+            title='Produs vandut',
+            description='Test',
+            price=200.00,
+            owner=self.seller,
+            category=self.category,
+            city='Cluj',
+            status='active',
+        )
+        conversation = Conversation.objects.create(listing=self.listing)
+        conversation.participants.add(self.seller, self.buyer)
+        self.url = reverse('listings:mark_sold', kwargs={'slug': self.listing.slug})
+
+    def test_only_owner_can_mark_sold(self):
+        self.client.login(username='ms-buyer', password='BuyerPass123!')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_confirmation_page_lists_chat_partners(self):
+        self.client.login(username='ms-seller', password='SellerPass123!')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'ms-buyer')
+        self.assertNotContains(response, 'ms-stranger')
+
+    def test_mark_sold_to_buyer_creates_transaction_and_notification(self):
+        self.client.login(username='ms-seller', password='SellerPass123!')
+        response = self.client.post(self.url, {'buyer': self.buyer.pk, 'sold_price': '180'})
+        self.assertEqual(response.status_code, 302)
+
+        self.listing.refresh_from_db()
+        self.assertEqual(self.listing.status, 'sold')
+
+        transaction = ListingTransaction.objects.get(listing=self.listing)
+        self.assertEqual(transaction.seller, self.seller)
+        self.assertEqual(transaction.buyer, self.buyer)
+        self.assertEqual(transaction.sold_price, 180)
+
+        notification = Notification.objects.get(recipient=self.buyer, notification_type='listing_sold')
+        self.assertIn(self.listing.title, notification.message)
+
+    def test_mark_sold_outside_platform_has_no_buyer(self):
+        self.client.login(username='ms-seller', password='SellerPass123!')
+        response = self.client.post(self.url, {'buyer': ''})
+        self.assertEqual(response.status_code, 302)
+
+        transaction = ListingTransaction.objects.get(listing=self.listing)
+        self.assertIsNone(transaction.buyer)
+        self.assertFalse(Notification.objects.filter(notification_type='listing_sold').exists())
+
+    def test_rejects_buyer_without_conversation(self):
+        self.client.login(username='ms-seller', password='SellerPass123!')
+        response = self.client.post(self.url, {'buyer': self.stranger.pk})
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(ListingTransaction.objects.filter(listing=self.listing).exists())
+        self.listing.refresh_from_db()
+        self.assertEqual(self.listing.status, 'active')
+
+    def test_sold_listing_cannot_be_marked_again(self):
+        self.client.login(username='ms-seller', password='SellerPass123!')
+        self.client.post(self.url, {'buyer': ''})
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
