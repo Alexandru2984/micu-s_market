@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "storages",
     "channels",
+    "ninja",  # /api/v1 + self-hosted Swagger static assets
 
     # allauth
     "allauth",
