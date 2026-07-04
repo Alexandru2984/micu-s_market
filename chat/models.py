@@ -1,12 +1,24 @@
 from pathlib import PurePath
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import get_valid_filename
 
 User = get_user_model()
+
+
+def private_attachment_storage():
+    """Local-disk storage for chat attachments regardless of default storage.
+
+    Attachments are private: nginx blocks /media/chat/ and Django serves
+    them only to conversation participants. They must never land in the
+    public media bucket when MEDIA_STORAGE_BACKEND=s3.
+    """
+    return FileSystemStorage(location=settings.MEDIA_ROOT, base_url=settings.MEDIA_URL)
 
 class Conversation(models.Model):
     """Conversation between two users about a listing"""
@@ -77,7 +89,11 @@ class Message(models.Model):
 class MessageAttachment(models.Model):
     """Attachments for messages (images, documents)"""
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='attachments', verbose_name="Mesaj")
-    file = models.FileField(upload_to='chat/private/attachments/', verbose_name="Fișier")
+    file = models.FileField(
+        upload_to='chat/private/attachments/',
+        storage=private_attachment_storage,
+        verbose_name="Fișier",
+    )
     filename = models.CharField(max_length=255, verbose_name="Nume fișier")
     file_type = models.CharField(max_length=50, verbose_name="Tip fișier")
     file_size = models.IntegerField(verbose_name="Dimensiune fișier")
