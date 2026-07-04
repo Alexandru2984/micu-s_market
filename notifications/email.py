@@ -16,6 +16,7 @@ EMAIL_TYPE_PREFERENCES = {
     "listing_approved": "email_listing_updates",
     "listing_rejected": "email_listing_updates",
     "price_alert": "email_price_alerts",
+    "new_listing_in_category": "email_price_alerts",
     "account_verification": "email_listing_updates",
     "system": "email_listing_updates",
 }
