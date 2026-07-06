@@ -25,5 +25,5 @@ websockets==16.0
 
 # Transitive dependency floors pinned for known CVE fixes (pip-audit).
 PyJWT>=2.13.0
-sqlparse>=0.5.4
+sqlparse>=0.5.5
 Pygments>=2.20.0
